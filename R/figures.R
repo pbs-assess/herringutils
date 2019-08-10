@@ -1,0 +1,719 @@
+#' Plot catch from a data frames as extracted from iscam data (dat) files
+#'
+#' @param df a data frame as constructed by [get_catch()]
+#' @param xlim Limits for the years shown on the plot
+#' @param translate Logical. If TRUE, translate to French
+#'
+#' @importFrom ggplot2 ggplot aes geom_bar scale_x_continuous expand_limits scale_fill_grey theme labs facet_wrap
+#' @importFrom rosettafish en2fr
+#' @export
+#' @return A ggplot object
+plot_catch <- function(df,
+                       xlim = c(1000, 3000),
+                       translate = FALSE){
+  g <- ggplot(df, aes(x = year, y = value)) +
+    geom_bar(stat = "identity", position = "stack", aes(fill = gear), width = 1) +
+    scale_x_continuous(limits = xlim) +
+    expand_limits(x = xlim[1]:xlim[2]) +
+    scale_fill_grey(start = 0, end = 0.8) +
+    theme(legend.position = "top") +
+    labs(x = en2fr("Year", translate),
+         y = paste(en2fr("Catch", translate), " (1000 t)"),
+         fill = en2fr("Gear", translate)) +
+    facet_wrap( ~ region, ncol = 2, dir = "v", scales = "free_y" )
+  g
+}
+
+#' Plot weight-at-age time series from a data frames as extracted from iscam data (dat) files
+#'
+#' @param df a data frame as constructed by [get_wa()]
+#' @param circle_age the age for which to add circles to plot
+#' @param xlim Limits for the years shown on the plot
+#' @param ylim limits for the weights shown on the plot
+#' @param translate Logical. If TRUE, translate to French
+#'
+#' @importFrom dplyr filter as_tibble rename mutate group_by ungroup select %>%
+#' @importFrom ggplot2 ggplot aes geom_line geom_point coord_cartesian expand_limits labs facet_wrap
+#' @importFrom reshape2 melt
+#' @importFrom rosettafish en2fr
+#' @importFrom zoo rollmean
+
+#' @export
+#' @return A ggplot object
+plot_wa <- function(df,
+                    circle_age = 3,
+                    xlim = c(1000, 3000),
+                    ylim = c(0, NA),
+                    translate = FALSE){
+  df <- df %>%
+    filter(year >= xlim[1])
+  dfm <- melt(df, id.vars = c("year", "area", "group", "sex", "region", "gear")) %>%
+    as_tibble() %>%
+    rename(Year = year,
+           Age = variable,
+           Weight = value) %>%
+    select(-c(area, group, sex)) %>%
+    group_by(region, Age) %>%
+    mutate(muWeight = rollmean(x = Weight, k = 5, align = "right", na.pad = TRUE)) %>%
+    ungroup() %>%
+    mutate(Age = factor(Age))
+  dfm_circle_age <- dfm %>%
+    filter(Age == circle_age) %>%
+    filter(!is.na(muWeight))
+  dfm <- dfm %>%
+    filter(Age != circle_age)
+  g <- ggplot(dfm) +
+    geom_line(aes(x = Year, y = muWeight, group = Age)) +
+    geom_point(data = dfm_circle_age,
+               aes(x = Year, y = Weight),
+               shape = 1,
+               size = 2) +
+    geom_line(data = dfm_circle_age,
+              aes(x = Year, y = muWeight),
+              size = 2) +
+    coord_cartesian(xlim, ylim) +
+    expand_limits(x = xlim[1]:xlim[2]) +
+    labs(x = en2fr("Year", translate),
+         y = paste0(en2fr("Weight-at-age", translate), " (kg)")) +
+    facet_wrap( ~ region, ncol = 2, dir = "v", scales = "free_y" )
+  g
+}
+
+#' Plot proportions-at-age time series from a data frames as extracted from iscam data (dat) files
+#'
+#' @param df a data frame as constructed by [get_pa()]
+#' @param age_plus age plus group
+#' @param conf confidence value for the envelope
+#' @param xlim limits for the years shown on the plot
+#' @param ylim limits for the ages shown on the plot
+#' @param size_range vector of min and max for range of sizes of points
+#' @param translate Logical. If TRUE, translate to French
+#'
+#' @importFrom dplyr filter as_tibble rename mutate group_by ungroup select summarize
+#' @importFrom ggplot2 ggplot aes geom_point geom_path scale_size_continuous geom_ribbon
+#' coord_cartesian expand_limits labs facet_wrap theme
+#' @importFrom reshape2 melt
+#' @importFrom rosettafish en2fr
+#' @export
+#' @return A ggplot object
+plot_pa <- function(df,
+                    age_plus = 10,
+                    conf = 0.9,
+                    xlim = c(1000, 3000),
+                    ylim = c(0, NA),
+                    size_range = c(0.5, 2),
+                    translate = FALSE){
+  df <- df %>%
+    filter(year >= xlim[1])
+  dfm <- melt(df, id.vars = c("year", "area", "group", "sex", "region", "gear")) %>%
+    as_tibble() %>%
+    rename(Region = region,
+           Year = year,
+           Age = variable,
+           Number = value) %>%
+    select(-c(area, group, sex)) %>%
+    mutate(Age = as.numeric(as.character(Age)),
+           Age = ifelse(Age > age_plus, age_plus, Age)) %>%
+    group_by(Region, Year, Age) %>%
+    summarize(Number = sum(Number)) %>%
+    mutate(Proportion = Number / ifelse(all(is.na(Number)), NA, sum(Number, na.rm = TRUE))) %>%
+    ungroup() %>%
+    mutate(Age = factor(Age))
+
+  # Determine weighted mean and approximate CI age by year
+  dfm_ci <- dfm %>%
+    select(Region, Year, Age, Proportion) %>%
+    mutate(Age = as.numeric(Age)) %>%
+    group_by(Region, Year) %>%
+    summarize(MeanAge = weighted.mean(x = Age, w = Proportion),
+              sBar = qnorm(1 - (1 - conf) / 2) * sum(sqrt(Proportion * (1 - Proportion)) / sqrt(Age)),
+              Lower = exp(log(MeanAge) - log(sBar)),
+              Upper = exp(log(MeanAge) + log(sBar))) %>%
+    ungroup() %>%
+    mutate(GroupID = consecutive_group(Year))
+
+  g <- ggplot(dfm, aes(x = Year)) +
+    geom_point(aes(y = Age,
+                   size = ifelse(Proportion, Proportion, NA))) +
+    geom_path(data = dfm_ci,
+              aes(y = MeanAge, group = GroupID), size = 2) +
+    scale_size_continuous(range = size_range) +
+    geom_ribbon(data = dfm_ci,
+                aes(ymin = Lower, ymax = Upper, group = GroupID),
+                alpha = 0.25) +
+    coord_cartesian(xlim, ylim) +
+    expand_limits(x = xlim[1]:xlim[2]) +
+    labs(size = en2fr("Proportion", translate),
+         x = en2fr("Age", translate),
+         y = en2fr("Year", translate)) +
+    facet_wrap(~ Region, ncol = 2, dir = "v", scales = "free_y" ) +
+    theme(legend.position = "top")
+  g
+}
+
+#' Plot survey indices from data frames as extracted from iscam data (dat) files
+#'
+#' @param df a data frame as constructed by [get_surv_ind()]
+#' @param xlim limits for the years shown on the plot
+#' @param ylim limits for the ages shown on the plot
+#' @param translate Logical. If TRUE, translate to French
+#' @param new_surv_yr Year in which the survey type changed. Will be shown as a vertical line
+#' @param new_surv_yr_type ggplot linetype for new_survey_yr
+#' @param new_surv_yr_size ggplot line size for new_survey_yr
+#'
+#' @importFrom dplyr filter select mutate as_tibble rename
+#' @importFrom reshape2 melt
+#' @importFrom ggplot2 ggplot aes geom_line geom_point coord_cartesian expand_limits scale_shape_manual
+#'  labs xlab ylab facet_wrap geom_vline theme
+#' @export
+#' @return A ggplot object
+plot_herring_spawn_ind <- function(df,
+                                   xlim = c(1000, 3000),
+                                   ylim = NA,
+                                   new_surv_yr = NA,
+                                   new_surv_yr_type = "dashed",
+                                   new_surv_yr_size = 0.25,
+                                   translate = FALSE){
+  stopifnot(!is.na(new_surv_yr),
+            is.numeric(new_surv_yr),
+            length(new_surv_yr) == 1)
+
+  df <- df %>%
+    filter(year >= xlim[1]) %>%
+    mutate(gear = ifelse(year < new_surv_yr, "Surface", "Dive"),
+           gear = factor(gear)) %>%
+    select(-qind)
+
+  dfm <- melt(df, id.vars = c("year", "area", "group", "sex", "region", "wt", "timing", "gear")) %>%
+    as_tibble() %>%
+    rename(Region = region,
+           Year = year,
+           Index = value) %>%
+    select(-c(area, group, sex, wt, timing))
+
+  g <- ggplot(dfm, aes(x = Year, y = Index)) +
+    geom_point(aes(shape = gear)) +
+    geom_line(aes(group = gear)) +
+    scale_shape_manual(values = c(2, 1)) +
+    geom_vline(xintercept = new_surv_yr - 0.5, linetype = new_surv_yr_type, size = new_surv_yr_size) +
+    expand_limits(x = xlim[1]:xlim[2]) +
+    labs(shape = en2fr("Survey period", translate),
+         x = en2fr("Year", translate),
+         y = paste0(en2fr("Spawn index", translate), " (1000 t)")) +
+    facet_wrap(~ Region, ncol = 2, dir = "v", scales = "free_y" ) +
+    theme(legend.position="top")
+  if(!is.na(ylim[1])){
+    g <- g +
+      coord_cartesian(xlim, ylim)
+  }
+  g
+}
+
+#' Plot the median SSB as a line, with points which are survey index scaled by catchability value
+#' for the survey
+#'
+#' @param df Data frame of the survey estimates, as constructed by [get_surv_ind()]
+#' @param model an iscam model object
+#' @param gear a gear data frame containing `gear`, `gearname`, and `qind` columns
+#' @param new_surv_yr the year when the survey changed from surface to dive
+#' @param point_size size for points
+#' @param line_size thickness of line
+#' @param annot a character to place in parentheses in the top left of the plot.
+#' If NA, nothing will appear
+#' @param show_x_axis Logical
+#' @param show_legend Logical
+#' @param translate Logical. If TRUE, translate to french
+#'
+#' @importFrom dplyr filter select mutate as_tibble rename
+#' @importFrom reshape2 melt
+#' @importFrom ggplot2 ggplot aes geom_line geom_point scale_shape_manual ylab annotate
+#' xlab theme guides element_text element_blank
+#' @export
+#' @return A ggplot object
+plot_scaled_abundance <- function(df,
+                                  model,
+                                  gear,
+                                  new_surv_yr = NA,
+                                  point_size = 2,
+                                  line_size = 2,
+                                  annot = NA,
+                                  show_x_axis = TRUE,
+                                  show_legend = FALSE,
+                                  translate = FALSE){
+  if(length(unique(df$region)) > 1){
+    stop("There is more than one region in the df data frame", call. = FALSE)
+  }
+  pars <- model$mcmccalcs$p.quants[2,]
+  qs <- pars[grep("^q[0-9]$", names(pars))]
+  names(qs) <- gsub("q", "", names(qs))
+  qs <- qs %>%
+    melt(qs) %>%
+    as_tibble(rownames = "qind") %>%
+    mutate(qind = as.numeric(qind))
+
+  dfm <- full_join(df, qs, by = "qind") %>%
+    rename(qmedian = value.y,
+           spawn = value.x) %>%
+    mutate(abundance = spawn / qmedian)
+
+  ssb <- t(model$mcmccalcs$sbt.quants) %>%
+    as_tibble(rownames = "year") %>%
+    rename(median = `50%`) %>%
+    mutate(survey = ifelse(year < new_surv_yr, "Surface", "Dive"),
+           year = as.numeric(year))
+
+  g <- ggplot(dfm, aes(x = year, y = abundance)) +
+    geom_point(aes(shape = gear), size = point_size) +
+    scale_shape_manual(values = c(2, 1)) +
+    geom_line(data = ssb,
+             aes(x = year, y = median, group = survey),
+             size = line_size) +
+    ylab(paste0(en2fr("Scaled abundance", translate), " (1000 t)"))
+  if(!is.na(annot)){
+    g <- g +
+      annotate(geom = "text",
+               x = -Inf,
+               y = Inf,
+               label = paste0("(", annot, ")"),
+               vjust = 1.3,
+               hjust = -0.1,
+               size = 2.5)
+  }
+  if(show_x_axis){
+    g <- g +
+      xlab(en2fr("Year", translate))
+  }else{
+    g <- g +
+      theme(axis.text.x = element_blank(),
+            text = element_text(size = 8),
+            axis.text = element_text(size = 8),
+            axis.title.x = element_blank())
+  }
+  if(!show_legend){
+    g <- g +
+      guides(shape = FALSE, linetype = FALSE)
+  }
+  g
+}
+
+#' Plot natural mortality mcmc median and credibility interval
+#'
+#' @param model an iscam model
+#' @param line_size thickness of the median line
+#' @param ribbon_alpha transparency of the credibility interval ribbon
+#' @param annot a character to place in parentheses in the top left of the plot.
+#' If NA, nothing will appear
+#' @param show_x_axis Logical
+#' @param translate Logical. If TRUE, translate to french
+#'
+#' @importFrom dplyr mutate as_tibble
+#' @importFrom reshape2 melt
+#' @importFrom ggplot2 ggplot aes geom_line geom_ribbon ylab annotate
+#' xlab theme element_text element_blank
+#' @export
+#' @return A ggplot object
+plot_natural_mortality <- function(model,
+                                   line_size = 2,
+                                   ribbon_alpha = 0.5,
+                                   annot = NA,
+                                   show_x_axis = TRUE,
+                                   translate = FALSE){
+  m <- model$mcmccalcs$nat.mort.quants %>%
+    t() %>%
+    as_tibble(rownames = "year") %>%
+    mutate(year = as.numeric(year))
+  names(m) <- c("year", "lower", "median", "upper")
+
+  g <- ggplot(m, aes(x = year, y = median)) +
+    geom_line(size = line_size) +
+    geom_ribbon(aes(ymin = lower, ymax = upper), alpha = ribbon_alpha) +
+    ylab(en2fr("Instantaneous natural mortality", translate))
+  if(!is.na(annot)){
+    g <- g +
+      annotate(geom = "text",
+               x = -Inf,
+               y = Inf,
+               label = paste0("(", annot, ")"),
+               vjust = 1.3,
+               hjust = -0.1,
+               size = 2.5)
+  }
+  if(show_x_axis){
+    g <- g +
+      xlab(en2fr("Year", translate))
+  }else{
+    g <- g +
+      theme(axis.text.x = element_blank(),
+            text = element_text(size = 8),
+            axis.text = element_text(size = 8),
+            axis.title.x = element_blank())
+  }
+  g
+}
+
+#' Plot recruitment as points and errorbars
+#'
+#' @param model an iscam model object
+#' @param point_size Size of points for median recruitment
+#' @param line_size thickness of errorbars
+#' @param annot a character to place in parentheses in the top left of the plot.
+#' If NA, nothing will appear
+#' @param show_x_axis Logical
+#' @param translate Logical. If TRUE, translate to french
+#'
+#' @importFrom dplyr mutate as_tibble
+#' @importFrom reshape2 melt
+#' @importFrom ggplot2 ggplot aes geom_point geom_errorbar ylab annotate
+#' xlab theme element_text element_blank
+#' @export
+#' @return A ggplot object
+plot_recruitment <- function(model,
+                             point_size = 2,
+                             line_size = 2,
+                             annot = NA,
+                             show_x_axis = TRUE,
+                             translate = FALSE){
+
+  rec <- model$mcmccalcs$recr.quants %>%
+    t() %>%
+    as_tibble(rownames = "year") %>%
+    mutate(year = as.numeric(year))
+  names(rec) <- c("year", "lower", "median", "upper", "mpd")
+  rec <- rec %>%
+    mutate(lower = lower / 1000,
+           median = median / 1000,
+           upper = upper / 1000,
+           mpd = mpd / 1000)
+
+  g <- ggplot(rec, aes(x = year, y = median)) +
+    geom_point(size = point_size) +
+    geom_errorbar(aes(ymin = lower, ymax = upper), size = line_size / 2, width = 0) +
+    ylab(paste0(en2fr("Number of age-2 recruits", translate), " (1,000 millions)"))
+  if(!is.na(annot)){
+    g <- g +
+      annotate(geom = "text",
+               x = -Inf,
+               y = Inf,
+               label = paste0("(", annot, ")"),
+               vjust = 1.3,
+               hjust = -0.1,
+               size = 2.5)
+  }
+  if(show_x_axis){
+    g <- g +
+      xlab(en2fr("Year", translate))
+  }else{
+    g <- g +
+      theme(axis.text.x = element_blank(),
+            text = element_text(size = 8),
+            axis.text = element_text(size = 8),
+            axis.title.x = element_blank())
+  }
+  g
+
+}
+
+#' Plot estimated biommass median and credible interval, projected biomass with credible interval,
+#' catch history, and LRP line with credible interval
+#'
+#' @param model an iscam model object
+#' @param catch_df a data frame of catch as constructed by [get_catch()]
+#' @param point_size size of point for projection year median biomass
+#' @param errorbar_size thickness of errorbar for projection year median biomass
+#' @param line_size thickness of the median and LRP lines
+#' @param ribbon_alpha transparency value for the biomass credibility interval ribbon
+#' @param lrp_ribbon_alpha transparency value for the LRP credibility interval ribbon
+#' @param between_bars amount of space between catch bars
+#' @param refpt_show which reference point to show. See `model$mcmccalcs$r.quants`` for choices
+#' @param annot a character to place in parentheses in the top left of the plot.
+#' If NA, nothing will appear
+#' @param show_x_axis Logical
+#' @param translate Logical. If TRUE, translate to french
+#'
+#' @importFrom dplyr filter select mutate as_tibble
+#' @importFrom ggplot2 ggplot aes geom_hline geom_rect geom_line geom_ribbon geom_point geom_errorbar
+#' geom_bar ylab annotate xlab theme guides element_text element_blank position_nudge
+#' @export
+#' @return A ggplot object
+plot_biomass_catch <- function(model,
+                               catch_df,
+                               point_size = 3,
+                               errorbar_size = 1,
+                               line_size = 2,
+                               ribbon_alpha = 0.5,
+                               lrp_ribbon_alpha = 0.35,
+                               between_bars = 0.5,
+                               refpt_show = "0.3sbo",
+                               annot = NA,
+                               show_x_axis = TRUE,
+                               translate = FALSE){
+
+  if(length(unique(catch_df$region)) > 1){
+    stop("There is more than one region in the catch_df data frame", call. = FALSE)
+  }
+  sbt <- model$mcmccalcs$sbt.quants %>%
+    t() %>%
+    as_tibble(rownames = "year") %>%
+    mutate(year = as.numeric(year))
+  names(sbt) <- c("year", "lower", "median", "upper", "mpd")
+
+  proj <- model$mcmccalcs$proj.quants
+  proj_yr <- as.numeric(gsub("B", "", colnames(proj)[2]))
+  proj_sbt <- as.numeric(c(proj_yr, proj[,2]))
+  names(proj_sbt) <- c("year", "lower", "median", "upper")
+  proj_sbt <- as_tibble(t(proj_sbt))
+
+  ct <- catch_df %>%
+    select(-c(area, group, sex, type, region)) %>%
+    group_by(year) %>%
+    summarize(median = sum(value)) %>%
+    ungroup()
+
+  lrp <- model$mcmccalcs$r.quants
+  lrp <- lrp[,-1] %>%
+    as_tibble(rownames = "refpt") %>%
+    filter(refpt == refpt_show)
+  names(lrp) <- c("year", "lower", "median", "upper")
+  lrp[1,1] <- min(sbt$year) - 2
+  lrp[,1] <- as.numeric(lrp[,1])
+
+  g <- ggplot(sbt, aes(x = year, y = median)) +
+    geom_hline(yintercept = lrp$median,
+               color = "red",
+               size = line_size) +
+    geom_rect(data = lrp, aes(xmin = -Inf, xmax = Inf, ymin = lrp$lower, ymax = lrp$upper),
+              alpha = lrp_ribbon_alpha,
+              fill = "red") +
+    geom_line(size = line_size) +
+    geom_ribbon(aes(ymin = lower, ymax = upper), alpha = ribbon_alpha) +
+    geom_point(data = proj_sbt,
+               position = position_nudge(x = 0.5),
+               size = point_size) +
+    geom_errorbar(data = proj_sbt,
+                  aes(ymin = lower, ymax = upper),
+                  size = errorbar_size,
+                  width = 0,
+                  position = position_nudge(x = 0.5)) +
+    geom_bar(data = ct,
+             stat = "identity",
+             width = between_bars,
+             fill = "black") +
+    #geom_hline(aes(yintercept = lrp$lower)) +
+    #geom_hline(aes(yintercept = lrp$upper)) +
+    ylab(paste0(en2fr("Spawning biomass", translate), " (1,000 t)"))
+  if(!is.na(annot)){
+    g <- g +
+      annotate(geom = "text",
+               x = -Inf,
+               y = Inf,
+               label = paste0("(", annot, ")"),
+               vjust = 1.3,
+               hjust = -0.1,
+               size = 2.5)
+  }
+  if(show_x_axis){
+    g <- g +
+      xlab(en2fr("Year", translate))
+  }else{
+    g <- g +
+      theme(axis.text.x = element_blank(),
+            text = element_text(size = 8),
+            axis.text = element_text(size = 8),
+            axis.title.x = element_blank())
+  }
+  g
+}
+
+#' Plot recruitment deviations as points and errorbars, with a running mean of the median
+#' values
+#'
+#' @param model an iscam model object
+#' @param run_mean_yrs number of years to set the running mean calculation to
+#' @param point_size Size of points for median recruitment
+#' @param line_size thickness of the line for the running mean
+#' @param errorbar_size thickness of errorbars for recruitment deviations
+#' @param zeroline_size thickness of guide line at zero deviation
+#' @param zeroline_type type of  of guide line at zero deviation
+#' @param annot a character to place in parentheses in the top left of the plot.
+#' If NA, nothing will appear
+#' @param show_x_axis Logical
+#' @param translate Logical. If TRUE, translate to french
+#'
+#' @importFrom dplyr filter select mutate as_tibble
+#' @importFrom ggplot2 ggplot aes geom_hline geom_line geom_point geom_errorbar
+#' ylab annotate xlab theme element_text element_blank
+#' @importFrom zoo rollmean
+#' @export
+#' @return A ggplot object
+plot_recruitment_devs <- function(model,
+                                  run_mean_yrs = 3,
+                                  point_size = 2,
+                                  line_size = 2,
+                                  errorbar_size = 1,
+                                  zeroline_size = 1,
+                                  zeroline_type = "dashed",
+                                  annot = NA,
+                                  show_x_axis = TRUE,
+                                  translate = FALSE){
+
+  recdev <- model$mcmccalcs$recr.devs.quants %>%
+    t() %>%
+    as_tibble(rownames = "year") %>%
+    mutate(year = as.numeric(year))
+  names(recdev) <- c("year", "lower", "median", "upper")
+
+  recdev <- recdev %>%
+    mutate(runmean = rollmean(x = median,
+                              k = run_mean_yrs,
+                              align = "right",
+                              na.pad = TRUE))
+
+  g <- ggplot(recdev, aes(x = year, y = median)) +
+    geom_hline(yintercept = 0,
+               size = zeroline_size,
+               linetype = zeroline_type) +
+    geom_point(size = point_size) +
+    geom_errorbar(aes(ymin = lower, ymax = upper),
+                  size = errorbar_size / 2,
+                  width = 0) +
+    geom_line(aes(y = runmean),
+              color = "red",
+              size = line_size) +
+    ylab(en2fr("Log recruitment deviations", translate))
+  if(!is.na(annot)){
+    g <- g +
+      annotate(geom = "text",
+               x = -Inf,
+               y = Inf,
+               label = paste0("(", annot, ")"),
+               vjust = 1.3,
+               hjust = -0.1,
+               size = 2.5)
+  }
+  if(show_x_axis){
+    g <- g +
+      xlab(en2fr("Year", translate))
+  }else{
+    g <- g +
+      theme(axis.text.x = element_blank(),
+            text = element_text(size = 8),
+            axis.text = element_text(size = 8),
+            axis.title.x = element_blank())
+  }
+  g
+
+}
+
+#' Plot production using a phase plot with a path through time. Includes the reference point and its credible interval
+#'
+#' @param model an iscam model object
+#' @param catch_df a data frame of catch as constructed by [get_catch()]
+#' @param new_surv_yr year in which the survey changed from surface to dive
+#' @param point_size size for points for years
+#' @param line_size thickness of the path line
+#' @param zeroline_size thickness of the line across zero
+#' @param zeroline_type type of the line across zer
+#' @param lrp_ribbon_alpha transparency of the reference point credible interval ribbon
+#' @param refpt_show which reference point to show. See `model$mcmccalcs$r.quants`` for choices
+#' @param annot a character to place in parentheses in the top left of the plot.
+#' If NA, nothing will appear
+#' @param show_x_axis Logical
+#' @param translate Logical. If TRUE, translate to french
+#'
+#' @importFrom dplyr filter select mutate as_tibble group_by ungroup summarize full_join lead
+#' @importFrom ggplot2 ggplot aes geom_hline geom_vline geom_rect geom_point geom_path
+#' scale_color_gradient expand_limits ylab annotate xlab theme guides element_text element_blank
+#' @importFrom ggrepel geom_text_repel
+#' @importFrom stats na.omit
+#' @export
+#' @return A ggplot object
+plot_biomass_phase <- function(model,
+                               catch_df,
+                               new_surv_yr = NA,
+                               point_size = 3,
+                               line_size = 2,
+                               zeroline_size = 1,
+                               zeroline_type = "dashed",
+                               lrp_ribbon_alpha = 0.35,
+                               refpt_show = "0.3sbo",
+                               annot = NA,
+                               show_x_axis = TRUE,
+                               translate = FALSE){
+
+  stopifnot(!is.na(new_surv_yr),
+            is.numeric(new_surv_yr),
+            length(new_surv_yr) == 1)
+  if(length(unique(catch_df$region)) > 1){
+    stop("There is more than one region in the catch_df data frame", call. = FALSE)
+  }
+  sbt <- model$mcmccalcs$sbt.quants %>%
+    t() %>%
+    as_tibble(rownames = "year") %>%
+    mutate(year = as.numeric(year))
+  names(sbt) <- c("year", "lower", "median", "upper", "mpd")
+
+  ct <- catch_df %>%
+    select(-c(area, group, sex, type, region)) %>%
+    group_by(year) %>%
+    summarize(catch = sum(value)) %>%
+    ungroup()
+
+  dd <- full_join(sbt, ct, by = "year") %>%
+    mutate(catch = ifelse(is.na(catch), 0, catch),
+           mediannext = lead(median),
+           catchnext = lead(catch),
+           production = mediannext - median + catchnext,
+           prodrate = production / median) %>%
+    na.omit() %>%
+    filter(year >= new_surv_yr)
+
+  dd <- dd %>%
+    mutate(shp = ifelse(year != max(year), 0, 24))
+
+  lrp <- model$mcmccalcs$r.quants
+  lrp <- lrp[,-1] %>%
+    as_tibble(rownames = "refpt") %>%
+    filter(refpt == refpt_show)
+  names(lrp) <- c("year", "lower", "median", "upper")
+  lrp[1,1] <- min(sbt$year) - 2
+  lrp[,1] <- as.numeric(lrp[,1])
+
+  g <- ggplot(dd, aes(x = median, y = production)) +
+    geom_hline(yintercept = 0,
+               size = zeroline_size,
+               linetype = zeroline_type) +
+    geom_vline(xintercept = lrp$median,
+               color = "red",
+               size = line_size) +
+    geom_rect(data = lrp, aes(xmin = lrp$lower, xmax = lrp$upper, ymin = -Inf, ymax = Inf),
+              alpha = lrp_ribbon_alpha,
+              fill = "red", inherit.aes = FALSE) +
+    geom_point(aes(color = year, shape = factor(shp)), size = 5) +
+    scale_color_gradient(low = "lightgrey", high = "black") +
+    geom_text_repel(aes(label = year), segment.colour = "grey", size = 4) +
+    geom_path(size = 1) +
+    guides(color = FALSE, shape = FALSE) +
+    expand_limits(x = 0) +
+    ylab(paste0(en2fr("Spawning biomass production", translate), " (1,000 t)"))
+  if(!is.na(annot)){
+    g <- g +
+      annotate(geom = "text",
+               x = -Inf,
+               y = Inf,
+               label = paste0("(", annot, ")"),
+               vjust = 1.3,
+               hjust = -0.1,
+               size = 2.5)
+  }
+  if(show_x_axis){
+    g <- g +
+      xlab(paste0(en2fr("Spawning biomass", translate), " (1,000 t)"))
+  }else{
+    g <- g +
+      theme(axis.text.x = element_blank(),
+            text = element_text(size = 8),
+            axis.text = element_text(size = 8),
+            axis.title.x = element_blank())
+  }
+  g
+}

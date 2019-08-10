@@ -1,0 +1,24 @@
+Package: herringutils
+Title: Provides Plotting, Table-making, and Utility Functions for the CSAS Herring Documents
+Version: 0.0.0.9000
+Authors@R: 
+    person(given = "Chris",
+           family = "Grandin",
+           role = c("aut", "cre"),
+           email = "chris.grandin@gmail.com",
+           comment = c(ORCID = "https://orcid.org/0000-0002-6746-3486"))
+Description: Provides functions including loading, plotting and making tables for herring documents using iscam outputs (from https://github.com/pbs-assess/gfiscam).
+License: GPL-3
+Encoding: UTF-8
+Imports:
+  dplyr,
+  ggplot2,
+  rosettafish,
+  reshape2,
+  csasdown,
+  stringr,
+  gfutilities,
+  ggrepel,
+  zoo
+LazyData: true
+RoxygenNote: 6.1.1
