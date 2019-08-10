@@ -19,6 +19,8 @@ Imports:
   stringr,
   gfutilities,
   ggrepel,
+  gfiscamutils,
+  forcats,
   zoo
 LazyData: true
 RoxygenNote: 6.1.1

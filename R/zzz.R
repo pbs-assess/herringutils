@@ -46,6 +46,9 @@ globalVariables(c(
 "Harvest",
 "abundance",
 "Weight",
-"minor_regions_short"
+"minor_regions_short",
+"gearname",
+"iyr",
+"it"
 
   ))
