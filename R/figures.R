@@ -167,13 +167,13 @@ plot_pa <- function(df,
 #'  labs xlab ylab facet_wrap geom_vline theme
 #' @export
 #' @return A ggplot object
-plot_herring_spawn_ind <- function(df,
-                                   xlim = c(1000, 3000),
-                                   ylim = NA,
-                                   new_surv_yr = NA,
-                                   new_surv_yr_type = "dashed",
-                                   new_surv_yr_size = 0.25,
-                                   translate = FALSE){
+plot_spawn_ind <- function(df,
+                           xlim = c(1000, 3000),
+                           ylim = NA,
+                           new_surv_yr = NA,
+                           new_surv_yr_type = "dashed",
+                           new_surv_yr_size = 0.25,
+                           translate = FALSE){
   stopifnot(!is.na(new_surv_yr),
             is.numeric(new_surv_yr),
             length(new_surv_yr) == 1)
