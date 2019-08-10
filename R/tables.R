@@ -8,6 +8,7 @@
 #' @importFrom stringr str_extract
 #' @importFrom rosettafish en2fr
 #' @importFrom csasdown csas_table
+#'
 #' @export
 #' @return a [csasdown::csas_table()]
 input_data_table <- function(tab,
@@ -65,6 +66,7 @@ input_data_table <- function(tab,
 #' @importFrom reshape2 dcast
 #' @importFrom rosettafish en2fr
 #' @importFrom csasdown csas_table
+#'
 #' @export
 #' @return a [csasdown::csas_table()]
 total_landed_catch_table <- function(tab,
@@ -100,6 +102,7 @@ total_landed_catch_table <- function(tab,
 #' @importFrom reshape2 dcast
 #' @importFrom rosettafish en2fr
 #' @importFrom csasdown csas_table
+#'
 #' @export
 #' @return a [csasdown::csas_table()]
 sok_harvest_table <- function(tab,
@@ -134,6 +137,7 @@ sok_harvest_table <- function(tab,
 #' @param cap caption for table
 #' @param translate Logical. Translate to french if TRUE
 #'
+#' @export
 #' @return a [csasdown::csas_table()]
 spawn_index_by_area_table <- function(tab, cap = "", translate = FALSE){
   names(tab) <- gsub("&", "\\\\&", names(tab))
