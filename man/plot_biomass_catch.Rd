@@ -8,7 +8,10 @@ catch history, and LRP line with credible interval}
 plot_biomass_catch(model, catch_df, point_size = 3, errorbar_size = 1,
   line_size = 2, ribbon_alpha = 0.5, lrp_ribbon_alpha = 0.35,
   between_bars = 0.5, refpt_show = "0.3sbo", xlim = NA,
-  line_len = 15, annot = NA, show_x_axis = TRUE, translate = FALSE)
+  show_x_axis = TRUE, show_y_axis = TRUE, x_axis_label_size = 8,
+  x_axis_tick_label_size = 8, y_axis_label_size = 8,
+  y_axis_tick_label_size = 8, x_axis_label_newline_length = 30,
+  y_axis_label_newline_length = 20, annot = NA, translate = FALSE)
 }
 \arguments{
 \item{model}{an iscam model object}
@@ -31,12 +34,24 @@ plot_biomass_catch(model, catch_df, point_size = 3, errorbar_size = 1,
 
 \item{xlim}{x-limits for the plot. Implemented with [ggplot2::coord_cartesian()]}
 
-\item{line_len}{length of y-axis label lines (newline will be inserted to make these labels this length)}
+\item{show_x_axis}{see [modify_axes_labels()]}
+
+\item{show_y_axis}{see [modify_axes_labels()]}
+
+\item{x_axis_label_size}{see [modify_axes_labels()]}
+
+\item{x_axis_tick_label_size}{see [modify_axes_labels()]}
+
+\item{y_axis_label_size}{see [modify_axes_labels()]}
+
+\item{y_axis_tick_label_size}{see [modify_axes_labels()]}
+
+\item{x_axis_label_newline_length}{see [newline_format()]}
+
+\item{y_axis_label_newline_length}{see [newline_format()]}
 
 \item{annot}{a character to place in parentheses in the top left of the plot.
 If NA, nothing will appear}
-
-\item{show_x_axis}{Logical}
 
 \item{translate}{Logical. If TRUE, translate to french}
 }

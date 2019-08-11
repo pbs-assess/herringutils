@@ -7,8 +7,11 @@
 plot_biomass_phase(model, catch_df, new_surv_yr = NA, point_size = 3,
   line_size = 2, text_size = 2, zeroline_size = 1,
   zeroline_type = "dashed", lrp_ribbon_alpha = 0.35,
-  refpt_show = "0.3sbo", line_len = 15, annot = NA,
-  show_x_axis = TRUE, translate = FALSE)
+  refpt_show = "0.3sbo", show_x_axis = TRUE, show_y_axis = TRUE,
+  x_axis_label_size = 8, x_axis_tick_label_size = 8,
+  y_axis_label_size = 8, y_axis_tick_label_size = 8,
+  x_axis_label_newline_length = 30, y_axis_label_newline_length = 20,
+  annot = NA, translate = FALSE)
 }
 \arguments{
 \item{model}{an iscam model object}
@@ -31,12 +34,24 @@ plot_biomass_phase(model, catch_df, new_surv_yr = NA, point_size = 3,
 
 \item{refpt_show}{which reference point to show. See `model$mcmccalcs$r.quants`` for choices}
 
-\item{line_len}{length of y-axis label lines (newline will be inserted to make these labels this length)}
+\item{show_x_axis}{see [modify_axes_labels()]}
+
+\item{show_y_axis}{see [modify_axes_labels()]}
+
+\item{x_axis_label_size}{see [modify_axes_labels()]}
+
+\item{x_axis_tick_label_size}{see [modify_axes_labels()]}
+
+\item{y_axis_label_size}{see [modify_axes_labels()]}
+
+\item{y_axis_tick_label_size}{see [modify_axes_labels()]}
+
+\item{x_axis_label_newline_length}{see [newline_format()]}
+
+\item{y_axis_label_newline_length}{see [newline_format()]}
 
 \item{annot}{a character to place in parentheses in the top left of the plot.
 If NA, nothing will appear}
-
-\item{show_x_axis}{Logical}
 
 \item{translate}{Logical. If TRUE, translate to french}
 }

@@ -219,10 +219,16 @@ plot_spawn_ind <- function(df,
 #' @param point_size size for points
 #' @param line_size thickness of line
 #' @param xlim x-limits for the plot. Implemented with [ggplot2::coord_cartesian()]
-#' @param line_len length of y-axis label lines (newline will be inserted to make these labels this length)
+#' @param show_x_axis see [modify_axes_labels()]
+#' @param show_y_axis see [modify_axes_labels()]
+#' @param x_axis_label_size see [modify_axes_labels()]
+#' @param x_axis_tick_label_size see [modify_axes_labels()]
+#' @param y_axis_label_size see [modify_axes_labels()]
+#' @param y_axis_tick_label_size see [modify_axes_labels()]
+#' @param x_axis_label_newline_length see [newline_format()]
+#' @param y_axis_label_newline_length see [newline_format()]
 #' @param annot a character to place in parentheses in the top left of the plot.
 #' If NA, nothing will appear
-#' @param show_x_axis Logical
 #' @param show_legend Logical
 #' @param translate Logical. If TRUE, translate to french
 #'
@@ -239,9 +245,15 @@ plot_scaled_abundance <- function(df,
                                   point_size = 2,
                                   line_size = 2,
                                   xlim = NA,
-                                  line_len = 15,
-                                  annot = NA,
                                   show_x_axis = TRUE,
+                                  show_y_axis = TRUE,
+                                  x_axis_label_size = 8,
+                                  x_axis_tick_label_size = 8,
+                                  y_axis_label_size = 8,
+                                  y_axis_tick_label_size = 8,
+                                  x_axis_label_newline_length = 30,
+                                  y_axis_label_newline_length = 20,
+                                  annot = NA,
                                   show_legend = FALSE,
                                   translate = FALSE){
   if(length(unique(df$region)) > 1){
@@ -272,8 +284,7 @@ plot_scaled_abundance <- function(df,
     scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10)) +
     geom_line(data = ssb,
              aes(x = year, y = median, group = survey),
-             size = line_size) +
-    ylab(newline_format(paste0(en2fr("Scaled abundance", translate), " (1000 t)"), line_len))
+             size = line_size)
   if(!is.na(xlim)){
     g <- g +
       coord_cartesian(xlim = xlim, expand = TRUE)
@@ -288,20 +299,21 @@ plot_scaled_abundance <- function(df,
                hjust = -0.1,
                size = 2.5)
   }
-  if(show_x_axis){
-    g <- g +
-      xlab(en2fr("Year", translate))
-  }else{
-    g <- g +
-      theme(axis.text.x = element_blank(),
-            text = element_text(size = 8),
-            axis.text = element_text(size = 8),
-            axis.title.x = element_blank())
-  }
   if(!show_legend){
     g <- g +
       guides(shape = FALSE, linetype = FALSE)
   }
+  g <- modify_axes_labels(g,
+                          x_label_text = newline_format(en2fr("Year", translate),
+                                                        x_axis_label_newline_length),
+                          y_label_text = newline_format(paste0(en2fr("Scaled abundance", translate), " (1000 t)"),
+                                                        y_axis_label_newline_length),
+                          show_x_axis = show_x_axis,
+                          show_y_axis = show_y_axis,
+                          x_axis_label_size = x_axis_label_size,
+                          x_axis_tick_label_size = x_axis_tick_label_size,
+                          y_axis_label_size = y_axis_label_size,
+                          y_axis_tick_label_size = y_axis_tick_label_size)
   g
 }
 
@@ -311,10 +323,16 @@ plot_scaled_abundance <- function(df,
 #' @param line_size thickness of the median line
 #' @param ribbon_alpha transparency of the credibility interval ribbon
 #' @param xlim x-limits for the plot. Implemented with [ggplot2::coord_cartesian()]
-#' @param line_len length of y-axis label lines (newline will be inserted to make these labels this length)
+#' @param show_x_axis see [modify_axes_labels()]
+#' @param show_y_axis see [modify_axes_labels()]
+#' @param x_axis_label_size see [modify_axes_labels()]
+#' @param x_axis_tick_label_size see [modify_axes_labels()]
+#' @param y_axis_label_size see [modify_axes_labels()]
+#' @param y_axis_tick_label_size see [modify_axes_labels()]
+#' @param x_axis_label_newline_length see [newline_format()]
+#' @param y_axis_label_newline_length see [newline_format()]
 #' @param annot a character to place in parentheses in the top left of the plot.
 #' If NA, nothing will appear
-#' @param show_x_axis Logical
 #' @param translate Logical. If TRUE, translate to french
 #'
 #' @importFrom dplyr mutate as_tibble
@@ -327,9 +345,15 @@ plot_natural_mortality <- function(model,
                                    line_size = 2,
                                    ribbon_alpha = 0.5,
                                    xlim = NA,
-                                   line_len = 15,
-                                   annot = NA,
                                    show_x_axis = TRUE,
+                                   show_y_axis = TRUE,
+                                   x_axis_label_size = 8,
+                                   x_axis_tick_label_size = 8,
+                                   y_axis_label_size = 8,
+                                   y_axis_tick_label_size = 8,
+                                   x_axis_label_newline_length = 30,
+                                   y_axis_label_newline_length = 20,
+                                   annot = NA,
                                    translate = FALSE){
   m <- model$mcmccalcs$nat.mort.quants %>%
     t() %>%
@@ -340,8 +364,7 @@ plot_natural_mortality <- function(model,
   g <- ggplot(m, aes(x = year, y = median)) +
     geom_line(size = line_size) +
     geom_ribbon(aes(ymin = lower, ymax = upper), alpha = ribbon_alpha) +
-    scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10)) +
-    ylab(newline_format(en2fr("Instantaneous natural mortality", translate), line_len))
+    scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10))
   if(!is.na(xlim)){
     g <- g +
       coord_cartesian(xlim = xlim, expand = TRUE)
@@ -356,16 +379,17 @@ plot_natural_mortality <- function(model,
                hjust = -0.1,
                size = 2.5)
   }
-  if(show_x_axis){
-    g <- g +
-      xlab(en2fr("Year", translate))
-  }else{
-    g <- g +
-      theme(axis.text.x = element_blank(),
-            text = element_text(size = 8),
-            axis.text = element_text(size = 8),
-            axis.title.x = element_blank())
-  }
+  g <- modify_axes_labels(g,
+                          x_label_text = newline_format(en2fr("Year", translate),
+                                                        x_axis_label_newline_length),
+                          y_label_text = newline_format(en2fr("Instantaneous natural mortality", translate),
+                                                        y_axis_label_newline_length),
+                          show_x_axis = show_x_axis,
+                          show_y_axis = show_y_axis,
+                          x_axis_label_size = x_axis_label_size,
+                          x_axis_tick_label_size = x_axis_tick_label_size,
+                          y_axis_label_size = y_axis_label_size,
+                          y_axis_tick_label_size = y_axis_tick_label_size)
   g
 }
 
@@ -375,10 +399,16 @@ plot_natural_mortality <- function(model,
 #' @param point_size Size of points for median recruitment
 #' @param line_size thickness of errorbars
 #' @param xlim x-limits for the plot. Implemented with [ggplot2::coord_cartesian()]
-#' @param line_len length of y-axis label lines (newline will be inserted to make these labels this length)
+#' @param show_x_axis see [modify_axes_labels()]
+#' @param show_y_axis see [modify_axes_labels()]
+#' @param x_axis_label_size see [modify_axes_labels()]
+#' @param x_axis_tick_label_size see [modify_axes_labels()]
+#' @param y_axis_label_size see [modify_axes_labels()]
+#' @param y_axis_tick_label_size see [modify_axes_labels()]
+#' @param x_axis_label_newline_length see [newline_format()]
+#' @param y_axis_label_newline_length see [newline_format()]
 #' @param annot a character to place in parentheses in the top left of the plot.
 #' If NA, nothing will appear
-#' @param show_x_axis Logical
 #' @param translate Logical. If TRUE, translate to french
 #'
 #' @importFrom dplyr mutate as_tibble
@@ -391,9 +421,15 @@ plot_recruitment <- function(model,
                              point_size = 2,
                              line_size = 2,
                              xlim = NA,
-                             line_len = 15,
-                             annot = NA,
                              show_x_axis = TRUE,
+                             show_y_axis = TRUE,
+                             x_axis_label_size = 8,
+                             x_axis_tick_label_size = 8,
+                             y_axis_label_size = 8,
+                             y_axis_tick_label_size = 8,
+                             x_axis_label_newline_length = 30,
+                             y_axis_label_newline_length = 20,
+                             annot = NA,
                              translate = FALSE){
 
   rec <- model$mcmccalcs$recr.quants %>%
@@ -410,8 +446,7 @@ plot_recruitment <- function(model,
   g <- ggplot(rec, aes(x = year, y = median)) +
     geom_point(size = point_size) +
     geom_errorbar(aes(ymin = lower, ymax = upper), size = line_size / 2, width = 0) +
-    scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10)) +
-    ylab(newline_format(paste0(en2fr("Number of age-2 recruits", translate), " (1,000 millions)"), line_len))
+    scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10))
   if(!is.na(xlim)){
     g <- g +
       coord_cartesian(xlim = xlim, expand = TRUE)
@@ -426,16 +461,17 @@ plot_recruitment <- function(model,
                hjust = -0.1,
                size = 2.5)
   }
-  if(show_x_axis){
-    g <- g +
-      xlab(en2fr("Year", translate))
-  }else{
-    g <- g +
-      theme(axis.text.x = element_blank(),
-            text = element_text(size = 8),
-            axis.text = element_text(size = 8),
-            axis.title.x = element_blank())
-  }
+  g <- modify_axes_labels(g,
+                          x_label_text = newline_format(en2fr("Year", translate),
+                                                        x_axis_label_newline_length),
+                          y_label_text = newline_format(paste(en2fr("Number of age-2 recruits", translate), " (1,000 millions)"),
+                                                        y_axis_label_newline_length),
+                          show_x_axis = show_x_axis,
+                          show_y_axis = show_y_axis,
+                          x_axis_label_size = x_axis_label_size,
+                          x_axis_tick_label_size = x_axis_tick_label_size,
+                          y_axis_label_size = y_axis_label_size,
+                          y_axis_tick_label_size = y_axis_tick_label_size)
   g
 
 }
@@ -453,10 +489,16 @@ plot_recruitment <- function(model,
 #' @param between_bars amount of space between catch bars
 #' @param refpt_show which reference point to show. See `model$mcmccalcs$r.quants`` for choices
 #' @param xlim x-limits for the plot. Implemented with [ggplot2::coord_cartesian()]
-#' @param line_len length of y-axis label lines (newline will be inserted to make these labels this length)
+#' @param show_x_axis see [modify_axes_labels()]
+#' @param show_y_axis see [modify_axes_labels()]
+#' @param x_axis_label_size see [modify_axes_labels()]
+#' @param x_axis_tick_label_size see [modify_axes_labels()]
+#' @param y_axis_label_size see [modify_axes_labels()]
+#' @param y_axis_tick_label_size see [modify_axes_labels()]
+#' @param x_axis_label_newline_length see [newline_format()]
+#' @param y_axis_label_newline_length see [newline_format()]
 #' @param annot a character to place in parentheses in the top left of the plot.
 #' If NA, nothing will appear
-#' @param show_x_axis Logical
 #' @param translate Logical. If TRUE, translate to french
 #'
 #' @importFrom dplyr filter select mutate as_tibble
@@ -474,9 +516,15 @@ plot_biomass_catch <- function(model,
                                between_bars = 0.5,
                                refpt_show = "0.3sbo",
                                xlim = NA,
-                               line_len = 15,
-                               annot = NA,
                                show_x_axis = TRUE,
+                               show_y_axis = TRUE,
+                               x_axis_label_size = 8,
+                               x_axis_tick_label_size = 8,
+                               y_axis_label_size = 8,
+                               y_axis_tick_label_size = 8,
+                               x_axis_label_newline_length = 30,
+                               y_axis_label_newline_length = 20,
+                               annot = NA,
                                translate = FALSE){
 
   if(length(unique(catch_df$region)) > 1){
@@ -529,8 +577,7 @@ plot_biomass_catch <- function(model,
              stat = "identity",
              width = between_bars,
              fill = "black") +
-    scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10)) +
-    ylab(newline_format(paste0(en2fr("Spawning biomass", translate), " (1,000 t)"), line_len))
+    scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10))
   if(!is.na(xlim)){
     g <- g +
       coord_cartesian(xlim = xlim, expand = TRUE)
@@ -545,16 +592,17 @@ plot_biomass_catch <- function(model,
                hjust = -0.1,
                size = 2.5)
   }
-  if(show_x_axis){
-    g <- g +
-      xlab(en2fr("Year", translate))
-  }else{
-    g <- g +
-      theme(axis.text.x = element_blank(),
-            text = element_text(size = 8),
-            axis.text = element_text(size = 8),
-            axis.title.x = element_blank())
-  }
+  g <- modify_axes_labels(g,
+                          x_label_text = newline_format(en2fr("Year", translate),
+                                                        x_axis_label_newline_length),
+                          y_label_text = newline_format(en2fr("Spawning biomass", translate),
+                                                        y_axis_label_newline_length),
+                          show_x_axis = show_x_axis,
+                          show_y_axis = show_y_axis,
+                          x_axis_label_size = x_axis_label_size,
+                          x_axis_tick_label_size = x_axis_tick_label_size,
+                          y_axis_label_size = y_axis_label_size,
+                          y_axis_tick_label_size = y_axis_tick_label_size)
   g
 }
 
@@ -569,10 +617,16 @@ plot_biomass_catch <- function(model,
 #' @param zeroline_size thickness of guide line at zero deviation
 #' @param zeroline_type type of  of guide line at zero deviation
 #' @param xlim x-limits for the plot. Implemented with [ggplot2::coord_cartesian()]
-#' @param line_len length of y-axis label lines (newline will be inserted to make these labels this length)
+#' @param show_x_axis see [modify_axes_labels()]
+#' @param show_y_axis see [modify_axes_labels()]
+#' @param x_axis_label_size see [modify_axes_labels()]
+#' @param x_axis_tick_label_size see [modify_axes_labels()]
+#' @param y_axis_label_size see [modify_axes_labels()]
+#' @param y_axis_tick_label_size see [modify_axes_labels()]
+#' @param x_axis_label_newline_length see [newline_format()]
+#' @param y_axis_label_newline_length see [newline_format()]
 #' @param annot a character to place in parentheses in the top left of the plot.
 #' If NA, nothing will appear
-#' @param show_x_axis Logical
 #' @param translate Logical. If TRUE, translate to french
 #'
 #' @importFrom dplyr filter select mutate as_tibble
@@ -589,9 +643,15 @@ plot_recruitment_devs <- function(model,
                                   zeroline_size = 1,
                                   zeroline_type = "dashed",
                                   xlim = NA,
-                                  line_len = 15,
-                                  annot = NA,
                                   show_x_axis = TRUE,
+                                  show_y_axis = TRUE,
+                                  x_axis_label_size = 8,
+                                  x_axis_tick_label_size = 8,
+                                  y_axis_label_size = 8,
+                                  y_axis_tick_label_size = 8,
+                                  x_axis_label_newline_length = 30,
+                                  y_axis_label_newline_length = 20,
+                                  annot = NA,
                                   translate = FALSE){
 
   recdev <- model$mcmccalcs$recr.devs.quants %>%
@@ -617,8 +677,7 @@ plot_recruitment_devs <- function(model,
     geom_line(aes(y = runmean),
               color = "red",
               size = line_size) +
-    scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10)) +
-    ylab(newline_format(en2fr("Log recruitment deviations", translate), line_len))
+    scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10))
   if(!is.na(xlim)){
     g <- g +
       coord_cartesian(xlim = xlim, expand = TRUE)
@@ -633,18 +692,18 @@ plot_recruitment_devs <- function(model,
                hjust = -0.1,
                size = 2.5)
   }
-  if(show_x_axis){
-    g <- g +
-      xlab(en2fr("Year", translate))
-  }else{
-    g <- g +
-      theme(axis.text.x = element_blank(),
-            text = element_text(size = 8),
-            axis.text = element_text(size = 8),
-            axis.title.x = element_blank())
-  }
+  g <- modify_axes_labels(g,
+                          x_label_text = newline_format(en2fr("Year", translate),
+                                                        x_axis_label_newline_length),
+                          y_label_text = newline_format(en2fr("Log recruitment deviations", translate),
+                                                        y_axis_label_newline_length),
+                          show_x_axis = show_x_axis,
+                          show_y_axis = show_y_axis,
+                          x_axis_label_size = x_axis_label_size,
+                          x_axis_tick_label_size = x_axis_tick_label_size,
+                          y_axis_label_size = y_axis_label_size,
+                          y_axis_tick_label_size = y_axis_tick_label_size)
   g
-
 }
 
 #' Plot production using a phase plot with a path through time. Includes the reference point and its credible interval
@@ -659,10 +718,16 @@ plot_recruitment_devs <- function(model,
 #' @param zeroline_type type of the line across zer
 #' @param lrp_ribbon_alpha transparency of the reference point credible interval ribbon
 #' @param refpt_show which reference point to show. See `model$mcmccalcs$r.quants`` for choices
-#' @param line_len length of y-axis label lines (newline will be inserted to make these labels this length)
+#' @param show_x_axis see [modify_axes_labels()]
+#' @param show_y_axis see [modify_axes_labels()]
+#' @param x_axis_label_size see [modify_axes_labels()]
+#' @param x_axis_tick_label_size see [modify_axes_labels()]
+#' @param y_axis_label_size see [modify_axes_labels()]
+#' @param y_axis_tick_label_size see [modify_axes_labels()]
+#' @param x_axis_label_newline_length see [newline_format()]
+#' @param y_axis_label_newline_length see [newline_format()]
 #' @param annot a character to place in parentheses in the top left of the plot.
 #' If NA, nothing will appear
-#' @param show_x_axis Logical
 #' @param translate Logical. If TRUE, translate to french
 #'
 #' @importFrom dplyr filter select mutate as_tibble group_by ungroup summarize full_join lead
@@ -682,9 +747,15 @@ plot_biomass_phase <- function(model,
                                zeroline_type = "dashed",
                                lrp_ribbon_alpha = 0.35,
                                refpt_show = "0.3sbo",
-                               line_len = 15,
-                               annot = NA,
                                show_x_axis = TRUE,
+                               show_y_axis = TRUE,
+                               x_axis_label_size = 8,
+                               x_axis_tick_label_size = 8,
+                               y_axis_label_size = 8,
+                               y_axis_tick_label_size = 8,
+                               x_axis_label_newline_length = 30,
+                               y_axis_label_newline_length = 20,
+                               annot = NA,
                                translate = FALSE){
 
   stopifnot(!is.na(new_surv_yr),
@@ -740,8 +811,7 @@ plot_biomass_phase <- function(model,
     geom_text_repel(aes(label = year), segment.colour = "grey", size = text_size) +
     geom_path(size = 1) +
     guides(color = FALSE, shape = FALSE) +
-    expand_limits(x = 0) +
-    ylab(newline_format(paste0(en2fr("Spawning biomass production", translate), " (1,000 t)"), line_len))
+    expand_limits(x = 0)
   if(!is.na(annot)){
     g <- g +
       annotate(geom = "text",
@@ -752,15 +822,16 @@ plot_biomass_phase <- function(model,
                hjust = -0.1,
                size = 2.5)
   }
-  if(show_x_axis){
-    g <- g +
-      xlab(paste0(en2fr("Spawning biomass", translate), " (1,000 t)"))
-  }else{
-    g <- g +
-      theme(axis.text.x = element_blank(),
-            text = element_text(size = 8),
-            axis.text = element_text(size = 8),
-            axis.title.x = element_blank())
-  }
+  g <- modify_axes_labels(g,
+                          x_label_text = newline_format(paste0(en2fr("Spawning biomass", translate), " (1,000 t)"),
+                                                        x_axis_label_newline_length),
+                          y_label_text = newline_format(paste0(en2fr("Spawning biomass production", translate), " (1,000 t)"),
+                                                        y_axis_label_newline_length),
+                          show_x_axis = show_x_axis,
+                          show_y_axis = show_y_axis,
+                          x_axis_label_size = x_axis_label_size,
+                          x_axis_tick_label_size = x_axis_tick_label_size,
+                          y_axis_label_size = y_axis_label_size,
+                          y_axis_tick_label_size = y_axis_tick_label_size)
   g
 }

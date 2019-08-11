@@ -1,3 +1,50 @@
+#' Add or omit the x and y label and tick mark text to a ggplot.
+#'
+#' @param g a ggplot object
+#' @param x_label_text text for the x label. Only added if `show_x_axis` is `TRUE`
+#' @param y_label_text text for the x label. Only added if `show_y_axis` is `TRUE`
+#' @param show_x_axis Logical for whether or not to show the x axis label and tick marks/tick text
+#' @param show_y_axis Logical for whether or not to show the y axis label and tick marks/tick text
+#' @param x_axis_label_size size of the font to use for the x axis label
+#' @param x_axis_tick_label_size size of the font to use for the x axis tick mark labels
+#' @param y_axis_label_size size of the font to use for the y axis label
+#' @param y_axis_tick_label_size size of the font to use for the y axis tick mark labels
+#'
+#' @importFrom ggplot2 xlab ylab theme element_text element_blank
+#' @export
+#' @return the modified ggplot object
+modify_axes_labels <- function(g,
+                               x_label_text = "",
+                               y_label_text = "",
+                               show_x_axis = TRUE,
+                               show_y_axis = TRUE,
+                               x_axis_label_size = 8,
+                               x_axis_tick_label_size = 8,
+                               y_axis_label_size = 8,
+                               y_axis_tick_label_size = 8){
+  if(show_x_axis){
+    g <- g +
+      xlab(x_label_text) +
+      theme(axis.text.x = element_text(size = x_axis_tick_label_size),
+            axis.title.x = element_text(size = x_axis_label_size))
+  }else{
+    g <- g +
+      theme(axis.text.x = element_blank(),
+            axis.title.x = element_blank())
+  }
+  if(show_y_axis){
+    g <- g +
+      ylab(y_label_text) +
+      theme(axis.text.y = element_text(size = y_axis_tick_label_size),
+            axis.title.y = element_text(size = y_axis_label_size))
+  }else{
+    g <- g +
+      theme(axis.text.y = element_blank(),
+            axis.title.y = element_blank())
+  }
+  g
+}
+
 #' Insert a newline between words so that all single lines will be of length `len` or less.
 #'
 #' @param x string to insert newlines into
@@ -40,7 +87,6 @@ newline_format <- function(x, len){
   }
   line
 }
-
 
 #' Function to add a new column indicating group ID based on sequential data
 #'
