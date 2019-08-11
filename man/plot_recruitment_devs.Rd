@@ -7,7 +7,7 @@ values}
 \usage{
 plot_recruitment_devs(model, run_mean_yrs = 3, point_size = 2,
   line_size = 2, errorbar_size = 1, zeroline_size = 1,
-  zeroline_type = "dashed", xlim = NA, annot = NA,
+  zeroline_type = "dashed", xlim = NA, line_len = 15, annot = NA,
   show_x_axis = TRUE, translate = FALSE)
 }
 \arguments{
@@ -26,6 +26,8 @@ plot_recruitment_devs(model, run_mean_yrs = 3, point_size = 2,
 \item{zeroline_type}{type of  of guide line at zero deviation}
 
 \item{xlim}{x-limits for the plot. Implemented with [ggplot2::coord_cartesian()]}
+
+\item{line_len}{length of y-axis label lines (newline will be inserted to make these labels this length)}
 
 \item{annot}{a character to place in parentheses in the top left of the plot.
 If NA, nothing will appear}

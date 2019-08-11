@@ -18,6 +18,6 @@ string with newlines inserted
 Insert a newline between words so that all single lines will be of length `len` or less.
 }
 \examples{
-str <- "This is a test of the newline_format function which is used to split text into predetermined-length lines"
+str <- "This is a test of the newline_format function which is used to split text"
 newline_format(str, 12)
 }

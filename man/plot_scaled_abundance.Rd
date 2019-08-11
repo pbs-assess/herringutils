@@ -6,8 +6,9 @@
 for the survey}
 \usage{
 plot_scaled_abundance(df, model, gear, new_surv_yr = NA,
-  point_size = 2, line_size = 2, xlim = NA, annot = NA,
-  show_x_axis = TRUE, show_legend = FALSE, translate = FALSE)
+  point_size = 2, line_size = 2, xlim = NA, line_len = 15,
+  annot = NA, show_x_axis = TRUE, show_legend = FALSE,
+  translate = FALSE)
 }
 \arguments{
 \item{df}{Data frame of the survey estimates, as constructed by [get_surv_ind()]}
@@ -23,6 +24,8 @@ plot_scaled_abundance(df, model, gear, new_surv_yr = NA,
 \item{line_size}{thickness of line}
 
 \item{xlim}{x-limits for the plot. Implemented with [ggplot2::coord_cartesian()]}
+
+\item{line_len}{length of y-axis label lines (newline will be inserted to make these labels this length)}
 
 \item{annot}{a character to place in parentheses in the top left of the plot.
 If NA, nothing will appear}

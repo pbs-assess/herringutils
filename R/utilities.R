@@ -7,7 +7,7 @@
 #' @importFrom stringr str_sub str_split
 #' @export
 #' @examples
-#' str <- "This is a test of the newline_format function which is used to split text into predetermined-length lines"
+#' str <- "This is a test of the newline_format function which is used to split text"
 #' newline_format(str, 12)
 newline_format <- function(x, len){
   stopifnot(!is.na(x),

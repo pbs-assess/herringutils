@@ -7,8 +7,8 @@ catch history, and LRP line with credible interval}
 \usage{
 plot_biomass_catch(model, catch_df, point_size = 3, errorbar_size = 1,
   line_size = 2, ribbon_alpha = 0.5, lrp_ribbon_alpha = 0.35,
-  between_bars = 0.5, refpt_show = "0.3sbo", xlim = NA, annot = NA,
-  show_x_axis = TRUE, translate = FALSE)
+  between_bars = 0.5, refpt_show = "0.3sbo", xlim = NA,
+  line_len = 15, annot = NA, show_x_axis = TRUE, translate = FALSE)
 }
 \arguments{
 \item{model}{an iscam model object}
@@ -30,6 +30,8 @@ plot_biomass_catch(model, catch_df, point_size = 3, errorbar_size = 1,
 \item{refpt_show}{which reference point to show. See `model$mcmccalcs$r.quants`` for choices}
 
 \item{xlim}{x-limits for the plot. Implemented with [ggplot2::coord_cartesian()]}
+
+\item{line_len}{length of y-axis label lines (newline will be inserted to make these labels this length)}
 
 \item{annot}{a character to place in parentheses in the top left of the plot.
 If NA, nothing will appear}

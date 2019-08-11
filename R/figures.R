@@ -219,6 +219,7 @@ plot_spawn_ind <- function(df,
 #' @param point_size size for points
 #' @param line_size thickness of line
 #' @param xlim x-limits for the plot. Implemented with [ggplot2::coord_cartesian()]
+#' @param line_len length of y-axis label lines (newline will be inserted to make these labels this length)
 #' @param annot a character to place in parentheses in the top left of the plot.
 #' If NA, nothing will appear
 #' @param show_x_axis Logical
@@ -238,6 +239,7 @@ plot_scaled_abundance <- function(df,
                                   point_size = 2,
                                   line_size = 2,
                                   xlim = NA,
+                                  line_len = 15,
                                   annot = NA,
                                   show_x_axis = TRUE,
                                   show_legend = FALSE,
@@ -271,7 +273,7 @@ plot_scaled_abundance <- function(df,
     geom_line(data = ssb,
              aes(x = year, y = median, group = survey),
              size = line_size) +
-    ylab(paste0(en2fr("Scaled abundance", translate), " (1000 t)"))
+    ylab(newline_format(paste0(en2fr("Scaled abundance", translate), " (1000 t)"), line_len))
   if(!is.na(xlim)){
     g <- g +
       coord_cartesian(xlim = xlim, expand = TRUE)
@@ -309,6 +311,7 @@ plot_scaled_abundance <- function(df,
 #' @param line_size thickness of the median line
 #' @param ribbon_alpha transparency of the credibility interval ribbon
 #' @param xlim x-limits for the plot. Implemented with [ggplot2::coord_cartesian()]
+#' @param line_len length of y-axis label lines (newline will be inserted to make these labels this length)
 #' @param annot a character to place in parentheses in the top left of the plot.
 #' If NA, nothing will appear
 #' @param show_x_axis Logical
@@ -324,6 +327,7 @@ plot_natural_mortality <- function(model,
                                    line_size = 2,
                                    ribbon_alpha = 0.5,
                                    xlim = NA,
+                                   line_len = 15,
                                    annot = NA,
                                    show_x_axis = TRUE,
                                    translate = FALSE){
@@ -337,7 +341,7 @@ plot_natural_mortality <- function(model,
     geom_line(size = line_size) +
     geom_ribbon(aes(ymin = lower, ymax = upper), alpha = ribbon_alpha) +
     scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10)) +
-    ylab(en2fr("Instantaneous natural mortality", translate))
+    ylab(newline_format(en2fr("Instantaneous natural mortality", translate), line_len))
   if(!is.na(xlim)){
     g <- g +
       coord_cartesian(xlim = xlim, expand = TRUE)
@@ -371,6 +375,7 @@ plot_natural_mortality <- function(model,
 #' @param point_size Size of points for median recruitment
 #' @param line_size thickness of errorbars
 #' @param xlim x-limits for the plot. Implemented with [ggplot2::coord_cartesian()]
+#' @param line_len length of y-axis label lines (newline will be inserted to make these labels this length)
 #' @param annot a character to place in parentheses in the top left of the plot.
 #' If NA, nothing will appear
 #' @param show_x_axis Logical
@@ -386,6 +391,7 @@ plot_recruitment <- function(model,
                              point_size = 2,
                              line_size = 2,
                              xlim = NA,
+                             line_len = 15,
                              annot = NA,
                              show_x_axis = TRUE,
                              translate = FALSE){
@@ -405,7 +411,7 @@ plot_recruitment <- function(model,
     geom_point(size = point_size) +
     geom_errorbar(aes(ymin = lower, ymax = upper), size = line_size / 2, width = 0) +
     scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10)) +
-    ylab(paste0(en2fr("Number of age-2 recruits", translate), " (1,000 millions)"))
+    ylab(newline_format(paste0(en2fr("Number of age-2 recruits", translate), " (1,000 millions)"), line_len))
   if(!is.na(xlim)){
     g <- g +
       coord_cartesian(xlim = xlim, expand = TRUE)
@@ -447,6 +453,7 @@ plot_recruitment <- function(model,
 #' @param between_bars amount of space between catch bars
 #' @param refpt_show which reference point to show. See `model$mcmccalcs$r.quants`` for choices
 #' @param xlim x-limits for the plot. Implemented with [ggplot2::coord_cartesian()]
+#' @param line_len length of y-axis label lines (newline will be inserted to make these labels this length)
 #' @param annot a character to place in parentheses in the top left of the plot.
 #' If NA, nothing will appear
 #' @param show_x_axis Logical
@@ -467,6 +474,7 @@ plot_biomass_catch <- function(model,
                                between_bars = 0.5,
                                refpt_show = "0.3sbo",
                                xlim = NA,
+                               line_len = 15,
                                annot = NA,
                                show_x_axis = TRUE,
                                translate = FALSE){
@@ -522,7 +530,7 @@ plot_biomass_catch <- function(model,
              width = between_bars,
              fill = "black") +
     scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10)) +
-    ylab(paste0(en2fr("Spawning biomass", translate), " (1,000 t)"))
+    ylab(newline_format(paste0(en2fr("Spawning biomass", translate), " (1,000 t)"), line_len))
   if(!is.na(xlim)){
     g <- g +
       coord_cartesian(xlim = xlim, expand = TRUE)
@@ -561,6 +569,7 @@ plot_biomass_catch <- function(model,
 #' @param zeroline_size thickness of guide line at zero deviation
 #' @param zeroline_type type of  of guide line at zero deviation
 #' @param xlim x-limits for the plot. Implemented with [ggplot2::coord_cartesian()]
+#' @param line_len length of y-axis label lines (newline will be inserted to make these labels this length)
 #' @param annot a character to place in parentheses in the top left of the plot.
 #' If NA, nothing will appear
 #' @param show_x_axis Logical
@@ -580,6 +589,7 @@ plot_recruitment_devs <- function(model,
                                   zeroline_size = 1,
                                   zeroline_type = "dashed",
                                   xlim = NA,
+                                  line_len = 15,
                                   annot = NA,
                                   show_x_axis = TRUE,
                                   translate = FALSE){
@@ -608,7 +618,7 @@ plot_recruitment_devs <- function(model,
               color = "red",
               size = line_size) +
     scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10)) +
-    ylab(en2fr("Log recruitment deviations", translate))
+    ylab(newline_format(en2fr("Log recruitment deviations", translate), line_len))
   if(!is.na(xlim)){
     g <- g +
       coord_cartesian(xlim = xlim, expand = TRUE)
@@ -649,6 +659,7 @@ plot_recruitment_devs <- function(model,
 #' @param zeroline_type type of the line across zer
 #' @param lrp_ribbon_alpha transparency of the reference point credible interval ribbon
 #' @param refpt_show which reference point to show. See `model$mcmccalcs$r.quants`` for choices
+#' @param line_len length of y-axis label lines (newline will be inserted to make these labels this length)
 #' @param annot a character to place in parentheses in the top left of the plot.
 #' If NA, nothing will appear
 #' @param show_x_axis Logical
@@ -671,6 +682,7 @@ plot_biomass_phase <- function(model,
                                zeroline_type = "dashed",
                                lrp_ribbon_alpha = 0.35,
                                refpt_show = "0.3sbo",
+                               line_len = 15,
                                annot = NA,
                                show_x_axis = TRUE,
                                translate = FALSE){
@@ -729,7 +741,7 @@ plot_biomass_phase <- function(model,
     geom_path(size = 1) +
     guides(color = FALSE, shape = FALSE) +
     expand_limits(x = 0) +
-    ylab(paste0(en2fr("Spawning biomass production", translate), " (1,000 t)"))
+    ylab(newline_format(paste0(en2fr("Spawning biomass production", translate), " (1,000 t)"), line_len))
   if(!is.na(annot)){
     g <- g +
       annotate(geom = "text",
