@@ -1,3 +1,47 @@
+#' Insert a newline between words so that all single lines will be of length `len` or less.
+#'
+#' @param x string to insert newlines into
+#' @param len length that each line must be
+#'
+#' @return string with newlines inserted
+#' @importFrom stringr str_sub str_split
+#' @export
+#' @examples
+#' str <- "This is a test of the newline_format function which is used to split text into predetermined-length lines"
+#' newline_format(str, 12)
+newline_format <- function(x, len){
+  stopifnot(!is.na(x),
+            !is.null(x),
+            is.character(x),
+            !is.na(len),
+            !is.null(len),
+            len > 0)
+  if(len < 2){
+    return(x)
+  }
+  j <- str_split(x, " ")
+  nchar_j <- lapply(j, nchar)[[1]]
+  j <- j[[1]]
+  cumj <- cumsum(nchar_j)
+  line <- ""
+  while(length(cumj)){
+    if(length(j) == 1){
+     line <- paste0(line, j)
+     cumj <- numeric(0)
+    }else{
+      cumj_lt <- cumj < len
+      line <- paste0(line, paste(j[1:length(cumj[cumj_lt])], collapse = " "), "\n")
+      cumj <- cumj[!cumj_lt] - len
+      j <- j[-(1:length(cumj[cumj_lt]))]
+    }
+  }
+  if(str_sub(line, start = nchar(line), end = nchar(line)) == "\n"){
+    line <- str_sub(line, start = 1, end = nchar(line) - 1)
+  }
+  line
+}
+
+
 #' Function to add a new column indicating group ID based on sequential data
 #'
 #' @param vec the vector

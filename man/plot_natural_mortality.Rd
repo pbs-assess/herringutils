@@ -5,7 +5,7 @@
 \title{Plot natural mortality mcmc median and credibility interval}
 \usage{
 plot_natural_mortality(model, line_size = 2, ribbon_alpha = 0.5,
-  annot = NA, show_x_axis = TRUE, translate = FALSE)
+  xlim = NA, annot = NA, show_x_axis = TRUE, translate = FALSE)
 }
 \arguments{
 \item{model}{an iscam model}
@@ -13,6 +13,8 @@ plot_natural_mortality(model, line_size = 2, ribbon_alpha = 0.5,
 \item{line_size}{thickness of the median line}
 
 \item{ribbon_alpha}{transparency of the credibility interval ribbon}
+
+\item{xlim}{x-limits for the plot. Implemented with [ggplot2::coord_cartesian()]}
 
 \item{annot}{a character to place in parentheses in the top left of the plot.
 If NA, nothing will appear}

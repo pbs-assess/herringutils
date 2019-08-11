@@ -5,9 +5,10 @@
 \title{Plot production using a phase plot with a path through time. Includes the reference point and its credible interval}
 \usage{
 plot_biomass_phase(model, catch_df, new_surv_yr = NA, point_size = 3,
-  line_size = 2, zeroline_size = 1, zeroline_type = "dashed",
-  lrp_ribbon_alpha = 0.35, refpt_show = "0.3sbo", annot = NA,
-  show_x_axis = TRUE, translate = FALSE)
+  line_size = 2, text_size = 2, zeroline_size = 1,
+  zeroline_type = "dashed", lrp_ribbon_alpha = 0.35,
+  refpt_show = "0.3sbo", annot = NA, show_x_axis = TRUE,
+  translate = FALSE)
 }
 \arguments{
 \item{model}{an iscam model object}
@@ -19,6 +20,8 @@ plot_biomass_phase(model, catch_df, new_surv_yr = NA, point_size = 3,
 \item{point_size}{size for points for years}
 
 \item{line_size}{thickness of the path line}
+
+\item{text_size}{size for year marker text labels}
 
 \item{zeroline_size}{thickness of the line across zero}
 

@@ -218,6 +218,7 @@ plot_spawn_ind <- function(df,
 #' @param new_surv_yr the year when the survey changed from surface to dive
 #' @param point_size size for points
 #' @param line_size thickness of line
+#' @param xlim x-limits for the plot. Implemented with [ggplot2::coord_cartesian()]
 #' @param annot a character to place in parentheses in the top left of the plot.
 #' If NA, nothing will appear
 #' @param show_x_axis Logical
@@ -236,6 +237,7 @@ plot_scaled_abundance <- function(df,
                                   new_surv_yr = NA,
                                   point_size = 2,
                                   line_size = 2,
+                                  xlim = NA,
                                   annot = NA,
                                   show_x_axis = TRUE,
                                   show_legend = FALSE,
@@ -265,10 +267,15 @@ plot_scaled_abundance <- function(df,
   g <- ggplot(dfm, aes(x = year, y = abundance)) +
     geom_point(aes(shape = gear), size = point_size) +
     scale_shape_manual(values = c(2, 1)) +
+    scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10)) +
     geom_line(data = ssb,
              aes(x = year, y = median, group = survey),
              size = line_size) +
     ylab(paste0(en2fr("Scaled abundance", translate), " (1000 t)"))
+  if(!is.na(xlim)){
+    g <- g +
+      coord_cartesian(xlim = xlim, expand = TRUE)
+  }
   if(!is.na(annot)){
     g <- g +
       annotate(geom = "text",
@@ -301,6 +308,7 @@ plot_scaled_abundance <- function(df,
 #' @param model an iscam model
 #' @param line_size thickness of the median line
 #' @param ribbon_alpha transparency of the credibility interval ribbon
+#' @param xlim x-limits for the plot. Implemented with [ggplot2::coord_cartesian()]
 #' @param annot a character to place in parentheses in the top left of the plot.
 #' If NA, nothing will appear
 #' @param show_x_axis Logical
@@ -315,6 +323,7 @@ plot_scaled_abundance <- function(df,
 plot_natural_mortality <- function(model,
                                    line_size = 2,
                                    ribbon_alpha = 0.5,
+                                   xlim = NA,
                                    annot = NA,
                                    show_x_axis = TRUE,
                                    translate = FALSE){
@@ -327,7 +336,12 @@ plot_natural_mortality <- function(model,
   g <- ggplot(m, aes(x = year, y = median)) +
     geom_line(size = line_size) +
     geom_ribbon(aes(ymin = lower, ymax = upper), alpha = ribbon_alpha) +
+    scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10)) +
     ylab(en2fr("Instantaneous natural mortality", translate))
+  if(!is.na(xlim)){
+    g <- g +
+      coord_cartesian(xlim = xlim, expand = TRUE)
+  }
   if(!is.na(annot)){
     g <- g +
       annotate(geom = "text",
@@ -356,6 +370,7 @@ plot_natural_mortality <- function(model,
 #' @param model an iscam model object
 #' @param point_size Size of points for median recruitment
 #' @param line_size thickness of errorbars
+#' @param xlim x-limits for the plot. Implemented with [ggplot2::coord_cartesian()]
 #' @param annot a character to place in parentheses in the top left of the plot.
 #' If NA, nothing will appear
 #' @param show_x_axis Logical
@@ -370,6 +385,7 @@ plot_natural_mortality <- function(model,
 plot_recruitment <- function(model,
                              point_size = 2,
                              line_size = 2,
+                             xlim = NA,
                              annot = NA,
                              show_x_axis = TRUE,
                              translate = FALSE){
@@ -388,7 +404,12 @@ plot_recruitment <- function(model,
   g <- ggplot(rec, aes(x = year, y = median)) +
     geom_point(size = point_size) +
     geom_errorbar(aes(ymin = lower, ymax = upper), size = line_size / 2, width = 0) +
+    scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10)) +
     ylab(paste0(en2fr("Number of age-2 recruits", translate), " (1,000 millions)"))
+  if(!is.na(xlim)){
+    g <- g +
+      coord_cartesian(xlim = xlim, expand = TRUE)
+  }
   if(!is.na(annot)){
     g <- g +
       annotate(geom = "text",
@@ -425,6 +446,7 @@ plot_recruitment <- function(model,
 #' @param lrp_ribbon_alpha transparency value for the LRP credibility interval ribbon
 #' @param between_bars amount of space between catch bars
 #' @param refpt_show which reference point to show. See `model$mcmccalcs$r.quants`` for choices
+#' @param xlim x-limits for the plot. Implemented with [ggplot2::coord_cartesian()]
 #' @param annot a character to place in parentheses in the top left of the plot.
 #' If NA, nothing will appear
 #' @param show_x_axis Logical
@@ -444,6 +466,7 @@ plot_biomass_catch <- function(model,
                                lrp_ribbon_alpha = 0.35,
                                between_bars = 0.5,
                                refpt_show = "0.3sbo",
+                               xlim = NA,
                                annot = NA,
                                show_x_axis = TRUE,
                                translate = FALSE){
@@ -498,9 +521,12 @@ plot_biomass_catch <- function(model,
              stat = "identity",
              width = between_bars,
              fill = "black") +
-    #geom_hline(aes(yintercept = lrp$lower)) +
-    #geom_hline(aes(yintercept = lrp$upper)) +
+    scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10)) +
     ylab(paste0(en2fr("Spawning biomass", translate), " (1,000 t)"))
+  if(!is.na(xlim)){
+    g <- g +
+      coord_cartesian(xlim = xlim, expand = TRUE)
+  }
   if(!is.na(annot)){
     g <- g +
       annotate(geom = "text",
@@ -534,6 +560,7 @@ plot_biomass_catch <- function(model,
 #' @param errorbar_size thickness of errorbars for recruitment deviations
 #' @param zeroline_size thickness of guide line at zero deviation
 #' @param zeroline_type type of  of guide line at zero deviation
+#' @param xlim x-limits for the plot. Implemented with [ggplot2::coord_cartesian()]
 #' @param annot a character to place in parentheses in the top left of the plot.
 #' If NA, nothing will appear
 #' @param show_x_axis Logical
@@ -552,6 +579,7 @@ plot_recruitment_devs <- function(model,
                                   errorbar_size = 1,
                                   zeroline_size = 1,
                                   zeroline_type = "dashed",
+                                  xlim = NA,
                                   annot = NA,
                                   show_x_axis = TRUE,
                                   translate = FALSE){
@@ -574,12 +602,17 @@ plot_recruitment_devs <- function(model,
                linetype = zeroline_type) +
     geom_point(size = point_size) +
     geom_errorbar(aes(ymin = lower, ymax = upper),
-                  size = errorbar_size / 2,
+                  size = errorbar_size,
                   width = 0) +
     geom_line(aes(y = runmean),
               color = "red",
               size = line_size) +
+    scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10)) +
     ylab(en2fr("Log recruitment deviations", translate))
+  if(!is.na(xlim)){
+    g <- g +
+      coord_cartesian(xlim = xlim, expand = TRUE)
+  }
   if(!is.na(annot)){
     g <- g +
       annotate(geom = "text",
@@ -611,6 +644,7 @@ plot_recruitment_devs <- function(model,
 #' @param new_surv_yr year in which the survey changed from surface to dive
 #' @param point_size size for points for years
 #' @param line_size thickness of the path line
+#' @param text_size size for year marker text labels
 #' @param zeroline_size thickness of the line across zero
 #' @param zeroline_type type of the line across zer
 #' @param lrp_ribbon_alpha transparency of the reference point credible interval ribbon
@@ -632,6 +666,7 @@ plot_biomass_phase <- function(model,
                                new_surv_yr = NA,
                                point_size = 3,
                                line_size = 2,
+                               text_size = 2,
                                zeroline_size = 1,
                                zeroline_type = "dashed",
                                lrp_ribbon_alpha = 0.35,
@@ -688,9 +723,9 @@ plot_biomass_phase <- function(model,
     geom_rect(data = lrp, aes(xmin = lrp$lower, xmax = lrp$upper, ymin = -Inf, ymax = Inf),
               alpha = lrp_ribbon_alpha,
               fill = "red", inherit.aes = FALSE) +
-    geom_point(aes(color = year, shape = factor(shp)), size = 5) +
+    geom_point(aes(color = year, shape = factor(shp)), size = point_size) +
     scale_color_gradient(low = "lightgrey", high = "black") +
-    geom_text_repel(aes(label = year), segment.colour = "grey", size = 4) +
+    geom_text_repel(aes(label = year), segment.colour = "grey", size = text_size) +
     geom_path(size = 1) +
     guides(color = FALSE, shape = FALSE) +
     expand_limits(x = 0) +

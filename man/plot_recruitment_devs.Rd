@@ -7,8 +7,8 @@ values}
 \usage{
 plot_recruitment_devs(model, run_mean_yrs = 3, point_size = 2,
   line_size = 2, errorbar_size = 1, zeroline_size = 1,
-  zeroline_type = "dashed", annot = NA, show_x_axis = TRUE,
-  translate = FALSE)
+  zeroline_type = "dashed", xlim = NA, annot = NA,
+  show_x_axis = TRUE, translate = FALSE)
 }
 \arguments{
 \item{model}{an iscam model object}
@@ -24,6 +24,8 @@ plot_recruitment_devs(model, run_mean_yrs = 3, point_size = 2,
 \item{zeroline_size}{thickness of guide line at zero deviation}
 
 \item{zeroline_type}{type of  of guide line at zero deviation}
+
+\item{xlim}{x-limits for the plot. Implemented with [ggplot2::coord_cartesian()]}
 
 \item{annot}{a character to place in parentheses in the top left of the plot.
 If NA, nothing will appear}

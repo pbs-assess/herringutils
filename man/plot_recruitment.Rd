@@ -4,8 +4,8 @@
 \alias{plot_recruitment}
 \title{Plot recruitment as points and errorbars}
 \usage{
-plot_recruitment(model, point_size = 2, line_size = 2, annot = NA,
-  show_x_axis = TRUE, translate = FALSE)
+plot_recruitment(model, point_size = 2, line_size = 2, xlim = NA,
+  annot = NA, show_x_axis = TRUE, translate = FALSE)
 }
 \arguments{
 \item{model}{an iscam model object}
@@ -13,6 +13,8 @@ plot_recruitment(model, point_size = 2, line_size = 2, annot = NA,
 \item{point_size}{Size of points for median recruitment}
 
 \item{line_size}{thickness of errorbars}
+
+\item{xlim}{x-limits for the plot. Implemented with [ggplot2::coord_cartesian()]}
 
 \item{annot}{a character to place in parentheses in the top left of the plot.
 If NA, nothing will appear}
