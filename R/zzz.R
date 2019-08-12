@@ -49,6 +49,10 @@ globalVariables(c(
 "minor_regions_short",
 "gearname",
 "iyr",
-"it"
+"it",
+"ct",
+"ut",
+"utlower",
+"utupper"
 
   ))

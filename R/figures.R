@@ -209,6 +209,71 @@ plot_spawn_ind <- function(df,
   g
 }
 
+#' Title
+#'
+#' @param df a data frame as constructed by [get_catch()]
+#' @param models a list of iscam model objects
+#' @param regions a vector of regions names in the order they are to appear in the facets
+#' @param line_size thickness of the mediat Ut line
+#' @param ribbon_alpha transparency of the ribbon representing the  credible interval for Ut
+#' @param ylim Limits to show on the y-axis. Implemented with [ggplot2::coord_cartesian()]
+#' @param translate Logical. If TRUE, translate to French
+#'
+#' @return a ggplot object
+#' @importFrom dplyr arrange
+#' @importFrom tibble tibble
+#' @export
+plot_harvest_rate <- function(df,
+                              models,
+                              regions,
+                              line_size = 1,
+                              ribbon_alpha = 0.35,
+                              ylim = c(0, 1),
+                              translate = FALSE){
+  dfm <- df %>%
+    group_by(year, region) %>%
+    summarize(ct = sum(value)) %>%
+    ungroup()
+
+  ssb <- lapply(seq_along(models), function(x){
+    j <-  t(models[[x]]$mcmccalcs$sbt.quants) %>%
+      as_tibble(rownames = "year") %>%
+      mutate(year = as.numeric(year))
+    names(j) <- c("year", "lower", "median", "upper", "mpd")
+    j <- j %>%
+      full_join(dfm, by = "year") %>%
+      filter(region == regions[[x]]) %>%
+      mutate(utlower = ct / (ct + lower),
+             ut = ct / (ct + median),
+             utupper = ct / (ct + upper),
+             region = as.character(region))
+    yrs <- as.numeric(min(j$year):max(j$year))
+    all_yrs <- tibble(year = yrs,
+                  region = rep(regions[[x]], length(yrs)))
+    j <- j %>%
+      full_join(all_yrs, by = c("year", "region"))  %>%
+      arrange(year)
+  }) %>%
+    bind_rows()
+
+  ssb <- arrange(transform(ssb, region = factor(region, levels = regions)), region)
+
+  g <- ggplot(ssb, aes(x = year, y = ut)) +
+    geom_line(size = line_size) +
+    geom_ribbon(aes(ymin = utlower, ymax = utupper), alpha = ribbon_alpha) +
+    geom_hline(yintercept = 0.2, linetype = "dashed") +
+    scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10)) +
+  labs(x = en2fr("Year", translate),
+         y = en2fr("Effective harvest rate", translate)) +
+    facet_wrap(~ region, ncol = 2, dir = "v", scales = "free_y" )
+
+  if(!is.na(ylim[1])){
+    g <- g +
+      coord_cartesian(ylim = ylim, expand = TRUE)
+  }
+  g
+}
+
 #' Plot the median SSB as a line, with points which are survey index scaled by catchability value
 #' for the survey
 #'
