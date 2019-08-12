@@ -16,6 +16,7 @@ plot_catch <- function(df,
     scale_x_continuous(limits = xlim) +
     expand_limits(x = xlim[1]:xlim[2]) +
     scale_fill_grey(start = 0, end = 0.8) +
+    scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10)) +
     theme(legend.position = "top") +
     labs(x = en2fr("Year", translate),
          y = paste(en2fr("Catch", translate), " (1000 t)"),
@@ -71,6 +72,7 @@ plot_wa <- function(df,
     geom_line(data = dfm_circle_age,
               aes(x = Year, y = muWeight),
               size = 2) +
+    scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10)) +
     coord_cartesian(xlim, ylim) +
     expand_limits(x = xlim[1]:xlim[2]) +
     labs(x = en2fr("Year", translate),
@@ -141,6 +143,7 @@ plot_pa <- function(df,
     geom_ribbon(data = dfm_ci,
                 aes(ymin = Lower, ymax = Upper, group = GroupID),
                 alpha = 0.25) +
+    scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10)) +
     coord_cartesian(xlim, ylim) +
     expand_limits(x = xlim[1]:xlim[2]) +
     labs(size = en2fr("Proportion", translate),
@@ -196,6 +199,7 @@ plot_spawn_ind <- function(df,
     geom_line(aes(group = gear)) +
     scale_shape_manual(values = c(2, 1)) +
     geom_vline(xintercept = new_surv_yr - 0.5, linetype = new_surv_yr_type, size = new_surv_yr_size) +
+    scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10)) +
     expand_limits(x = xlim[1]:xlim[2]) +
     labs(shape = en2fr("Survey period", translate),
          x = en2fr("Year", translate),
@@ -256,6 +260,7 @@ plot_harvest_rate <- function(df,
   }) %>%
     bind_rows()
 
+  # Needed to have facets appear in same order as regions vector
   ssb <- arrange(transform(ssb, region = factor(region, levels = regions)), region)
 
   g <- ggplot(ssb, aes(x = year, y = ut)) +
@@ -263,7 +268,7 @@ plot_harvest_rate <- function(df,
     geom_ribbon(aes(ymin = utlower, ymax = utupper), alpha = ribbon_alpha) +
     geom_hline(yintercept = 0.2, linetype = "dashed") +
     scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10)) +
-  labs(x = en2fr("Year", translate),
+    labs(x = en2fr("Year", translate),
          y = en2fr("Effective harvest rate", translate)) +
     facet_wrap(~ region, ncol = 2, dir = "v", scales = "free_y" )
 
@@ -274,6 +279,97 @@ plot_harvest_rate <- function(df,
   g
 }
 
+#' Plot density of MCMC posterior for projected biomass with quantiles and
+#'  reference point (also with quantiles)
+#'
+#' @param models list of iscam model objects
+#' @param regions a vector of regions names in the order they are to appear in the facets
+#' @param yr year to plot. Must be in the table `models[[x]]$mcmccalcs$proj.quants``
+#' @param tac tac to extract data for
+#' @param refpt the reference point to plot, as found in `models[[x]]$mcmccalcs$proj.quants``
+#' @param line_size thickness of the mediat Ut line
+#' @param ribbon_alpha transparency of the ribbon representing the  credible interval for Ut
+#' @param translate Logical. If TRUE, translate to French
+#'
+#' @return a ggplot object
+#' @importFrom ggplot2 geom_density
+#' @importFrom scales pretty_breaks
+#' @export
+plot_proj_biomass_density <- function(models,
+                                      regions,
+                                      yr,
+                                      tac = 0,
+                                      refpt = "X03B0",
+                                      line_size = 1,
+                                      ribbon_alpha = 0.35,
+                                      translate = FALSE){
+
+  get_qnt <- function(field){
+    lapply(seq_along(models), function(x){
+      j <- models[[x]]$mcmccalcs$proj.quants %>%
+        as_tibble() %>%
+        filter(TAC == tac) %>%
+        select(field) %>%
+        t() %>%
+        as_tibble()
+      names(j) <- c("lower", "median", "upper")
+      j <- j %>%
+        mutate(region = regions[[x]])
+      j
+    }) %>%
+      bind_rows()
+  }
+  sb_quants <- get_qnt(paste0("B", yr))
+  rp_quants <- get_qnt(refpt)
+
+  proj <- lapply(seq_along(models), function(x){
+    j <- models[[x]]$mcmc$proj %>%
+      filter(TAC == tac) %>%
+      select(paste0("B", yr)) %>%
+      as_tibble() %>%
+      rename(biomass = paste0("B", yr)) %>%
+      mutate(region = regions[[x]])
+  }) %>%
+    bind_rows()
+
+  # Needed to have facets appear in same order as regions vector
+  proj <- arrange(transform(proj, region = factor(region, levels = regions)), region)
+  sb_quants <- arrange(transform(sb_quants, region = factor(region, levels = regions)), region)
+  rp_quants <- arrange(transform(rp_quants, region = factor(region, levels = regions)), region)
+
+  g <- ggplot(proj) +
+    geom_density(aes(x = biomass), fill = "grey") +
+    scale_x_continuous(breaks = pretty_breaks(6), limits = c(0, NA)) +
+    geom_vline(data = sb_quants,
+               aes(xintercept = median),
+               size = line_size) +
+    geom_vline(data = sb_quants,
+               aes(xintercept = lower),
+               linetype = "dashed",
+               size = line_size) +
+    geom_vline(data = sb_quants,
+               aes(xintercept = upper),
+               linetype = "dashed",
+               size = line_size) +
+    geom_vline(data = rp_quants,
+               aes(xintercept = median),
+               color = "red",
+               size = line_size) +
+    geom_rect(data = rp_quants,
+              aes(xmin = lower,
+                  xmax = upper,
+                  ymin = -Inf,
+                  ymax = Inf),
+              alpha = ribbon_alpha,
+              color = "transparent",
+              fill = "red") +
+    labs(x = paste0(en2fr("Spawning biomass ", translate), yr, " (1,000 t)"),
+         y = en2fr("Density", translate)) +
+    facet_wrap(~ region, ncol = 2, dir = "v", scales = "free")
+  g
+}
+
+#' -----------------------------------------------------------------------------------------------
 #' Plot the median SSB as a line, with points which are survey index scaled by catchability value
 #' for the survey
 #'

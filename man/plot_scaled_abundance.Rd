@@ -2,7 +2,8 @@
 % Please edit documentation in R/figures.R
 \name{plot_scaled_abundance}
 \alias{plot_scaled_abundance}
-\title{Plot the median SSB as a line, with points which are survey index scaled by catchability value
+\title{-----------------------------------------------------------------------------------------------
+Plot the median SSB as a line, with points which are survey index scaled by catchability value
 for the survey}
 \usage{
 plot_scaled_abundance(df, model, gear, new_surv_yr = NA,
@@ -55,6 +56,7 @@ If NA, nothing will appear}
 A ggplot object
 }
 \description{
+-----------------------------------------------------------------------------------------------
 Plot the median SSB as a line, with points which are survey index scaled by catchability value
 for the survey
 }

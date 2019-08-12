@@ -53,6 +53,8 @@ globalVariables(c(
 "ct",
 "ut",
 "utlower",
-"utupper"
+"utupper",
+"TAC",
+"biomass"
 
   ))

@@ -21,6 +21,7 @@ Imports:
   ggrepel,
   gfiscamutils,
   forcats,
+  scales,
   tibble,
   zoo
 LazyData: true
