@@ -363,7 +363,7 @@ plot_proj_biomass_density <- function(models,
               alpha = ribbon_alpha,
               color = "transparent",
               fill = "red") +
-    labs(x = paste0(en2fr("Spawning biomass ", translate), yr, " (1,000 t)"),
+    labs(x = paste0(en2fr("Spawning biomass", translate), yr, " (1,000 t)"),
          y = en2fr("Density", translate)) +
     facet_wrap(~ region, ncol = 2, dir = "v", scales = "free")
   g
