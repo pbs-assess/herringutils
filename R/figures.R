@@ -996,3 +996,40 @@ plot_biomass_phase <- function(model,
                           y_axis_tick_label_size = y_axis_tick_label_size)
   g
 }
+
+plot_bh <- function(models,
+                    regions){
+  # Note sbt goes from start year to end year + 1
+  # rt goes from start year + start age to end year
+
+  # lapply !!!
+  sbt <- model$mpd$sbt
+  rt <- model$mpd$rt
+
+  sbt_yrs <- model$mpd$yrs
+  names(sbt) <- sbt_yrs
+  sbt <- enframe(sbt) %>%
+    rename(year = name)
+  sage <- model$dat$start.age
+  rt_yrs <- sbt_yrs[(sage + 1):(length(sbt_yrs) - 1)]
+  names(rt) <- rt_yrs
+  rt <- enframe(rt) %>%
+    rename(year = name)
+
+  d <- sbt %>%
+    full_join(rt, by = "year") %>%
+    rename(sbt = value.x,
+           rt = value.y) #%>%
+  #mutate(year = factor(year))
+  g <- ggplot(d, aes(x = sbt, y = rt)) +
+    geom_point(aes(color = year,
+                   shape = year)) #+
+  # geom_point( data=filter(bhSub, Year==max(yrRange)), shape=24,
+  #             colour="black", fill="white") +
+  # geom_point( data=bhPredSub, aes(x=sbo, y=ro), shape=8 ) +
+  # geom_line( data=bhPredSub ) +
+
+  browser()
+
+  g
+}
