@@ -997,6 +997,13 @@ plot_biomass_phase <- function(model,
   g
 }
 
+#' Plot Beverton-holt
+#'
+#' @param models iscam models list
+#' @param regions the regions to include
+#'
+#' @export
+#' @importFrom tibble enframe
 plot_bh <- function(models,
                     regions){
   # Note sbt goes from start year to end year + 1
@@ -1028,8 +1035,6 @@ plot_bh <- function(models,
   #             colour="black", fill="white") +
   # geom_point( data=bhPredSub, aes(x=sbo, y=ro), shape=8 ) +
   # geom_line( data=bhPredSub ) +
-
-  browser()
 
   g
 }

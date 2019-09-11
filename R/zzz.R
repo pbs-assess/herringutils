@@ -55,6 +55,7 @@ globalVariables(c(
 "utlower",
 "utupper",
 "TAC",
-"biomass"
-
+"biomass",
+"model",
+"name"
   ))
