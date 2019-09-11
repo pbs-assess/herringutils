@@ -947,7 +947,7 @@ plot_biomass_phase <- function(model,
     filter(year >= new_surv_yr)
 
   dd <- dd %>%
-    mutate(shp = ifelse(year != max(year), 0, 24))
+    mutate(shp = ifelse(year != max(year-1), 0, 24))
 
   lrp <- model$mcmccalcs$r.quants
   lrp <- lrp[,-1] %>%
