@@ -5,7 +5,7 @@
 \title{Plot natural mortality mcmc median and credibility interval}
 \usage{
 plot_natural_mortality(model, line_size = 2, ribbon_alpha = 0.5,
-  xlim = NA, show_x_axis = TRUE, show_y_axis = TRUE,
+  xlim = NA, ylim = NA, show_x_axis = TRUE, show_y_axis = TRUE,
   x_axis_label_size = 8, x_axis_tick_label_size = 8,
   y_axis_label_size = 8, y_axis_tick_label_size = 8,
   x_axis_label_newline_length = 30, y_axis_label_newline_length = 20,
@@ -19,6 +19,8 @@ plot_natural_mortality(model, line_size = 2, ribbon_alpha = 0.5,
 \item{ribbon_alpha}{transparency of the credibility interval ribbon}
 
 \item{xlim}{x-limits for the plot. Implemented with [ggplot2::coord_cartesian()]}
+
+\item{ylim}{y-limits for the plot. Implemented with [ggplot2::coord_cartesian()]}
 
 \item{show_x_axis}{see [modify_axes_labels()]}
 
@@ -43,6 +45,7 @@ If NA, nothing will appear}
 }
 \value{
 A ggplot object
+coord_cartesian(xlim = xlim, expand = TRUE)
 }
 \description{
 Plot natural mortality mcmc median and credibility interval
