@@ -484,6 +484,7 @@ plot_scaled_abundance <- function(df,
 #' @param line_size thickness of the median line
 #' @param ribbon_alpha transparency of the credibility interval ribbon
 #' @param xlim x-limits for the plot. Implemented with [ggplot2::coord_cartesian()]
+#' @param ylim y-limits for the plot. Implemented with [ggplot2::coord_cartesian()]
 #' @param show_x_axis see [modify_axes_labels()]
 #' @param show_y_axis see [modify_axes_labels()]
 #' @param x_axis_label_size see [modify_axes_labels()]
@@ -506,6 +507,7 @@ plot_natural_mortality <- function(model,
                                    line_size = 2,
                                    ribbon_alpha = 0.5,
                                    xlim = NA,
+                                   ylim = NA,
                                    show_x_axis = TRUE,
                                    show_y_axis = TRUE,
                                    x_axis_label_size = 8,
@@ -528,7 +530,8 @@ plot_natural_mortality <- function(model,
     scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10))
   if(!is.na(xlim)){
     g <- g +
-      coord_cartesian(xlim = xlim, expand = TRUE)
+      #' coord_cartesian(xlim = xlim, expand = TRUE)
+      coord_cartesian(xlim = xlim, ylim = c(0,1.25),expand = TRUE)
   }
   if(!is.na(annot)){
     g <- g +
