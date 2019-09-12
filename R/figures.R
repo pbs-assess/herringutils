@@ -946,9 +946,8 @@ plot_biomass_phase <- function(model,
     na.omit() %>%
     filter(year >= new_surv_yr)
 
-  # Remove last year and set the last year to have a different shape from the rest
   dd <- dd[-nrow(dd),] %>%
-    mutate(shp = ifelse(year != max(year), 0, 2))
+    mutate(shp = factor(0))
 
   lrp <- model$mcmccalcs$r.quants
   lrp <- lrp[,-1] %>%
@@ -958,20 +957,35 @@ plot_biomass_phase <- function(model,
   lrp[1,1] <- min(sbt$year) - 2
   lrp[,1] <- as.numeric(lrp[,1])
 
-  g <- ggplot(dd, aes(x = median, y = production)) +
+  g <- ggplot(dd, aes(x = median,
+                      y = production)) +
     geom_hline(yintercept = 0,
                size = zeroline_size,
                linetype = zeroline_type) +
     geom_vline(xintercept = lrp$median,
                color = "red",
                size = line_size) +
-    geom_rect(data = lrp, aes(xmin = lrp$lower, xmax = lrp$upper, ymin = -Inf, ymax = Inf),
+    geom_rect(data = lrp, aes(xmin = lrp$lower,
+                              xmax = lrp$upper,
+                              ymin = -Inf,
+                              ymax = Inf),
               alpha = lrp_ribbon_alpha,
-              fill = "red", inherit.aes = FALSE) +
-    geom_point(aes(color = year, shape = factor(shp)), size = point_size) +
+              fill = "red",
+              inherit.aes = FALSE) +
+    geom_point(data = filter(dd, year != max(year)),
+               aes(color = year,
+                   shape = shp),
+               size = point_size) +
+    geom_point(data = filter(dd, year == max(year)),
+               shape = 24,
+               color = "black",
+               fill = "white",
+               size = point_size) +
     scale_color_gradient(low = "lightgrey", high = "black") +
-    geom_text_repel(aes(label = year), segment.colour = "grey", size = text_size) +
     geom_path(size = 1) +
+    geom_text_repel(aes(label = year),
+                    segment.colour = "grey",
+                    size = text_size) +
     guides(color = FALSE, shape = FALSE) +
     expand_limits(x = 0)
   if(!is.na(annot)){
