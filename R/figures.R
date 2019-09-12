@@ -903,6 +903,7 @@ plot_biomass_phase <- function(model,
                                new_surv_yr = NA,
                                point_size = 3,
                                line_size = 2,
+                               path_line_size = 0.4,
                                text_size = 2,
                                zeroline_size = 1,
                                zeroline_type = "dashed",
@@ -982,7 +983,7 @@ plot_biomass_phase <- function(model,
                fill = "white",
                size = point_size) +
     scale_color_gradient(low = "lightgrey", high = "black") +
-    geom_path(size = 1) +
+    geom_path(size = path_line_size) +
     geom_text_repel(aes(label = year),
                     segment.colour = "grey",
                     size = text_size) +
