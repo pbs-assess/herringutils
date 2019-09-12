@@ -985,7 +985,7 @@ plot_biomass_phase <- function(model,
     scale_color_gradient(low = "lightgrey", high = "black") +
     geom_path(size = path_line_size) +
     geom_text_repel(aes(label = year),
-                    segment.colour = "grey",
+                    segment.colour = "lightgrey",
                     size = text_size) +
     guides(color = FALSE, shape = FALSE) +
     expand_limits(x = 0)
