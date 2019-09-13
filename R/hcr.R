@@ -84,7 +84,7 @@ hcr.min.esc.slow <- function(bt,
 #' @param catch.cap catch cap to use if calculated catch limit is higher
 #' @param bo initial biomass used in reletive biomass calculation
 #'
-#' @return catch limit
+#' @return a vector of length 2 made up of the catch limit and corresponding target harvest rate
 #' @export
 hcr.hs <- function(bt,
                    ref.hr,
@@ -92,12 +92,13 @@ hcr.hs <- function(bt,
                    usr,
                    catch.cap,
                    bo = 1){
+
   bt <- bt[length(bt)]
   targ.hr <- 0
   dep <- bt / bo
 
   if(dep <= lrp){
-    return(0)
+    return(c(0, 0))
   }
 
   if(dep > lrp & dep <= usr){
@@ -110,7 +111,7 @@ hcr.hs <- function(bt,
   if(catch.cap > 0 & catch.lim > catch.cap){
     catch.lim <- catch.cap
   }
-  catch.lim
+  c(catch.lim, targ.hr)
 }
 
 #' Calculate catch limit based on biomass reference points and reference harvest rate,
@@ -124,7 +125,7 @@ hcr.hs <- function(bt,
 #' @param catch.cap catch cap to use if calculated catch limit is higher
 #' @param bo initial biomass used in reletive biomass calculation
 #'
-#' @return catch limit
+#' @return a vector of length 2 made up of the catch limit and corresponding target harvest rate
 #' @export
 hcr.hs.slow <- function(bt,
                         num.end.yrs = 3,
@@ -142,18 +143,21 @@ hcr.hs.slow <- function(bt,
   bt.diff <- bt - lrp
 
   if(any(bt.diff <= 0)){
-    return(0)
+    return(c(0, 0))
   }
 
   if(dep > lrp & dep <= usr){
     targ.hr <- (dep - lrp) * ref.hr / (usr - lrp)
   }
   if(dep > usr){
+    if(ret.hr){
+      return(ref.hr)
+    }
     targ.hr <- ref.hr
   }
   catch.lim <- targ.hr * last.bt
   if(catch.cap > 0 & catch.lim > catch.cap){
     catch.lim <- catch.cap
   }
-  catch.lim
+  c(catch.lim, targ.hr)
 }

@@ -20,7 +20,7 @@ hcr.hs(bt, ref.hr, lrp, usr, catch.cap, bo = 1)
 \item{bo}{initial biomass used in reletive biomass calculation}
 }
 \value{
-catch limit
+a vector of length 2 made up of the catch limit and corresponding target harvest rate
 }
 \description{
 Calculate catch limit based on biomass reference points and reference harvest rate
