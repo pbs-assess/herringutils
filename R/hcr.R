@@ -150,9 +150,6 @@ hcr.hs.slow <- function(bt,
     targ.hr <- (dep - lrp) * ref.hr / (usr - lrp)
   }
   if(dep > usr){
-    if(ret.hr){
-      return(ref.hr)
-    }
     targ.hr <- ref.hr
   }
   catch.lim <- targ.hr * last.bt
