@@ -11,6 +11,8 @@
 plot_catch <- function(df,
                        xlim = c(1000, 3000),
                        translate = FALSE){
+  df <- df %>%
+    filter(year >= xlim[1])
   g <- ggplot(df, aes(x = year, y = value)) +
     geom_bar(stat = "identity", position = "stack", aes(fill = gear), width = 1) +
     scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10)) +
@@ -49,8 +51,8 @@ plot_wa <- function(df,
                     ylim = c(0, NA),
                     n_roll=5,
                     translate = FALSE){
-  df <- df %>%
-    filter(year >= xlim[1])
+  # df <- df %>%
+  #   filter(year >= xlim[1])
   dfm <- melt(df, id.vars = c("year", "area", "group", "sex", "region", "gear")) %>%
     as_tibble() %>%
     rename(Year = year,
@@ -63,9 +65,9 @@ plot_wa <- function(df,
     mutate(Age = factor(Age))
   dfm_circle_age <- dfm %>%
     filter(Age == circle_age) %>%
-    filter(!is.na(muWeight))
+    filter(!is.na(muWeight), Year >= xlim[1])
   dfm <- dfm %>%
-    filter(Age != circle_age)
+    filter(Age != circle_age, Year >= xlim[1])
   g <- ggplot(dfm) +
     geom_line(aes(x = Year, y = muWeight, group = Age)) +
     geom_point(data = dfm_circle_age,
