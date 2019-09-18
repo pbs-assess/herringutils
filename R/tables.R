@@ -185,6 +185,7 @@ decision_tables_mp <- function(df,
   df$label <- gsub("_", "\\\\_", df$label)
   df <- df %>%
     mutate(tac = 0,
+           mp = as.character(mp),
            obj1 = paste0(f(obj1 * 100, dec.points = perc_dec_pts), "\\%"),
            obj2 = paste0(f(obj2 * 100, dec.points = perc_dec_pts), "\\%"),
            obj3 = f(obj3, dec.points = dec_pts),
