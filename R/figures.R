@@ -31,6 +31,7 @@ plot_catch <- function(df,
 #' @param circle_age the age for which to add circles to plot
 #' @param xlim Limits for the years shown on the plot
 #' @param ylim limits for the weights shown on the plot
+#' @param n_roll Number of years to calculate the rolling mean (window)
 #' @param translate Logical. If TRUE, translate to French
 #'
 #' @importFrom dplyr filter as_tibble rename mutate group_by ungroup select %>%
@@ -45,6 +46,7 @@ plot_wa <- function(df,
                     circle_age = 3,
                     xlim = c(1000, 3000),
                     ylim = c(0, NA),
+                    n_roll=5,
                     translate = FALSE){
   df <- df %>%
     filter(year >= xlim[1])

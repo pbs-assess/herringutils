@@ -5,7 +5,7 @@
 \title{Plot weight-at-age time series from a data frames as extracted from iscam data (dat) files}
 \usage{
 plot_wa(df, circle_age = 3, xlim = c(1000, 3000), ylim = c(0, NA),
-  translate = FALSE)
+  n_roll = 5, translate = FALSE)
 }
 \arguments{
 \item{df}{a data frame as constructed by [get_wa()]}
@@ -15,6 +15,8 @@ plot_wa(df, circle_age = 3, xlim = c(1000, 3000), ylim = c(0, NA),
 \item{xlim}{Limits for the years shown on the plot}
 
 \item{ylim}{limits for the weights shown on the plot}
+
+\item{n_roll}{Number of years to calculate the rolling mean (window)}
 
 \item{translate}{Logical. If TRUE, translate to French}
 }
