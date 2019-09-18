@@ -82,7 +82,7 @@ plot_wa <- function(df,
     expand_limits(x = xlim[1]:xlim[2]) +
     labs(x = en2fr("Year", translate),
          y = paste0(en2fr("Weight-at-age", translate), " (kg)")) +
-    facet_wrap( ~ region, ncol = 2, dir = "v", scales = "free_y" )
+    facet_wrap( ~ region, ncol = 2, dir = "v" )
   g
 }
 
@@ -154,7 +154,7 @@ plot_pa <- function(df,
     labs(size = en2fr("Proportion", translate),
          x = en2fr("Year", translate),
          y = en2fr("Age", translate)) +
-    facet_wrap(~ Region, ncol = 2, dir = "v", scales = "free_y" ) +
+    facet_wrap(~ Region, ncol = 2, dir = "v" ) +
     theme(legend.position = "top")
   g
 }
