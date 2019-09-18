@@ -878,10 +878,11 @@ plot_recruitment_devs <- function(model,
 #' @param catch_df a data frame of catch as constructed by [get_catch()]
 #' @param new_surv_yr year in which the survey changed from surface to dive
 #' @param point_size size for points for years
-#' @param line_size thickness of the path line
+#' @param line_size thickness of the straight lines on the plot
+#' @param path_line_size thickness of the path line between points
 #' @param text_size size for year marker text labels
 #' @param zeroline_size thickness of the line across zero
-#' @param zeroline_type type of the line across zer
+#' @param zeroline_type type of the line across zero
 #' @param lrp_ribbon_alpha transparency of the reference point credible interval ribbon
 #' @param refpt_show which reference point to show. See `model$mcmccalcs$r.quants`` for choices
 #' @param show_x_axis see [modify_axes_labels()]

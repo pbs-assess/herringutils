@@ -23,6 +23,7 @@ Imports:
   forcats,
   scales,
   tibble,
-  zoo
+  zoo,
+  xtable
 LazyData: true
 RoxygenNote: 6.1.1

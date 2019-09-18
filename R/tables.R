@@ -149,3 +149,129 @@ spawn_index_by_area_table <- function(tab, cap = "", translate = FALSE){
              align = c("l", rep("r", ncol(tab) - 1)),
              caption = cap)
 }
+
+#' Make decision table based on MP data
+#'
+#' @param df data brought in from CSV files found in the herringsr project's data directory
+#' @param xcaption caption to use for the table
+#' @param xlabel latex label to use for the table
+#' @param font.size size of font for table data
+#' @param space.size space between rows of data in the table
+#' @param last_col_header title text for the last column
+#' @param placement latex placement for the table
+#' @param translate logical. Translate to French if TRUE
+#'
+#' @return an [xtable::xtable()]
+#' @export
+#' @importFrom xtable xtable
+#' @importFrom dplyr as_tibble mutate
+#' @importfrom gfutilities latex.cline latex.amp latex.bold latex.mcol latex.nline latex.hline latex.size.str
+decision_tables_mp <- function(df,
+                               xcaption = "Default",
+                               xlabel = "tab:default",
+                               font.size = 9,
+                               space.size = 10,
+                               placement = "H",
+                               last_col_header = "TAC",
+                               translate = FALSE){
+
+  df$scenario <- gsub("_", "\\\\_", df$scenario)
+  df$label <- gsub("_", "\\\\_", df$label)
+  df <- df %>%
+    as_tibble() %>%
+    mutate(tac = 0)
+  new_rows <- list()
+  new_rows$pos <- list()
+  new_rows$pos[[1]] <- -1
+  new_rows$pos[[2]] <- -1
+  new_rows$pos[[3]] <- -1
+  new_rows$pos[[4]] <- -1
+  new_rows$command <- c(paste0(latex.cline("1-9"),
+                               latex.amp(3),
+                               latex.bold(en2fr("Conservation", translate = translate)),
+                               latex.amp(),
+                               latex.bold(en2fr("Biomass", translate = translate)),
+                               latex.amp(),
+                               latex.mcol(3,
+                                          "|c|",
+                                          latex.bold(en2fr("Yield", translate = translate))),
+                               latex.amp(),
+                               latex.nline),
+                        paste0(latex.mcol(3,
+                                          "c|",
+                                          latex.bold(en2fr("Criterion", translate = translate))),
+                               latex.amp(),
+                               latex.bold(paste0(en2fr("Objective", translate = translate),
+                                                 " 1 (",
+                                                 en2fr("LRP", translate = translate),
+                                                 ")")),
+                               latex.amp(),
+                               latex.bold(paste0(en2fr("Objective", translate = translate),
+                                                 " 2")),
+                               latex.amp(),
+                               latex.bold(paste0(en2fr("Objective", translate = translate),
+                                                 " 3")),
+                               latex.amp(),
+                               latex.bold(paste0(en2fr("Objective", translate = translate),
+                                                 " 4")),
+                               latex.amp(),
+                               latex.bold(paste0(en2fr("Catch", translate = translate),
+                                                 " < 650 t")),
+                               latex.amp(),
+                               latex.bold(last_col_header),
+                               latex.nline),
+                        paste0(latex.amp(3),
+                               latex.bold("$>75\\%$"),
+                               latex.amp(),
+                               latex.bold("$>50\\%$"),
+                               latex.amp(),
+                               latex.bold("$<25\\%$"),
+                               latex.amp(),
+                               latex.bold("max"),
+                               latex.amp(),
+                               latex.bold("min"),
+                               latex.amp(),
+                               latex.bold(paste0(en2fr("by", translate = translate),
+                                                 " ",
+                                                 en2fr("MP", translate = translate))),
+                               latex.nline),
+                        paste0(latex.cline("4-8"),
+                               latex.bold(en2fr("Scenario", translate = translate)),
+                               latex.amp(),
+                               latex.bold(en2fr("MP", translate = translate)),
+                               latex.amp(),
+                               latex.bold(en2fr("Label", translate = translate)),
+                               latex.amp(),
+                               latex.bold("$P(B_t>0.3B_0)$"),
+                               latex.amp(),
+                               latex.bold("$P(B_t>0.6B_0)$"),
+                               latex.amp(),
+                               latex.bold("AAV"),
+                               latex.amp(),
+                               latex.bold("$\\overline(C)_t$"),
+                               latex.amp(),
+                               latex.bold("$P(C_t<650)$"),
+                               latex.amp(),
+                               latex.bold("(kt)"),
+                               latex.nline,
+                               latex.cline("1-9")))
+
+
+
+  size.string <- latex.size.str(font.size, space.size)
+  print(xtable(df,
+               caption = xcaption,
+               label = xlabel,
+               align = "lccc|c|c|c|c|c|c"),
+        caption.placement = "top",
+        include.rownames = FALSE,
+        include.colnames = FALSE,
+        sanitize.text.function = function(x){x},
+        size = size.string,
+        add.to.row = new_rows,
+        table.placement = placement,
+        tabular.environment = "tabularx",
+        width = "\\textwidth",
+        hline.after = NULL)
+
+}
