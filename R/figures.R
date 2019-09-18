@@ -238,6 +238,7 @@ plot_harvest_rate <- function(df,
                               line_size = 1,
                               ribbon_alpha = 0.35,
                               ylim = c(0, 1),
+                              h_line = 0.2,
                               translate = FALSE){
   dfm <- df %>%
     group_by(year, region) %>%
@@ -271,7 +272,7 @@ plot_harvest_rate <- function(df,
   g <- ggplot(ssb, aes(x = year, y = ut)) +
     geom_line(size = line_size) +
     geom_ribbon(aes(ymin = utlower, ymax = utupper), alpha = ribbon_alpha) +
-    geom_hline(yintercept = 0.2, linetype = "dashed") +
+    geom_hline(yintercept = h_line, linetype = "dashed") +
     scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10)) +
     labs(x = en2fr("Year", translate),
          y = en2fr("Effective harvest rate", translate)) +

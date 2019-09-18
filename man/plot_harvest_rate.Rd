@@ -5,7 +5,8 @@
 \title{Title}
 \usage{
 plot_harvest_rate(df, models, regions, line_size = 1,
-  ribbon_alpha = 0.35, ylim = c(0, 1), translate = FALSE)
+  ribbon_alpha = 0.35, ylim = c(0, 1), h_line = 0.2,
+  translate = FALSE)
 }
 \arguments{
 \item{df}{a data frame as constructed by [get_catch()]}
