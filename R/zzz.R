@@ -63,5 +63,9 @@ globalVariables(c(
 "latex.cline",
 "latex.mcol",
 "latex.nline",
-"latex.size.str"
+"latex.size.str",
+"obj1",
+"obj2",
+"obj3",
+"obj4"
 ))

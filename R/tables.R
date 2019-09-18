@@ -160,6 +160,9 @@ spawn_index_by_area_table <- function(tab, cap = "", translate = FALSE){
 #' @param last_col_header title text for the last column
 #' @param placement latex placement for the table
 #' @param translate logical. Translate to French if TRUE
+#' @param perc_dec_pts number of decimal points to show for percentage columns
+#' @param dec_pts number of decimal points to show for numerical non-percentage columns
+#' @param col_align string for alignment of columns. c=center, r=right, l=left, |=place vertical bar between column
 #'
 #' @return an [xtable::xtable()]
 #' @export
@@ -173,13 +176,21 @@ decision_tables_mp <- function(df,
                                space.size = 10,
                                placement = "H",
                                last_col_header = "TAC",
+                               perc_dec_pts = 0,
+                               dec_pts = 2,
+                               col_align = "ccc|r|r|c|c|r|c",
                                translate = FALSE){
 
   df$scenario <- gsub("_", "\\\\_", df$scenario)
   df$label <- gsub("_", "\\\\_", df$label)
   df <- df %>%
-    as_tibble() %>%
-    mutate(tac = 0)
+    mutate(tac = 0,
+           obj1 = paste0(f(obj1 * 100, dec.points = perc_dec_pts), "\\%"),
+           obj2 = paste0(f(obj2 * 100, dec.points = perc_dec_pts), "\\%"),
+           obj3 = f(obj3, dec.points = dec_pts),
+           obj4 = f(obj4, dec.points = dec_pts),
+           catch = paste0(f(catch * 100, dec.points = perc_dec_pts), "\\%"))
+
   new_rows <- list()
   new_rows$pos <- list()
   new_rows$pos[[1]] <- -1
@@ -262,7 +273,7 @@ decision_tables_mp <- function(df,
   print(xtable(df,
                caption = xcaption,
                label = xlabel,
-               align = "lccc|c|c|c|c|c|c"),
+               align = paste0("l", col_align)),
         caption.placement = "top",
         include.rownames = FALSE,
         include.colnames = FALSE,

@@ -6,7 +6,8 @@
 \usage{
 decision_tables_mp(df, xcaption = "Default", xlabel = "tab:default",
   font.size = 9, space.size = 10, placement = "H",
-  last_col_header = "TAC", translate = FALSE)
+  last_col_header = "TAC", perc_dec_pts = 0, dec_pts = 2,
+  col_align = "ccc|r|r|c|c|r|c", translate = FALSE)
 }
 \arguments{
 \item{df}{data brought in from CSV files found in the herringsr project's data directory}
@@ -22,6 +23,12 @@ decision_tables_mp(df, xcaption = "Default", xlabel = "tab:default",
 \item{placement}{latex placement for the table}
 
 \item{last_col_header}{title text for the last column}
+
+\item{perc_dec_pts}{number of decimal points to show for percentage columns}
+
+\item{dec_pts}{number of decimal points to show for numerical non-percentage columns}
+
+\item{col_align}{string for alignment of columns. c=center, r=right, l=left, |=place vertical bar between column}
 
 \item{translate}{logical. Translate to French if TRUE}
 }
