@@ -57,5 +57,11 @@ globalVariables(c(
 "TAC",
 "biomass",
 "model",
-"name"
-  ))
+"name",
+"latex.amp",
+"latex.bold",
+"latex.cline",
+"latex.mcol",
+"latex.nline",
+"latex.size.str"
+))

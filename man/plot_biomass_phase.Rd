@@ -22,13 +22,15 @@ plot_biomass_phase(model, catch_df, new_surv_yr = NA, point_size = 3,
 
 \item{point_size}{size for points for years}
 
-\item{line_size}{thickness of the path line}
+\item{line_size}{thickness of the straight lines on the plot}
+
+\item{path_line_size}{thickness of the path line between points}
 
 \item{text_size}{size for year marker text labels}
 
 \item{zeroline_size}{thickness of the line across zero}
 
-\item{zeroline_type}{type of the line across zer}
+\item{zeroline_type}{type of the line across zero}
 
 \item{lrp_ribbon_alpha}{transparency of the reference point credible interval ribbon}
 
