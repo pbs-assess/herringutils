@@ -275,7 +275,7 @@ plot_harvest_rate <- function(df,
     scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10)) +
     labs(x = en2fr("Year", translate),
          y = en2fr("Effective harvest rate", translate)) +
-    facet_wrap(~ region, ncol = 2, dir = "v", scales = "free_y" )
+    facet_wrap(~ region, ncol = 2, dir = "v" )
 
   if(!is.na(ylim[1])){
     g <- g +
@@ -370,7 +370,7 @@ plot_proj_biomass_density <- function(models,
               fill = "red") +
     labs(x = paste0(en2fr("Spawning biomass", translate), yr, " (1,000 t)"),
          y = en2fr("Density", translate)) +
-    facet_wrap(~ region, ncol = 2, dir = "v", scales = "free")
+    facet_wrap(~ region, ncol = 2, dir = "v", scales = "free_y")
   g
 }
 
