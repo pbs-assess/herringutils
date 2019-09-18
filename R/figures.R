@@ -150,8 +150,8 @@ plot_pa <- function(df,
     coord_cartesian(xlim, ylim) +
     expand_limits(x = xlim[1]:xlim[2]) +
     labs(size = en2fr("Proportion", translate),
-         x = en2fr("Age", translate),
-         y = en2fr("Year", translate)) +
+         x = en2fr("Year", translate),
+         y = en2fr("Age", translate)) +
     facet_wrap(~ Region, ncol = 2, dir = "v", scales = "free_y" ) +
     theme(legend.position = "top")
   g
