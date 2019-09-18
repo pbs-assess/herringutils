@@ -60,7 +60,7 @@ plot_wa <- function(df,
            Weight = value) %>%
     select(-c(area, group, sex)) %>%
     group_by(region, Age) %>%
-    mutate(muWeight = rollmean(x = Weight, k = 5, align = "right", na.pad = TRUE)) %>%
+    mutate(muWeight = rollmean(x = Weight, k = n_roll, align = "right", na.pad = TRUE)) %>%
     ungroup() %>%
     mutate(Age = factor(Age))
   dfm_circle_age <- dfm %>%
