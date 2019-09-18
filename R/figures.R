@@ -13,10 +13,10 @@ plot_catch <- function(df,
                        translate = FALSE){
   g <- ggplot(df, aes(x = year, y = value)) +
     geom_bar(stat = "identity", position = "stack", aes(fill = gear), width = 1) +
-    scale_x_continuous(limits = xlim) +
+    scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10)) +
+    coord_cartesian(xlim) +
     expand_limits(x = xlim[1]:xlim[2]) +
     scale_fill_grey(start = 0, end = 0.8) +
-    scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10)) +
     theme(legend.position = "top") +
     labs(x = en2fr("Year", translate),
          y = paste(en2fr("Catch", translate), " (1000 t)"),
@@ -24,6 +24,7 @@ plot_catch <- function(df,
     facet_wrap( ~ region, ncol = 2, dir = "v", scales = "free_y" )
   g
 }
+
 
 #' Plot weight-at-age time series from a data frames as extracted from iscam data (dat) files
 #'
