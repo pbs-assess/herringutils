@@ -7,7 +7,7 @@
 decision_tables_mp(df, xcaption = "Default", xlabel = "tab:default",
   font.size = 9, space.size = 10, placement = "H",
   last_col_header = "TAC", perc_dec_pts = 0, dec_pts = 2,
-  col_align = "ccc|r|r|c|c|r|c", translate = FALSE)
+  col_align = "ccc|r|r|c|c|r|c", inc_mps = NA, translate = FALSE)
 }
 \arguments{
 \item{df}{data brought in from CSV files found in the herringsr project's data directory}
@@ -29,6 +29,8 @@ decision_tables_mp(df, xcaption = "Default", xlabel = "tab:default",
 \item{dec_pts}{number of decimal points to show for numerical non-percentage columns}
 
 \item{col_align}{string for alignment of columns. c=center, r=right, l=left, |=place vertical bar between column}
+
+\item{inc_mps}{include these MP numbers in the table. If NA, all will be included}
 
 \item{translate}{logical. Translate to French if TRUE}
 }

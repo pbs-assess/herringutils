@@ -163,6 +163,7 @@ spawn_index_by_area_table <- function(tab, cap = "", translate = FALSE){
 #' @param perc_dec_pts number of decimal points to show for percentage columns
 #' @param dec_pts number of decimal points to show for numerical non-percentage columns
 #' @param col_align string for alignment of columns. c=center, r=right, l=left, |=place vertical bar between column
+#' @param inc_mps include these MP numbers in the table. If NA, all will be included
 #'
 #' @return an [xtable::xtable()]
 #' @export
@@ -179,6 +180,7 @@ decision_tables_mp <- function(df,
                                perc_dec_pts = 0,
                                dec_pts = 2,
                                col_align = "ccc|r|r|c|c|r|c",
+                               inc_mps = NA,
                                translate = FALSE){
 
   df$scenario <- gsub("_", "\\\\_", df$scenario)
@@ -191,6 +193,10 @@ decision_tables_mp <- function(df,
            obj3 = f(obj3, dec.points = dec_pts),
            obj4 = f(obj4, dec.points = dec_pts),
            catch = paste0(f(catch * 100, dec.points = perc_dec_pts), "\\%"))
+  if(!is.na(inc_mps[1])){
+    df <- df %>%
+      filter(mp %in% inc_mps)
+  }
 
   new_rows <- list()
   new_rows$pos <- list()
