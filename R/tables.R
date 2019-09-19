@@ -198,7 +198,7 @@ decision_tables_mp <- function(df,
                                last_col_header = "TAC",
                                perc_dec_pts = 0,
                                dec_pts = 2,
-                               col_align = "cc|c|c|c|c|c|c",
+                               col_align = "cc|c|c|c|c|c|c|c",
                                inc_mps = NA,
                                translate = FALSE){
 
