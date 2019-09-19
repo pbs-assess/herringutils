@@ -15,7 +15,7 @@ hcr.min.esc.slow(bt, num.end.yrs = 3, ref.hr, min.esc, catch.cap,
 
 \item{ref.hr}{reference harvest rate}
 
-\item{min.esc}{minimum escapement to base cath limit on}
+\item{min.esc}{minimum escapement to base catch limit on}
 
 \item{catch.cap}{catch cap to use if calculated catch limit is higher}
 
