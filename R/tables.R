@@ -136,10 +136,15 @@ sok_harvest_table <- function(tab,
 #' @param tab data.frame as read in by [readr::read_csv()]
 #' @param cap caption for table
 #' @param translate Logical. Translate to french if TRUE
+#' @param ... arguments passed to [csas_table()]
 #'
 #' @export
+#' @importFrom kableExtra add_header_above
 #' @return a [csasdown::csas_table()]
-spawn_index_by_area_table <- function(tab, cap = "", translate = FALSE){
+spawn_index_by_area_table <- function(tab,
+                                      cap = "",
+                                      translate = FALSE,
+                                      ...){
   names(tab) <- gsub("&", "\\\\&", names(tab))
   tab[-c(1, 2)] <- apply(tab[-c(1, 2)], c(1,2), f, 3)
   tab[2] <- apply(tab[2], c(1,2), f)
@@ -147,7 +152,9 @@ spawn_index_by_area_table <- function(tab, cap = "", translate = FALSE){
   csas_table(tab,
              format = "latex",
              align = c("l", rep("r", ncol(tab) - 1)),
-             caption = cap)
+             caption = cap,
+             ...) %>%
+    add_header_above(c("", "", "Proportion"=(ncol(tab)-2)), bold=TRUE)
 }
 
 #' Make decision table based on MP data

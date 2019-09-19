@@ -4,7 +4,7 @@
 \alias{spawn_index_by_area_table}
 \title{Table for spawn index by area}
 \usage{
-spawn_index_by_area_table(tab, cap = "", translate = FALSE)
+spawn_index_by_area_table(tab, cap = "", translate = FALSE, ...)
 }
 \arguments{
 \item{tab}{data.frame as read in by [readr::read_csv()]}
@@ -12,6 +12,8 @@ spawn_index_by_area_table(tab, cap = "", translate = FALSE)
 \item{cap}{caption for table}
 
 \item{translate}{Logical. Translate to french if TRUE}
+
+\item{...}{arguments passed to [csas_table()]}
 }
 \value{
 a [csasdown::csas_table()]
