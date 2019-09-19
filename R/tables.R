@@ -198,11 +198,10 @@ decision_tables_mp <- function(df,
                                last_col_header = "TAC",
                                perc_dec_pts = 0,
                                dec_pts = 2,
-                               col_align = "ccc|r|r|c|c|r|c",
+                               col_align = "cc|c|c|c|c|c|c",
                                inc_mps = NA,
                                translate = FALSE){
 
-  df$scenario <- gsub("_", "\\\\_", df$scenario)
   df$label <- gsub("_", "\\\\_", df$label)
   df <- df %>%
     mutate(tac = 0,
