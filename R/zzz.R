@@ -67,5 +67,6 @@ globalVariables(c(
 "obj1",
 "obj2",
 "obj3",
-"obj4"
+"obj4",
+"mp"
 ))

@@ -225,6 +225,7 @@ plot_spawn_ind <- function(df,
 #' @param line_size thickness of the mediat Ut line
 #' @param ribbon_alpha transparency of the ribbon representing the  credible interval for Ut
 #' @param ylim Limits to show on the y-axis. Implemented with [ggplot2::coord_cartesian()]
+#' @param h_line horizontal line value to plot
 #' @param translate Logical. If TRUE, translate to French
 #'
 #' @return a ggplot object

@@ -21,6 +21,8 @@ plot_harvest_rate(df, models, regions, line_size = 1,
 
 \item{ylim}{Limits to show on the y-axis. Implemented with [ggplot2::coord_cartesian()]}
 
+\item{h_line}{horizontal line value to plot}
+
 \item{translate}{Logical. If TRUE, translate to French}
 }
 \value{

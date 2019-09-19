@@ -5,7 +5,7 @@
 \title{Table showing the total landed catch by area for herring}
 \usage{
 total_landed_catch_table(tab, by_vec, first_yr, cap = "",
-  translate = FALSE)
+  translate = FALSE, ...)
 }
 \arguments{
 \item{tab}{data.frame as returned from [gfiscamutils::get_catch()]}
@@ -17,6 +17,8 @@ total_landed_catch_table(tab, by_vec, first_yr, cap = "",
 \item{cap}{caption for table}
 
 \item{translate}{Logical. Translate to french if TRUE}
+
+\item{...}{arguments passed to [csas_table()]}
 }
 \value{
 a [csasdown::csas_table()]

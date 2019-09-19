@@ -3,6 +3,7 @@
 #' @param tab data.frame as read in by [readr::read_csv()]
 #' @param cap caption for table
 #' @param translate Logical. Translate to french if TRUE
+#' @param ... arguments passed to [csas_table()]
 #'
 #' @importFrom gfutilities firstup firstlower
 #' @importFrom stringr str_extract
@@ -13,7 +14,8 @@
 #' @return a [csasdown::csas_table()]
 input_data_table <- function(tab,
                              cap = "",
-                             translate = FALSE){
+                             translate = FALSE,
+                             ...){
   # Source column
   tab$Source <- en2fr(tab$Source, translate, allow_missing = TRUE)
   tmp <- tab$Source
@@ -50,7 +52,8 @@ input_data_table <- function(tab,
   names(tab) <- en2fr(names(tab), translate)
   csas_table(tab,
              format = "latex",
-             caption = cap)
+             caption = cap,
+             ...)
 
 }
 
@@ -61,6 +64,7 @@ input_data_table <- function(tab,
 #' @param first_yr first year to show in table
 #' @param cap caption for table
 #' @param translate Logical. Translate to french if TRUE
+#' @param ... arguments passed to [csas_table()]
 #'
 #' @importFrom dplyr filter select mutate as_tibble group_by ungroup summarize full_join lead
 #' @importFrom reshape2 dcast
@@ -73,7 +77,8 @@ total_landed_catch_table <- function(tab,
                                      by_vec,
                                      first_yr,
                                      cap = "",
-                                     translate = FALSE){
+                                     translate = FALSE,
+                                     ...){
   tab <- tab %>%
     filter(year >= first_yr) %>%
     select(c(year, value, region)) %>%
@@ -87,7 +92,8 @@ total_landed_catch_table <- function(tab,
   csas_table(tab,
              format = "latex",
              align = c("l", rep("r", 5)),
-             caption = cap)
+             caption = cap,
+             ...)
 }
 
 #' Table for the Spawn on kelp harvest for herring
@@ -97,6 +103,7 @@ total_landed_catch_table <- function(tab,
 #' @param first_yr first year to show in table
 #' @param cap caption for table
 #' @param translate Logical. Translate to french if TRUE
+#' @param ... arguments passed to [csas_table()]
 #'
 #' @importFrom dplyr filter select mutate as_tibble group_by ungroup summarize full_join lead
 #' @importFrom reshape2 dcast
@@ -109,7 +116,8 @@ sok_harvest_table <- function(tab,
                               by_vec,
                               first_yr,
                               cap = "",
-                              translate = FALSE){
+                              translate = FALSE,
+                              ...){
   tab <- tab %>%
     filter(Year >= first_yr) %>%
     select(c(Year, Harvest, Region)) %>%
@@ -128,7 +136,8 @@ sok_harvest_table <- function(tab,
   csas_table(tab,
              format = "latex",
              align = c("l", rep("r", 5)),
-             caption = cap)
+             caption = cap,
+             ...)
 }
 
 #' Table for spawn index by area
@@ -154,7 +163,10 @@ spawn_index_by_area_table <- function(tab,
              align = c("l", rep("r", ncol(tab) - 1)),
              caption = cap,
              ...) %>%
-    add_header_above(c("", "", "Proportion"=(ncol(tab)-2)), bold=TRUE)
+    add_header_above(c("",
+                       "",
+                       "Proportion" = (ncol(tab) - 2)),
+                     bold = TRUE)
 }
 
 #' Make decision table based on MP data

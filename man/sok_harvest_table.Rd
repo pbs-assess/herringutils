@@ -4,7 +4,8 @@
 \alias{sok_harvest_table}
 \title{Table for the Spawn on kelp harvest for herring}
 \usage{
-sok_harvest_table(tab, by_vec, first_yr, cap = "", translate = FALSE)
+sok_harvest_table(tab, by_vec, first_yr, cap = "", translate = FALSE,
+  ...)
 }
 \arguments{
 \item{tab}{data.frame as read in by [readr::read_csv()]}
@@ -16,6 +17,8 @@ sok_harvest_table(tab, by_vec, first_yr, cap = "", translate = FALSE)
 \item{cap}{caption for table}
 
 \item{translate}{Logical. Translate to french if TRUE}
+
+\item{...}{arguments passed to [csas_table()]}
 }
 \value{
 a [csasdown::csas_table()]
