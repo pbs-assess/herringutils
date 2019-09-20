@@ -88,6 +88,9 @@ total_landed_catch_table <- function(tab,
     ungroup() %>%
     dcast(year ~ region, value.var = "catch") %>%
     rename(Year = year)
+  sar <- en2fr("SAR", translate)
+  ahead <- c(" "=1, sar=5)
+  names(ahead) <- c(" ", sar)
   tab <- add_cols_and_reorder(tab, by = by_vec)
   names(tab)[names(tab) == "Year"] <- en2fr("Year", translate)
   csas_table(tab,
@@ -95,8 +98,7 @@ total_landed_catch_table <- function(tab,
              align = c("l", rep("r", 5)),
              caption = cap,
              ...) %>%
-    add_header_above(c("",
-                       "SAR" = (ncol(tab) - 1)),
+    add_header_above(ahead,
                      bold = TRUE)
 }
 
@@ -131,6 +133,9 @@ sok_harvest_table <- function(tab,
     ungroup() %>%
     dcast(Year ~ Region, value.var = "catch") #%>%
     #select(-by_vec)
+  sar <- en2fr("SAR", translate)
+  ahead <- c(" "=1, sar=5)
+  names(ahead) <- c(" ", sar)
   tab <- add_cols_and_reorder(tab, by = by_vec)
   if(translate){
     tab$DPR[tab$Year == 2016] <- "DT"
@@ -142,9 +147,8 @@ sok_harvest_table <- function(tab,
              format = "latex",
              align = c("l", rep("r", 5)),
              caption = cap,
-             ...) %>%
-    add_header_above(c("",
-                       "SAR" = (ncol(tab) - 1)),
+             ...)  %>%
+    add_header_above(ahead,
                      bold = TRUE)
 }
 
