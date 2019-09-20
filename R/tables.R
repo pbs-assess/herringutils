@@ -88,11 +88,11 @@ total_landed_catch_table <- function(tab,
     ungroup() %>%
     dcast(year ~ region, value.var = "catch") %>%
     rename(Year = year)
-  sar <- en2fr("SAR", translate)
-  ahead <- c(" "=1, sar=5)
-  names(ahead) <- c(" ", sar)
   tab <- add_cols_and_reorder(tab, by = by_vec)
   names(tab)[names(tab) == "Year"] <- en2fr("Year", translate)
+  sar <- en2fr("SAR", translate)
+  ahead <- c(" "=1, sar=(ncol(tab)-1))
+  names(ahead) <- c(" ", sar)
   csas_table(tab,
              format = "latex",
              align = c("l", rep("r", 5)),
