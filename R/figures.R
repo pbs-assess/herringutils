@@ -464,7 +464,7 @@ plot_scaled_abundance <- function(df,
                label = paste0("(", annot, ")"),
                vjust = 1.3,
                hjust = -0.1,
-               size = 2.5)
+               size = 3)
   }
   if(!show_legend){
     g <- g +
@@ -544,7 +544,7 @@ plot_natural_mortality <- function(model,
                label = paste0("(", annot, ")"),
                vjust = 1.3,
                hjust = -0.1,
-               size = 2.5)
+               size = 3)
   }
   g <- modify_axes_labels(g,
                           x_label_text = newline_format(en2fr("Year", translate),
@@ -626,12 +626,12 @@ plot_recruitment <- function(model,
                label = paste0("(", annot, ")"),
                vjust = 1.3,
                hjust = -0.1,
-               size = 2.5)
+               size = 3)
   }
   g <- modify_axes_labels(g,
                           x_label_text = newline_format(en2fr("Year", translate),
                                                         x_axis_label_newline_length),
-                          y_label_text = newline_format(paste(en2fr("Number of age-2 recruits", translate), " (1,000 millions)"),
+                          y_label_text = newline_format(paste(en2fr("Number of age-2 recruits", translate), " (1000 millions)"),
                                                         y_axis_label_newline_length),
                           show_x_axis = show_x_axis,
                           show_y_axis = show_y_axis,
@@ -756,7 +756,7 @@ plot_biomass_catch <- function(model,
                label = paste0("(", annot, ")"),
                vjust = 1.3,
                hjust = -0.1,
-               size = 2.5)
+               size = 3)
   }
   g <- modify_axes_labels(g,
                           x_label_text = newline_format(en2fr("Year", translate),
@@ -856,7 +856,7 @@ plot_recruitment_devs <- function(model,
                label = paste0("(", annot, ")"),
                vjust = 1.3,
                hjust = -0.1,
-               size = 2.5)
+               size = 3)
   }
   g <- modify_axes_labels(g,
                           x_label_text = newline_format(en2fr("Year", translate),
@@ -1003,7 +1003,7 @@ plot_biomass_phase <- function(model,
                label = paste0("(", annot, ")"),
                vjust = 1.3,
                hjust = -0.1,
-               size = 2.5)
+               size = 3)
   }
   g <- modify_axes_labels(g,
                           x_label_text = newline_format(paste0(en2fr("Spawning biomass", translate), " (1000 t)"),
