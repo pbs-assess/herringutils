@@ -840,9 +840,9 @@ plot_recruitment_devs <- function(model,
     geom_errorbar(aes(ymin = lower, ymax = upper),
                   size = errorbar_size,
                   width = 0) +
-    geom_line(aes(y = runmean),
-              color = "red",
-              size = line_size) +
+    #geom_line(aes(y = runmean),
+           #   color = "red",
+             # size = line_size) +
     scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10))
   if(!is.na(xlim)){
     g <- g +
