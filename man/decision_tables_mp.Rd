@@ -7,7 +7,7 @@
 decision_tables_mp(df, xcaption = "Default", xlabel = "tab:default",
   font.size = 9, space.size = 10, placement = "H",
   last_col_header = "TAC", perc_dec_pts = 0, dec_pts = 2,
-  col_align = "cc|c|c|c|c|c|c", inc_mps = NA, translate = FALSE)
+  col_align = "cc|c|c|c|c|c|c|c", inc_mps = NA, translate = FALSE)
 }
 \arguments{
 \item{df}{data brought in from CSV files found in the herringsr project's data directory}

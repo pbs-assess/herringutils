@@ -734,7 +734,6 @@ plot_biomass_catch <- function(model,
     geom_line(size = line_size) +
     geom_ribbon(aes(ymin = lower, ymax = upper), alpha = ribbon_alpha) +
     geom_point(data = proj_sbt,
-               position = position_nudge(x = 0.5),
                size = point_size) +
     geom_errorbar(data = proj_sbt,
                   aes(ymin = lower, ymax = upper),
