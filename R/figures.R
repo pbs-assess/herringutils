@@ -739,8 +739,7 @@ plot_biomass_catch <- function(model,
     geom_errorbar(data = proj_sbt,
                   aes(ymin = lower, ymax = upper),
                   size = errorbar_size,
-                  width = 0,
-                  position = position_nudge(x = 0.5)) +
+                  width = 0) +
     geom_bar(data = ct,
              stat = "identity",
              width = between_bars,
