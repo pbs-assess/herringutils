@@ -72,6 +72,7 @@ input_data_table <- function(tab,
 #' @importFrom csasdown csas_table
 #'
 #' @export
+#' @importFrom kableExtra add_header_above
 #' @return a [csasdown::csas_table()]
 total_landed_catch_table <- function(tab,
                                      by_vec,
@@ -93,7 +94,10 @@ total_landed_catch_table <- function(tab,
              format = "latex",
              align = c("l", rep("r", 5)),
              caption = cap,
-             ...)
+             ...) %>%
+    add_header_above(c("",
+                       "SAR" = (ncol(tab) - 1)),
+                     bold = TRUE)
 }
 
 #' Table for the Spawn on kelp harvest for herring
@@ -111,6 +115,7 @@ total_landed_catch_table <- function(tab,
 #' @importFrom csasdown csas_table
 #'
 #' @export
+#' @importFrom kableExtra add_header_above
 #' @return a [csasdown::csas_table()]
 sok_harvest_table <- function(tab,
                               by_vec,
@@ -137,7 +142,10 @@ sok_harvest_table <- function(tab,
              format = "latex",
              align = c("l", rep("r", 5)),
              caption = cap,
-             ...)
+             ...) %>%
+    add_header_above(c("",
+                       "SAR" = (ncol(tab) - 1)),
+                     bold = TRUE)
 }
 
 #' Table for spawn index by area
