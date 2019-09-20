@@ -697,17 +697,18 @@ plot_biomass_catch <- function(model,
   if(length(unique(catch_df$region)) > 1){
     stop("There is more than one region in the catch_df data frame", call. = FALSE)
   }
-  sbt <- model$mcmccalcs$sbt.quants %>%
-    t() %>%
-    as_tibble(rownames = "year") %>%
-    mutate(year = as.numeric(year))
-  names(sbt) <- c("year", "lower", "median", "upper", "mpd")
-
   proj <- model$mcmccalcs$proj.quants
   proj_yr <- as.numeric(gsub("B", "", colnames(proj)[2]))
   proj_sbt <- as.numeric(c(proj_yr, proj[,2]))
   names(proj_sbt) <- c("year", "lower", "median", "upper")
   proj_sbt <- as_tibble(t(proj_sbt))
+
+  sbt <- model$mcmccalcs$sbt.quants %>%
+    t() %>%
+    as_tibble(rownames = "year") %>%
+    mutate(year = as.numeric(year)) %>%
+    filter(year != proj_yr)
+  names(sbt) <- c("year", "lower", "median", "upper", "mpd")
 
   ct <- catch_df %>%
     select(-c(area, group, sex, type, region)) %>%
