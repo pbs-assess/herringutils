@@ -133,9 +133,6 @@ sok_harvest_table <- function(tab,
     ungroup() %>%
     dcast(Year ~ Region, value.var = "catch") #%>%
     #select(-by_vec)
-  sar <- en2fr("SAR", translate)
-  ahead <- c(" "=1, sar=5)
-  names(ahead) <- c(" ", sar)
   tab <- add_cols_and_reorder(tab, by = by_vec)
   if(translate){
     tab$DPR[tab$Year == 2016] <- "DT"
@@ -143,6 +140,9 @@ sok_harvest_table <- function(tab,
     tab$PRD[tab$Year == 2016] <- "WP"
   }
   names(tab)[names(tab) == "Year"] <- en2fr("Year", translate)
+  sar <- en2fr("SAR", translate)
+  ahead <- c(" "=1, sar=(ncol(tab)-1))
+  names(ahead) <- c(" ", sar)
   csas_table(tab,
              format = "latex",
              align = c("l", rep("r", 5)),
