@@ -52,7 +52,7 @@ plot_wa <- function(df,
                     n_roll=5,
                     translate = FALSE){
   df <- df %>%
-    filter(year >= xlim[1])
+    filter(year >= xlim[1], gear%in%c("Other", "RoeSN"))
   dfm <- melt(df, id.vars = c("year", "area", "group", "sex", "region", "gear")) %>%
     as_tibble() %>%
     rename(Year = year,
@@ -110,7 +110,7 @@ plot_pa <- function(df,
                     size_range = c(0.5, 2),
                     translate = FALSE){
   df <- df %>%
-    filter(year >= xlim[1])
+    filter(year >= xlim[1], gear%in%c("Other", "RoeSN"))
   dfm <- melt(df, id.vars = c("year", "area", "group", "sex", "region", "gear")) %>%
     as_tibble() %>%
     rename(Region = region,
