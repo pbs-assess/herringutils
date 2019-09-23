@@ -439,11 +439,16 @@ plot_scaled_abundance <- function(df,
            spawn = value.x) %>%
     mutate(abundance = spawn / qmedian)
 
+  proj <- model$mcmccalcs$proj.quants
+  proj_yr <- as.numeric(gsub("B", "", colnames(proj)[2]))
+  proj_sbt <- as.numeric(c(proj_yr, proj[,2]))
+
   ssb <- t(model$mcmccalcs$sbt.quants) %>%
     as_tibble(rownames = "year") %>%
     rename(median = `50%`) %>%
     mutate(survey = ifelse(year < new_surv_yr, "Surface", "Dive"),
-           year = as.numeric(year))
+           year = as.numeric(year)) %>%
+    filter(year != proj_yr)
 
   g <- ggplot(dfm, aes(x = year, y = abundance)) +
     geom_point(aes(shape = gear), size = point_size) +
