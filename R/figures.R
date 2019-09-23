@@ -75,7 +75,7 @@ plot_wa <- function(df,
                size = 2) +
     geom_line(data = dfm_circle_age,
               aes(x = Year, y = muWeight),
-              size = 2) +
+              size = 1.25) +
     scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10)) +
     coord_cartesian(xlim, ylim) +
     expand_limits(x = xlim[1]:xlim[2]) +
@@ -142,7 +142,7 @@ plot_pa <- function(df,
     geom_point(aes(y = Age,
                    size = ifelse(Proportion, Proportion, NA))) +
     geom_path(data = dfm_ci,
-              aes(y = MeanAge, group = GroupID), size = 2) +
+              aes(y = MeanAge, group = GroupID), size = 1.25) +
     scale_size_continuous(range = size_range) +
     geom_ribbon(data = dfm_ci,
                 aes(ymin = Lower, ymax = Upper, group = GroupID),
