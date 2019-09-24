@@ -93,7 +93,7 @@ hcr.min.esc <- function(bt,
   dep <- bt / bo
 
   if(abs.esc){
-    min.esc <- min.esc / bt
+    min.esc <- min.esc / bo
   }
   min.esc.val <- min.esc * bo
 
@@ -139,7 +139,7 @@ hcr.min.esc.slow <- function(bt,
   bt <- bt[(length(bt) - num.end.yrs):length(bt)]
   catch.lim <- 0
   if(abs.esc){
-    min.esc <- min.esc / bt
+    min.esc <- min.esc / bo
   }
   min.esc.val <- min.esc * bo
 
