@@ -457,7 +457,7 @@ plot_scaled_abundance <- function(df,
     geom_line(data = ssb,
              aes(x = year, y = median, group = survey),
              size = line_size)
-  if(!is.na(xlim)){
+  if(!is.na(xlim[1])){
     g <- g +
       coord_cartesian(xlim = xlim, expand = TRUE)
   }
@@ -537,7 +537,7 @@ plot_natural_mortality <- function(model,
     geom_line(size = line_size) +
     geom_ribbon(aes(ymin = lower, ymax = upper), alpha = ribbon_alpha) +
     scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10))
-  if(!is.na(xlim)){
+  if(!is.na(xlim[1])){
     g <- g +
        coord_cartesian(xlim = xlim, expand = TRUE)
   }
@@ -619,7 +619,7 @@ plot_recruitment <- function(model,
     geom_point(size = point_size) +
     geom_errorbar(aes(ymin = lower, ymax = upper), size = line_size / 2, width = 0) +
     scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10))
-  if(!is.na(xlim)){
+  if(!is.na(xlim[1])){
     g <- g +
       coord_cartesian(xlim = xlim, expand = TRUE)
   }
@@ -749,7 +749,7 @@ plot_biomass_catch <- function(model,
              width = between_bars,
              fill = "black") +
     scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10))
-  if(!is.na(xlim)){
+  if(!is.na(xlim[1])){
     g <- g +
       coord_cartesian(xlim = xlim, expand = TRUE)
   }
@@ -849,7 +849,7 @@ plot_recruitment_devs <- function(model,
            #   color = "red",
              # size = line_size) +
     scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10))
-  if(!is.na(xlim)){
+  if(!is.na(xlim[1])){
     g <- g +
       coord_cartesian(xlim = xlim, expand = TRUE)
   }
