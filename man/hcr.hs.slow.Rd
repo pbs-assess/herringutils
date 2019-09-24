@@ -5,7 +5,8 @@
 \title{Calculate catch limit based on biomass reference points and reference harvest rate,
  using the last N years for the calculation}
 \usage{
-hcr.hs.slow(bt, num.end.yrs = 3, ref.hr, lrp, usr, catch.cap, bo = 1)
+hcr.hs.slow(bt, num.end.yrs = 3, ref.hr, lrp, usr, catch.cap = 0,
+  bo = 1)
 }
 \arguments{
 \item{bt}{biomass vector for years}

@@ -4,7 +4,7 @@
 \alias{hcr.hs}
 \title{Calculate catch limit based on biomass reference points and reference harvest rate}
 \usage{
-hcr.hs(bt, ref.hr, lrp, usr, catch.cap, bo = 1)
+hcr.hs(bt, ref.hr, lrp, usr, catch.cap = 0, bo = 1)
 }
 \arguments{
 \item{bt}{biomass vector for years}

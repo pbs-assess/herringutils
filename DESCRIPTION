@@ -24,6 +24,7 @@ Imports:
   scales,
   tibble,
   zoo,
-  xtable
+  xtable,
+  kableExtra
 LazyData: true
 RoxygenNote: 6.1.1

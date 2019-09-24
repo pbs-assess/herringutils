@@ -215,19 +215,23 @@ decision_tables_mp <- function(df,
                                translate = FALSE){
 
   df$label <- gsub("_", "\\\\_", df$label)
+
   df <- df %>%
-    mutate(tac = 0,
-           hr = 0,
-           mp = as.character(mp),
+    mutate(mp = as.character(mp),
            obj1 = paste0(f(obj1 * 100, dec.points = perc_dec_pts), "\\%"),
            obj2 = paste0(f(obj2 * 100, dec.points = perc_dec_pts), "\\%"),
            obj3 = f(obj3, dec.points = dec_pts),
            obj4 = f(obj4, dec.points = dec_pts),
-           catch = paste0(f(catch * 100, dec.points = perc_dec_pts), "\\%"))
+           catch = paste0(f(catch * 100, dec.points = perc_dec_pts), "\\%"),
+           tac = f(tac, dec.points = dec_pts),
+           targ.hr = f(targ.hr, dec.points = dec_pts))
+
   if(!is.na(inc_mps[1])){
     df <- df %>%
       filter(mp %in% inc_mps)
   }
+  wherena <- apply(df, c(1,2), function(x){grep(" *NA", x)}) == 1
+  df[!is.na(wherena)] <- "--"
 
   new_rows <- list()
   new_rows$pos <- list()
@@ -244,7 +248,7 @@ decision_tables_mp <- function(df,
                                latex.mcol(3,
                                           "c|",
                                           latex.bold(en2fr("Yield", translate = translate))),
-                               latex.amp(),
+                               latex.amp(2),
                                latex.nline),
                         paste0(latex.mcol(2,
                                           "c|",
@@ -267,9 +271,9 @@ decision_tables_mp <- function(df,
                                latex.bold(paste0(en2fr("Catch", translate = translate),
                                                  " < 650 t")),
                                latex.amp(),
-                               latex.bold(en2fr("HR", translate = translate)),
-                               latex.amp(),
                                latex.bold(last_col_header),
+                               latex.amp(),
+                               latex.bold(en2fr("HR", translate = translate)),
                                latex.nline),
                         paste0(latex.amp(2),
                                "$>75\\%$",
@@ -285,10 +289,9 @@ decision_tables_mp <- function(df,
                                latex.bold(paste0(en2fr("by", translate = translate),
                                                  " ",
                                                  en2fr("MP", translate = translate))),
+                               latex.amp(),
                                latex.nline),
                         paste0(latex.cline("3-7"),
-                               latex.bold(en2fr("Scenario", translate = translate)),
-                               latex.amp(),
                                latex.bold(en2fr("MP", translate = translate)),
                                latex.amp(),
                                latex.bold(en2fr("Label", translate = translate)),
@@ -304,6 +307,7 @@ decision_tables_mp <- function(df,
                                "$P(C_t<650)$",
                                latex.amp(),
                                latex.bold("(kt)"),
+                               latex.amp(),
                                latex.nline,
                                latex.cline("1-9")))
 

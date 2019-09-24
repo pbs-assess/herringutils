@@ -5,8 +5,8 @@
 \title{Calculate catch limit based on a minimum escapement and reference harvest rate,
  using the last N years for the calculation}
 \usage{
-hcr.min.esc.slow(bt, num.end.yrs = 3, ref.hr, min.esc, catch.cap,
-  bo = 1)
+hcr.min.esc.slow(bt, num.end.yrs = 3, ref.hr, min.esc, abs.esc = FALSE,
+  catch.cap = 0, bo = 1)
 }
 \arguments{
 \item{bt}{biomass vector for years}

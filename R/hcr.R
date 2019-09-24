@@ -1,3 +1,77 @@
+#' Return the appropriate HCR values for the given 'row' as it appears in the MP data file
+#'
+#' @param row A row of one of the MP tables as it appears in `pbs-assess/herringsr/data/mp-*.csv` files
+#' @param bt a list of vectors of timeseries biomass values
+#' @param bo a vector of numeric values for the initial biomass to base relative biomasses on. This must be the
+#' same length as the bt list
+#'
+#' @return The original row with the catch limit (tac) and associated harvest rate (hr) populated
+#'
+#' @export
+hcr <- function(bt, bo, row){
+  stopifnot(length(bt) == length(bo))
+  hcr_helper <- function(bt, bo, row){
+    val <- c(NA, NA)
+    if(all(is.na(row$esc),
+           is.na(row$abs_esc),
+           is.na(row$cap),
+           is.na(row$lrp),
+           is.na(row$usr))){
+      val <- c(NA, NA)
+    }else if(is.na(row$lrp) &&
+             is.na(row$usr) &&
+             !is.na(row$esc) &&
+             !is.na(row$abs_esc)){
+      if(!is.na(row$slowyrs) && row$slowyrs > 1){
+        val <- hcr.min.esc.slow(bt,
+                                num.end.yrs = row$slowyrs,
+                                ref.hr = row$hr,
+                                min.esc = row$esc,
+                                abs.esc = row$abs_esc,
+                                catch.cap = row$cap,
+                                bo = bo)
+      }else{
+        val <- hcr.min.esc(bt,
+                           ref.hr = row$hr,
+                           min.esc = row$esc,
+                           abs.esc = row$abs_esc,
+                           catch.cap = row$cap,
+                           bo = bo)
+      }
+    }else if(!is.na(row$lrp) &&
+             !is.na(row$usr) &&
+             is.na(row$esc)){
+      if(!is.na(row$slowyrs) && row$slowyrs > 1){
+        val <- hcr.hs.slow(bt,
+                           num.end.yrs = row$slowyrs,
+                           ref.hr = row$hr,
+                           lrp = row$lrp,
+                           usr = row$usr,
+                           catch.cap = row$cap,
+                           bo = bo)
+      }else{
+        val <- hcr.hs(bt,
+                      ref.hr = row$hr,
+                      lrp = row$lrp,
+                      usr = row$usr,
+                      catch.cap = row$cap,
+                      bo = bo)
+      }
+    }else{
+      stop("The row given does not have variables set correctly. Row:\n", paste(row, collapse = ", "))
+    }
+  }
+
+  j <- lapply(seq_along(bt),
+              function(x){
+                hcr_helper(bt = bt[[x]],
+                           bo = bo[x],
+                           row = row)})
+  row$tac <- median(sapply(j, "[[", 1))
+  row$targ.hr <- median(sapply(j, "[[", 2))
+  row
+}
+
 #' Calculate catch limit based on a minimum escapement and reference harvest rate
 #'
 #' @param bt biomass vector for years
@@ -11,23 +85,31 @@
 hcr.min.esc <- function(bt,
                         ref.hr,
                         min.esc,
-                        catch.cap,
+                        abs.esc = FALSE,
+                        catch.cap = 0,
                         bo = 1){
   bt <- bt[length(bt)]
   catch.lim <- 0
   dep <- bt / bo
-  min.esc.val <- min.esc * bo
+  if(abs.esc){
+    min.esc.val <- min.esc / bt * bo
+  }else{
+    min.esc.val <- min.esc * bo
+  }
 
   if(dep <= min.esc){
-    return(0)
+    return(c(0, 0))
   }
-  if(dep > min.esc & dep <= min.esc / (1 - ref.hr)){
+  if(dep > min.esc && dep <= min.esc / (1 - ref.hr)){
     catch.lim <- bt - min.esc.val
   }
   if(dep > min.esc / (1 - ref.hr)){
     catch.lim <- ref.hr * bt
   }
-  if(catch.cap > 0 & catch.lim > catch.cap){
+  if(is.na(catch.cap)){
+    catch.cap <- 0
+  }
+  if(catch.cap > 0 && catch.lim > catch.cap){
     catch.lim <- catch.cap
   }
   targ.hr <- catch.lim / (catch.lim + bt)
@@ -50,27 +132,34 @@ hcr.min.esc.slow <- function(bt,
                              num.end.yrs = 3,
                              ref.hr,
                              min.esc,
-                             catch.cap,
+                             abs.esc = FALSE,
+                             catch.cap = 0,
                              bo = 1){
 
   bt <- bt[(length(bt) - num.end.yrs):length(bt)]
   catch.lim <- 0
-  min.esc.val <- min.esc * bo
+  if(abs.esc){
+    min.esc.val <- min.esc / bt * bo
+  }else{
+    min.esc.val <- min.esc * bo
+  }
   last.bt <- bt[length(bt)]
   dep <- last.bt / bo
   bt.diff <- bt - min.esc
 
   if(any(bt.diff <= 0)){
-    return(0)
+    return(c(0, 0))
   }
-
-  if(dep > min.esc & dep <= min.esc / (1 - ref.hr)){
+  if(dep > min.esc && dep <= min.esc / (1 - ref.hr)){
     catch.lim <- last.bt - min.esc.val
   }
   if(dep > min.esc / (1 - ref.hr)){
     catch.lim <- ref.hr * last.bt
   }
-  if(catch.cap > 0 & catch.lim > catch.cap){
+  if(is.na(catch.cap)){
+    catch.cap <- 0
+  }
+  if(catch.cap > 0 && catch.lim > catch.cap){
     catch.lim <- catch.cap
   }
   targ.hr <- catch.lim / (catch.lim + bt)
@@ -92,7 +181,7 @@ hcr.hs <- function(bt,
                    ref.hr,
                    lrp,
                    usr,
-                   catch.cap,
+                   catch.cap = 0,
                    bo = 1){
 
   bt <- bt[length(bt)]
@@ -103,14 +192,17 @@ hcr.hs <- function(bt,
     return(c(0, 0))
   }
 
-  if(dep > lrp & dep <= usr){
+  if(dep > lrp && dep <= usr){
     targ.hr <- (dep - lrp) * ref.hr / (usr - lrp)
   }
   if(dep > usr){
     targ.hr <- ref.hr
   }
   catch.lim <- targ.hr * bt
-  if(catch.cap > 0 & catch.lim > catch.cap){
+  if(is.na(catch.cap)){
+    catch.cap <- 0
+  }
+  if(catch.cap > 0 && catch.lim > catch.cap){
     catch.lim <- catch.cap
   }
   c(catch.lim, targ.hr)
@@ -134,7 +226,7 @@ hcr.hs.slow <- function(bt,
                         ref.hr,
                         lrp,
                         usr,
-                        catch.cap,
+                        catch.cap = 0,
                         bo = 1){
 
   bt <- bt[(length(bt) - num.end.yrs):length(bt)]
@@ -148,14 +240,17 @@ hcr.hs.slow <- function(bt,
     return(c(0, 0))
   }
 
-  if(dep > lrp & dep <= usr){
+  if(dep > lrp && dep <= usr){
     targ.hr <- (dep - lrp) * ref.hr / (usr - lrp)
   }
   if(dep > usr){
     targ.hr <- ref.hr
   }
   catch.lim <- targ.hr * last.bt
-  if(catch.cap > 0 & catch.lim > catch.cap){
+  if(is.na(catch.cap)){
+    catch.cap <- 0
+  }
+  if(catch.cap > 0 && catch.lim > catch.cap){
     catch.lim <- catch.cap
   }
   c(catch.lim, targ.hr)
