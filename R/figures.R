@@ -68,14 +68,19 @@ plot_wa <- function(df,
   dfm <- dfm %>%
     filter(Age != circle_age)
   g <- ggplot(dfm) +
-    geom_line(aes(x = Year, y = muWeight, group = Age)) +
+    geom_line(aes(x = Year,
+                  y = muWeight,
+                  group = Age),
+              na.rm = TRUE) +
     geom_point(data = dfm_circle_age,
                aes(x = Year, y = Weight),
                shape = 1,
-               size = 2) +
+               size = 2,
+               na.rm = TRUE) +
     geom_line(data = dfm_circle_age,
               aes(x = Year, y = muWeight),
-              size = 1.25) +
+              size = 1.25,
+              na.rm = TRUE) +
     scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10)) +
     coord_cartesian(xlim, ylim) +
     expand_limits(x = xlim[1]:xlim[2]) +
@@ -140,9 +145,12 @@ plot_pa <- function(df,
 
   g <- ggplot(dfm, aes(x = Year)) +
     geom_point(aes(y = Age,
-                   size = ifelse(Proportion, Proportion, NA))) +
+                   size = ifelse(Proportion, Proportion, NA)),
+                   na.rm = TRUE) +
     geom_path(data = dfm_ci,
-              aes(y = MeanAge, group = GroupID), size = 1.25) +
+              aes(y = MeanAge, group = GroupID),
+              size = 1.25,
+              na.rm = TRUE) +
     scale_size_continuous(range = size_range) +
     geom_ribbon(data = dfm_ci,
                 aes(ymin = Lower, ymax = Upper, group = GroupID),
@@ -199,8 +207,10 @@ plot_spawn_ind <- function(df,
     select(-c(area, group, sex, wt, timing))
 
   g <- ggplot(dfm, aes(x = Year, y = Index)) +
-    geom_point(aes(shape = gear)) +
-    geom_line(aes(group = gear)) +
+    geom_point(aes(shape = gear),
+               na.rm = TRUE) +
+    geom_line(aes(group = gear),
+              na.rm = TRUE) +
     scale_shape_manual(values = c(2, 1)) +
     geom_vline(xintercept = new_surv_yr - 0.5, linetype = new_surv_yr_type, size = new_surv_yr_size) +
     scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10)) +
@@ -270,7 +280,8 @@ plot_harvest_rate <- function(df,
   ssb <- arrange(transform(ssb, region = factor(region, levels = regions)), region)
 
   g <- ggplot(ssb, aes(x = year, y = ut)) +
-    geom_line(size = line_size) +
+    geom_line(size = line_size,
+              na.rm = TRUE) +
     geom_ribbon(aes(ymin = utlower, ymax = utupper), alpha = ribbon_alpha) +
     geom_hline(yintercept = h_line, linetype = "dashed") +
     scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10)) +
@@ -451,12 +462,15 @@ plot_scaled_abundance <- function(df,
     filter(year != proj_yr)
 
   g <- ggplot(dfm, aes(x = year, y = abundance)) +
-    geom_point(aes(shape = gear), size = point_size) +
+    geom_point(aes(shape = gear),
+               size = point_size,
+               na.rm = TRUE) +
     scale_shape_manual(values = c(2, 1)) +
     scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10)) +
     geom_line(data = ssb,
              aes(x = year, y = median, group = survey),
-             size = line_size)
+             size = line_size,
+             na.rm = TRUE)
   if(!is.na(xlim[1])){
     g <- g +
       coord_cartesian(xlim = xlim, expand = TRUE)
@@ -534,7 +548,8 @@ plot_natural_mortality <- function(model,
   names(m) <- c("year", "lower", "median", "upper")
 
   g <- ggplot(m, aes(x = year, y = median)) +
-    geom_line(size = line_size) +
+    geom_line(size = line_size,
+              na.rm = TRUE) +
     geom_ribbon(aes(ymin = lower, ymax = upper), alpha = ribbon_alpha) +
     scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10))
   if(!is.na(xlim[1])){
@@ -616,7 +631,8 @@ plot_recruitment <- function(model,
            mpd = mpd / 1000)
 
   g <- ggplot(rec, aes(x = year, y = median)) +
-    geom_point(size = point_size) +
+    geom_point(size = point_size,
+               na.rm = TRUE) +
     geom_errorbar(aes(ymin = lower, ymax = upper), size = line_size / 2, width = 0) +
     scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10))
   if(!is.na(xlim[1])){
@@ -736,10 +752,12 @@ plot_biomass_catch <- function(model,
     geom_rect(data = lrp, aes(xmin = -Inf, xmax = Inf, ymin = lrp$lower, ymax = lrp$upper),
               alpha = lrp_ribbon_alpha,
               fill = "red") +
-    geom_line(size = line_size) +
+    geom_line(size = line_size,
+              na.rm = TRUE) +
     geom_ribbon(aes(ymin = lower, ymax = upper), alpha = ribbon_alpha) +
     geom_point(data = proj_sbt,
-               size = point_size) +
+               size = point_size,
+               na.rm = TRUE) +
     geom_errorbar(data = proj_sbt,
                   aes(ymin = lower, ymax = upper),
                   size = errorbar_size,
@@ -841,7 +859,8 @@ plot_recruitment_devs <- function(model,
     geom_hline(yintercept = 0,
                size = zeroline_size,
                linetype = zeroline_type) +
-    geom_point(size = point_size) +
+    geom_point(size = point_size,
+               na.rm = TRUE) +
     geom_errorbar(aes(ymin = lower, ymax = upper),
                   size = errorbar_size,
                   width = 0) +
@@ -987,14 +1006,17 @@ plot_biomass_phase <- function(model,
     geom_point(data = filter(dd, year != max(year)),
                aes(color = year,
                    shape = shp),
-               size = point_size) +
+               size = point_size,
+               na.rm = TRUE) +
     geom_point(data = filter(dd, year == max(year)),
                shape = 24,
                color = "black",
                fill = "white",
-               size = point_size) +
+               size = point_size,
+               na.rm = TRUE) +
     scale_color_gradient(low = "lightgrey", high = "black") +
-    geom_path(size = path_line_size) +
+    geom_path(size = path_line_size,
+              na.rm = TRUE) +
     geom_text_repel(aes(label = year),
                     segment.colour = "lightgrey",
                     size = text_size) +
@@ -1057,7 +1079,8 @@ plot_bh <- function(models,
   #mutate(year = factor(year))
   g <- ggplot(d, aes(x = sbt, y = rt)) +
     geom_point(aes(color = year,
-                   shape = year)) #+
+                   shape = year),
+                   na.rm = TRUE) #+
   # geom_point( data=filter(bhSub, Year==max(yrRange)), shape=24,
   #             colour="black", fill="white") +
   # geom_point( data=bhPredSub, aes(x=sbo, y=ro), shape=8 ) +
