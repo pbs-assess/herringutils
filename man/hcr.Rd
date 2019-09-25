@@ -15,7 +15,7 @@ same length as the bt list}
 \item{row}{A row of one of the MP tables as it appears in `pbs-assess/herringsr/data/mp-*.csv` files}
 }
 \value{
-The original row with the catch limit (catch) and associated harvest rate (hr) populated
+The original row with the catch limit (tac) and associated harvest rate (hr) populated
 }
 \description{
 Return the appropriate HCR values for the given 'row' as it appears in the MP data file
