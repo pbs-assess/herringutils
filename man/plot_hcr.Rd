@@ -6,7 +6,7 @@
 \usage{
 plot_hcr(hcr.lst, sbt.lst, mp = "", region = "", probs = c(0.025,
   0.975), show.medians = TRUE, show.means = TRUE,
-  show.x.axes = FALSE)
+  show.x.axes = FALSE, panel.text.size = 4)
 }
 \arguments{
 \item{hcr.lst}{A list of length equal to the length of the sbt list, of vectors of length two,
@@ -25,6 +25,8 @@ containing the catch limit (tac) and associated harvest rate (hr)}
 \item{show.means}{show the mean lines}
 
 \item{show.x.axes}{if TRUE, axes labels, tick marks and tick labels will be shown on the lower plot's x axes}
+
+\item{panel.text.size}{text size for the description panels}
 }
 \value{
 a ggplot object

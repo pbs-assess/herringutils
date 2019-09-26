@@ -1057,6 +1057,7 @@ plot_biomass_phase <- function(model,
 #' @param show.medians show the median lines and credible intervals
 #' @param show.means show the mean lines
 #' @param show.x.axes if TRUE, axes labels, tick marks and tick labels will be shown on the lower plot's x axes
+#' @param panel.text.size text size for the description panels
 #'
 #' @return a ggplot object
 #' @export
@@ -1067,7 +1068,8 @@ plot_hcr <- function(hcr.lst,
                      probs = c(0.025, 0.975),
                      show.medians = TRUE,
                      show.means = TRUE,
-                     show.x.axes = FALSE){
+                     show.x.axes = FALSE,
+                     panel.text.size = 4){
 
   label <- paste0(region, "\n", gsub("_", "\n", mp))
   tac <- sapply(hcr.lst, "[[", 1)
@@ -1080,7 +1082,7 @@ plot_hcr <- function(hcr.lst,
     df <- data.frame()
     g <- ggplot(df) +
       geom_point() +
-      annotate("text", x = 100, y = 20, label = "No data", size = 5) +
+      annotate("text", x = 100, y = 20, label = "No data", size = panel.text.size) +
       theme(axis.text.x = element_blank(),
             axis.text.y = element_blank(),
             axis.ticks = element_blank(),
@@ -1090,7 +1092,7 @@ plot_hcr <- function(hcr.lst,
       ylab("")
     h <- ggplot(df) +
       geom_point() +
-      annotate("text", x = 100, y = 20, label = "No data", size = 5) +
+      annotate("text", x = 100, y = 20, label = "No data", size = panel.text.size) +
       theme(axis.text.x = element_blank(),
             axis.text.y = element_blank(),
             axis.ticks = element_blank(),
@@ -1100,7 +1102,7 @@ plot_hcr <- function(hcr.lst,
       ylab("")
     i <- ggplot(df) +
       geom_point() +
-      annotate("text", x = 100, y = 20, label = "No data", size = 5) +
+      annotate("text", x = 100, y = 20, label = "No data", size = panel.text.size) +
       theme(axis.text.x = element_blank(),
             axis.text.y = element_blank(),
             axis.ticks = element_blank(),
@@ -1256,7 +1258,7 @@ plot_hcr <- function(hcr.lst,
   i <- i +
     theme(plot.margin = unit(c(0, 0, 0, 0), "mm"))
   j <- ggplot() +
-    annotate("text", x = 100, y = 20, label = label, size = 5) +
+    annotate("text", x = 100, y = 20, label = label, size = panel.text.size) +
     theme(axis.text.x = element_blank(),
           axis.text.y = element_blank(),
           axis.ticks = element_blank(),
