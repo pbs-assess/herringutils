@@ -1,11 +1,12 @@
 #' Return the appropriate HCR values for the given 'row' as it appears in the MP data file
 #'
 #' @param row A row of one of the MP tables as it appears in `pbs-assess/herringsr/data/mp-*.csv` files
-#' @param bt a list of vectors of timeseries biomass values
-#' @param bo a vector of numeric values for the initial biomass to base relative biomasses on. This must be the
-#' same length as the bt list
+#' @param bt a list of vectors of timeseries biomass values (typically many posteriors)
+#' @param bo a vector of numeric values (typically many posteriors) for the initial biomass to base
+#'  relative biomasses on. This must be the same length as the bt list
 #'
-#' @return The original row with the catch limit (tac) and associated harvest rate (hr) populated
+#' @return A list of length equal to the length of the bt and bo lists, of vectors of length two,
+#'  containing the catch limit (tac) and associated harvest rate (hr)
 #'
 #' @export
 hcr <- function(bt, bo, row){
@@ -62,14 +63,11 @@ hcr <- function(bt, bo, row){
     }
   }
 
-  j <- lapply(seq_along(bt),
-              function(x){
-                hcr_helper(bt = bt[[x]],
-                           bo = bo[x],
-                           row = row)})
-  row$tac <- median(sapply(j, "[[", 1))
-  row$targ.hr <- median(sapply(j, "[[", 2))
-  row
+  lapply(seq_along(bt),
+         function(x){
+           hcr_helper(bt = bt[[x]],
+                      bo = bo[x],
+                      row = row)})
 }
 
 #' Calculate catch limit based on a minimum escapement and reference harvest rate

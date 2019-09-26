@@ -1046,6 +1046,269 @@ plot_biomass_phase <- function(model,
   g
 }
 
+#' Plot Harvest control rules as pairs plots
+#'
+#' @param hcr.lst A list of length equal to the length of the sbt list, of vectors of length two,
+#'  containing the catch limit (tac) and associated harvest rate (hr)
+#' @param sbt.lst a list of vectors of timeseries biomass values (typically many posteriors)
+#' @param mp name of the management procedure to appear on the blank panel
+#' @param region name for the region to appear on the blank panel
+#' @param probs vector of length 2 for credible interval of median
+#' @param show.medians show the median lines and credible intervals
+#' @param show.means show the mean lines
+#' @param show.x.axes if TRUE, axes labels, tick marks and tick labels will be shown on the lower plot's x axes
+#'
+#' @return a ggplot object
+#' @export
+plot_hcr <- function(hcr.lst,
+                     sbt.lst,
+                     mp = "",
+                     region = "",
+                     probs = c(0.025, 0.975),
+                     show.medians = TRUE,
+                     show.means = TRUE,
+                     show.x.axes = FALSE){
+
+  label <- paste0(region, "\n", gsub("_", "\n", mp))
+  tac <- sapply(hcr.lst, "[[", 1)
+  hr <- sapply(hcr.lst, "[[", 2)
+  sbt <- sapply(sbt.lst, "[[", length(sbt.lst[[1]]))
+  df <- tibble(tac = tac,
+               hr = hr,
+               sbt = sbt)
+  if(all(is.na(df$hr)) || all(is.na(df$tac))){
+    df <- data.frame()
+    g <- ggplot(df) +
+      geom_point() +
+      annotate("text", x = 100, y = 20, label = "No data", size = 5) +
+      theme(axis.text.x = element_blank(),
+            axis.text.y = element_blank(),
+            axis.ticks = element_blank(),
+            panel.grid.major = element_blank(),
+            panel.grid.minor = element_blank()) +
+      xlab("") +
+      ylab("")
+    h <- ggplot(df) +
+      geom_point() +
+      annotate("text", x = 100, y = 20, label = "No data", size = 5) +
+      theme(axis.text.x = element_blank(),
+            axis.text.y = element_blank(),
+            axis.ticks = element_blank(),
+            panel.grid.major = element_blank(),
+            panel.grid.minor = element_blank()) +
+      xlab("") +
+      ylab("")
+    i <- ggplot(df) +
+      geom_point() +
+      annotate("text", x = 100, y = 20, label = "No data", size = 5) +
+      theme(axis.text.x = element_blank(),
+            axis.text.y = element_blank(),
+            axis.ticks = element_blank(),
+            panel.grid.major = element_blank(),
+            panel.grid.minor = element_blank()) +
+      xlab("") +
+      ylab("")
+  }else{
+    g <- ggplot(df, aes(x = tac, y = hr)) +
+      geom_point(na.rm = TRUE) +
+      theme(axis.text.y = element_blank(),
+            axis.ticks.y = element_blank()) +
+      ylab("") +
+      xlab("TAC")
+
+    h <- ggplot(df, aes(x = sbt, y = tac)) +
+      geom_point(na.rm = TRUE) +
+      theme(axis.text.x = element_blank(),
+            axis.ticks.x = element_blank()) +
+      xlab("") +
+      ylab("TAC")
+
+    i <- ggplot(df, aes(x = sbt, y = hr)) +
+      geom_point(na.rm = TRUE) +
+      xlab("Projected Spawning Biomass") +
+      ylab("Harvest Rate")
+
+    if(show.medians){
+      quants.tac <- as_tibble(t(as.data.frame(quantile(tac, probs = probs, na.rm = TRUE)))) %>%
+        rename(lower = 1, upper = 2)
+      quants.hr <- as_tibble(t(as.data.frame(quantile(hr, probs = probs, na.rm = TRUE)))) %>%
+        rename(lower = 1, upper = 2)
+      quants.sbt <- as_tibble(t(as.data.frame(quantile(sbt, probs = probs)))) %>%
+        rename(lower = 1, upper = 2)
+      g <- g +
+        geom_vline(xintercept = median(tac),
+                   color = "red",
+                   size = 1,
+                   linetype = "dashed") +
+        geom_rect(data = quants.hr,
+                  aes(ymin = quants.hr$lower,
+                      ymax = quants.hr$upper,
+                      xmin = -Inf,
+                      xmax = Inf),
+                  inherit.aes = FALSE,
+                  alpha = 0.2,
+                  color = "transparent",
+                  fill = "red") +
+        geom_rect(data = quants.tac,
+                  aes(xmin = quants.tac$lower,
+                      xmax = quants.tac$upper,
+                      ymin = -Inf,
+                      ymax = Inf),
+                  inherit.aes = FALSE,
+                  alpha = 0.2,
+                  color = "transparent",
+                  fill = "red") +
+        geom_hline(yintercept = median(hr),
+                   color = "red",
+                   size = 1,
+                   linetype = "dashed")
+      h <- h +
+        geom_hline(yintercept = median(tac),
+                   color = "red",
+                   size = 1,
+                   linetype = "dashed") +
+        geom_vline(xintercept = median(sbt),
+                   color = "red",
+                   size = 1,
+                   linetype = "dashed") +
+        geom_rect(data = quants.sbt,
+                  aes(xmin = quants.sbt$lower,
+                      xmax = quants.sbt$upper,
+                      ymin = -Inf,
+                      ymax = Inf),
+                  inherit.aes = FALSE,
+                  alpha = 0.2,
+                  color = "transparent",
+                  fill = "red") +
+        geom_rect(data = quants.tac,
+                  aes(ymin = quants.tac$lower,
+                      ymax = quants.tac$upper,
+                      xmin = -Inf,
+                      xmax = Inf),
+                  inherit.aes = FALSE,
+                  alpha = 0.2,
+                  color = "transparent",
+                  fill = "red")
+      i <- i +
+        geom_hline(yintercept = median(hr),
+                   color = "red",
+                   size = 1,
+                   linetype = "dashed") +
+        geom_vline(xintercept = median(sbt),
+                   color = "red",
+                   size = 1,
+                   linetype = "dashed") +
+        geom_rect(data = quants.sbt,
+                  aes(xmin = quants.sbt$lower,
+                      xmax = quants.sbt$upper,
+                      ymin = -Inf,
+                      ymax = Inf),
+                  inherit.aes = FALSE,
+                  alpha = 0.2,
+                  color = "transparent",
+                  fill = "red") +
+        geom_rect(data = quants.hr,
+                  aes(ymin = quants.hr$lower,
+                      ymax = quants.hr$upper,
+                      xmin = -Inf,
+                      xmax = Inf),
+                  inherit.aes = FALSE,
+                  alpha = 0.2,
+                  color = "transparent",
+                  fill = "red")
+    }
+    if(show.means){
+      g <- g +
+        geom_vline(xintercept = mean(tac),
+                   color = "green",
+                   size = 1,
+                   linetype = "dashed") +
+        geom_hline(yintercept = mean(hr),
+                   color = "green",
+                   size = 1,
+                   linetype = "dashed")
+      h <- h +
+        geom_hline(yintercept = mean(tac),
+                   color = "green",
+                   size = 1,
+                   linetype = "dashed")
+      i <- i +
+        geom_hline(yintercept = mean(hr),
+                   color = "green",
+                   size = 1,
+                   linetype = "dashed")
+    }
+  }
+  if(!show.x.axes){
+    i <- i +
+      theme(axis.text.x = element_blank(),
+            axis.ticks.x = element_blank()) +
+      xlab("")
+    g <- g +
+      theme(axis.text.x = element_blank(),
+            axis.ticks.x = element_blank()) +
+      xlab("")
+  }
+  g <- g +
+    theme(plot.margin = unit(c(0, 0, 0, 0), "mm"))
+  #h <- h +
+  #  theme(plot.margin = unit(c(0, 0, 0, 0), "cm"))
+  i <- i +
+    theme(plot.margin = unit(c(0, 0, 0, 0), "mm"))
+  j <- ggplot() +
+    annotate("text", x = 100, y = 20, label = label, size = 5) +
+    theme(axis.text.x = element_blank(),
+          axis.text.y = element_blank(),
+          axis.ticks = element_blank(),
+          panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank()) +
+    xlab("") +
+    ylab("")  +
+    theme(plot.margin = unit(c(0, 0, 0, 0), "mm"))
+
+  #--------------------------------------------------------
+  get.panel.only <- function(g){
+    grob <- ggplotGrob(g)
+
+    # Select plot panel only
+    #   gt = gt[6,4]    # Using index notation; OR
+    grob <- gtable::gtable_filter(grob, "panel")
+
+    # Draw it
+    # Set up a print method
+    class(grob) <- c("Panel", class(grob))
+    grid::grid.newpage()
+    grid::grid.draw(grob)
+    # print.Panel <- function(x) {
+    #   grid::grid.newpage()
+    #   grid::grid.draw(x)
+    # }
+    g
+  }
+  #--------------------------------------------------------
+  #browser()
+  #grob <- ggplotGrob(g)
+  #grob <- gtable::gtable_filter(grob, "panel")
+  #class(grob) <- c("Panel", class(grob))
+  #print.Panel <- function(x) {
+  #  grid::grid.newpage()
+  #  grid::grid.draw(x)
+  #}
+  #g <- grob
+  #g <- get.panel.only(g)
+  #h <- get.panel.only(h)
+  #i <- get.panel.only(i)
+  #j <- get.panel.only(j)
+  cowplot::plot_grid(h,
+                     j,
+                     i,
+                     g,
+                     nrow = 2,
+                     ncol = 2,
+                     align = "hv",
+                     axis = "tblr")
+}
+
 #' Plot Beverton-holt
 #'
 #' @param models iscam models list

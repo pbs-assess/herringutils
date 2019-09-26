@@ -7,15 +7,16 @@
 hcr(bt, bo, row)
 }
 \arguments{
-\item{bt}{a list of vectors of timeseries biomass values}
+\item{bt}{a list of vectors of timeseries biomass values (typically many posteriors)}
 
-\item{bo}{a vector of numeric values for the initial biomass to base relative biomasses on. This must be the
-same length as the bt list}
+\item{bo}{a vector of numeric values (typically many posteriors) for the initial biomass to base
+relative biomasses on. This must be the same length as the bt list}
 
 \item{row}{A row of one of the MP tables as it appears in `pbs-assess/herringsr/data/mp-*.csv` files}
 }
 \value{
-The original row with the catch limit (tac) and associated harvest rate (hr) populated
+A list of length equal to the length of the bt and bo lists, of vectors of length two,
+ containing the catch limit (tac) and associated harvest rate (hr)
 }
 \description{
 Return the appropriate HCR values for the given 'row' as it appears in the MP data file
