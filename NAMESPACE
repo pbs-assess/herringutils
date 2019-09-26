@@ -2,6 +2,7 @@
 
 export(decision_tables_mp)
 export(get_catch)
+export(get_hcr_tac_hr)
 export(get_pa)
 export(get_surv_ind)
 export(get_wa)

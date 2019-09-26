@@ -1,3 +1,14 @@
+#' Calculate median of the TAC and HR from the hcr.lst
+#'
+#' @param hcr.lst A list of length-2 vectors, each of which is the TAC and the HR in that order
+#'
+#' @return a length-2 vector which includes the median TAC and HR for the hcr.lst given
+#' @export
+get_hcr_tac_hr <- function(hcr.lst){
+  c(median(sapply(hcr.lst, "[[", 1)),
+    median(sapply(hcr.lst, "[[", 2)))
+}
+
 #' Return the appropriate HCR values for the given 'row' as it appears in the MP data file
 #'
 #' @param row A row of one of the MP tables as it appears in `pbs-assess/herringsr/data/mp-*.csv` files
