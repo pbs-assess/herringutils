@@ -5,8 +5,9 @@
 \title{Plot Harvest control rules as pairs plots}
 \usage{
 plot_hcr(hcr.lst, sbt.lst, mp = "", region = "", probs = c(0.025,
-  0.975), show.medians = TRUE, show.means = TRUE,
-  show.x.axes = FALSE, panel.text.size = 4)
+  0.975), point.size = 0.25, line.width = 0.25, show.medians = TRUE,
+  show.means = TRUE, show.x.axes = FALSE, axis.text.size = 2,
+  panel.text.size = 3)
 }
 \arguments{
 \item{hcr.lst}{A list of length equal to the length of the sbt list, of vectors of length two,
@@ -20,11 +21,17 @@ containing the catch limit (tac) and associated harvest rate (hr)}
 
 \item{probs}{vector of length 2 for credible interval of median}
 
+\item{point.size}{size of points}
+
+\item{line.width}{width ot thickness of all lines}
+
 \item{show.medians}{show the median lines and credible intervals}
 
 \item{show.means}{show the mean lines}
 
 \item{show.x.axes}{if TRUE, axes labels, tick marks and tick labels will be shown on the lower plot's x axes}
+
+\item{axis.text.size}{size of text for axis labels}
 
 \item{panel.text.size}{text size for the description panels}
 }

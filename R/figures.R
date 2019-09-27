@@ -1058,6 +1058,9 @@ plot_biomass_phase <- function(model,
 #' @param show.means show the mean lines
 #' @param show.x.axes if TRUE, axes labels, tick marks and tick labels will be shown on the lower plot's x axes
 #' @param panel.text.size text size for the description panels
+#' @param point.size size of points
+#' @param line.width width ot thickness of all lines
+#' @param axis.text.size size of text for axis labels
 #'
 #' @return a ggplot object
 #' @export
@@ -1066,10 +1069,13 @@ plot_hcr <- function(hcr.lst,
                      mp = "",
                      region = "",
                      probs = c(0.025, 0.975),
+                     point.size = 0.05,
+                     line.width = 0.5,
                      show.medians = TRUE,
                      show.means = TRUE,
                      show.x.axes = FALSE,
-                     panel.text.size = 4){
+                     axis.text.size = 7,
+                     panel.text.size = 3){
 
   label <- paste0(region, "\n", gsub("_", "\n", mp))
   tac <- sapply(hcr.lst, "[[", 1)
@@ -1112,22 +1118,28 @@ plot_hcr <- function(hcr.lst,
       ylab("")
   }else{
     g <- ggplot(df, aes(x = tac, y = hr)) +
-      geom_point(na.rm = TRUE) +
+      geom_point(size = point.size,
+                 na.rm = TRUE) +
       theme(axis.text.y = element_blank(),
-            axis.ticks.y = element_blank()) +
+            axis.ticks.y = element_blank(),
+            axis.title = element_text(size = axis.text.size)) +
       ylab("") +
       xlab("TAC")
 
     h <- ggplot(df, aes(x = sbt, y = tac)) +
-      geom_point(na.rm = TRUE) +
+      geom_point(size = point.size,
+                 na.rm = TRUE) +
       theme(axis.text.x = element_blank(),
-            axis.ticks.x = element_blank()) +
+            axis.ticks.x = element_blank(),
+            axis.title = element_text(size = axis.text.size)) +
       xlab("") +
       ylab("TAC")
 
     i <- ggplot(df, aes(x = sbt, y = hr)) +
-      geom_point(na.rm = TRUE) +
-      xlab("Projected Spawning Biomass") +
+      geom_point(size = point.size,
+                 na.rm = TRUE) +
+      theme(axis.title = element_text(size = axis.text.size)) +
+      xlab("Projected SBt") +
       ylab("Harvest Rate")
 
     if(show.medians){
@@ -1140,7 +1152,7 @@ plot_hcr <- function(hcr.lst,
       g <- g +
         geom_vline(xintercept = median(tac),
                    color = "red",
-                   size = 1,
+                   size = line.width,
                    linetype = "dashed") +
         geom_rect(data = quants.hr,
                   aes(ymin = quants.hr$lower,
@@ -1162,16 +1174,16 @@ plot_hcr <- function(hcr.lst,
                   fill = "red") +
         geom_hline(yintercept = median(hr),
                    color = "red",
-                   size = 1,
+                   size = line.width,
                    linetype = "dashed")
       h <- h +
         geom_hline(yintercept = median(tac),
                    color = "red",
-                   size = 1,
+                   size = line.width,
                    linetype = "dashed") +
         geom_vline(xintercept = median(sbt),
                    color = "red",
-                   size = 1,
+                   size = line.width,
                    linetype = "dashed") +
         geom_rect(data = quants.sbt,
                   aes(xmin = quants.sbt$lower,
@@ -1194,11 +1206,11 @@ plot_hcr <- function(hcr.lst,
       i <- i +
         geom_hline(yintercept = median(hr),
                    color = "red",
-                   size = 1,
+                   size = line.width,
                    linetype = "dashed") +
         geom_vline(xintercept = median(sbt),
                    color = "red",
-                   size = 1,
+                   size = line.width,
                    linetype = "dashed") +
         geom_rect(data = quants.sbt,
                   aes(xmin = quants.sbt$lower,
@@ -1223,21 +1235,21 @@ plot_hcr <- function(hcr.lst,
       g <- g +
         geom_vline(xintercept = mean(tac),
                    color = "green",
-                   size = 1,
+                   size = line.width,
                    linetype = "dashed") +
         geom_hline(yintercept = mean(hr),
                    color = "green",
-                   size = 1,
+                   size = line.width,
                    linetype = "dashed")
       h <- h +
         geom_hline(yintercept = mean(tac),
                    color = "green",
-                   size = 1,
+                   size = line.width,
                    linetype = "dashed")
       i <- i +
         geom_hline(yintercept = mean(hr),
                    color = "green",
-                   size = 1,
+                   size = line.width,
                    linetype = "dashed")
     }
   }
@@ -1251,12 +1263,13 @@ plot_hcr <- function(hcr.lst,
             axis.ticks.x = element_blank()) +
       xlab("")
   }
+  ff <- unit(c(0, 0, 0, 0), "cm")
   g <- g +
-    theme(plot.margin = unit(c(0, 0, 0, 0), "mm"))
-  #h <- h +
-  #  theme(plot.margin = unit(c(0, 0, 0, 0), "cm"))
+    theme(plot.margin = ff)
+  h <- h +
+    theme(plot.margin = ff)
   i <- i +
-    theme(plot.margin = unit(c(0, 0, 0, 0), "mm"))
+    theme(plot.margin = ff)
   j <- ggplot() +
     annotate("text", x = 100, y = 20, label = label, size = panel.text.size) +
     theme(axis.text.x = element_blank(),
@@ -1266,41 +1279,8 @@ plot_hcr <- function(hcr.lst,
           panel.grid.minor = element_blank()) +
     xlab("") +
     ylab("")  +
-    theme(plot.margin = unit(c(0, 0, 0, 0), "mm"))
+    theme(plot.margin = ff)
 
-  #--------------------------------------------------------
-  get.panel.only <- function(g){
-    grob <- ggplotGrob(g)
-
-    # Select plot panel only
-    #   gt = gt[6,4]    # Using index notation; OR
-    grob <- gtable::gtable_filter(grob, "panel")
-
-    # Draw it
-    # Set up a print method
-    class(grob) <- c("Panel", class(grob))
-    grid::grid.newpage()
-    grid::grid.draw(grob)
-    # print.Panel <- function(x) {
-    #   grid::grid.newpage()
-    #   grid::grid.draw(x)
-    # }
-    g
-  }
-  #--------------------------------------------------------
-  #browser()
-  #grob <- ggplotGrob(g)
-  #grob <- gtable::gtable_filter(grob, "panel")
-  #class(grob) <- c("Panel", class(grob))
-  #print.Panel <- function(x) {
-  #  grid::grid.newpage()
-  #  grid::grid.draw(x)
-  #}
-  #g <- grob
-  #g <- get.panel.only(g)
-  #h <- get.panel.only(h)
-  #i <- get.panel.only(i)
-  #j <- get.panel.only(j)
   cowplot::plot_grid(h,
                      j,
                      i,
