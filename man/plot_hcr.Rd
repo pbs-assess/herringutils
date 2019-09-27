@@ -5,8 +5,8 @@
 \title{Plot Harvest control rules as pairs plots}
 \usage{
 plot_hcr(hcr.lst, sbt.lst, mp = "", region = "", probs = c(0.025,
-  0.975), point.size = 0.25, line.width = 0.25, show.medians = TRUE,
-  show.means = TRUE, show.x.axes = FALSE, axis.text.size = 2,
+  0.975), point.size = 0.05, line.width = 0.5, show.medians = TRUE,
+  show.means = TRUE, show.x.axes = FALSE, axis.text.size = 7,
   panel.text.size = 3)
 }
 \arguments{
