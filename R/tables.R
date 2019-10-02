@@ -336,6 +336,6 @@ decision_tables_mp <- function(df,
         table.placement = placement,
         tabular.environment = "tabularx",
         width = "\\textwidth",
-        hline.after = NULL)
+        hline.after = nrow(df))
 
 }
