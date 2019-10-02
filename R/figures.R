@@ -4,7 +4,7 @@
 #' @param xlim Limits for the years shown on the plot
 #' @param translate Logical. If TRUE, translate to French
 #'
-#' @importFrom ggplot2 ggplot aes geom_bar scale_x_continuous expand_limits scale_fill_grey theme labs facet_wrap
+#' @importFrom ggplot2 ggplot aes geom_bar scale_x_continuous expand_limits scale_fill_viridis_d theme labs facet_wrap
 #' @importFrom rosettafish en2fr
 #' @export
 #' @return A ggplot object
@@ -18,7 +18,7 @@ plot_catch <- function(df,
     scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10)) +
     coord_cartesian(xlim) +
     expand_limits(x = xlim[1]:xlim[2]) +
-    scale_fill_grey(start = 0, end = 0.8) +
+    scale_fill_viridis_d( ) +
     theme(legend.position = "top") +
     labs(x = en2fr("Year", translate),
          y = paste(en2fr("Catch", translate), " (1000 t)"),
@@ -690,8 +690,9 @@ plot_recruitment <- function(model,
 #' @param translate Logical. If TRUE, translate to french
 #'
 #' @importFrom dplyr filter select mutate as_tibble
-#' @importFrom ggplot2 ggplot aes geom_hline geom_rect geom_line geom_ribbon geom_point geom_errorbar
-#' geom_bar ylab annotate xlab theme guides element_text element_blank position_nudge
+#' @importFrom ggplot2 ggplot aes geom_hline geom_rect geom_line geom_ribbon geom_point
+#' geom_errorbar geom_bar ylab annotate xlab theme guides element_text element_blank
+#' position_nudge scale_fill_viridis_d
 #' @export
 #' @return A ggplot object
 plot_biomass_catch <- function(model,
@@ -733,7 +734,7 @@ plot_biomass_catch <- function(model,
 
   ct <- catch_df %>%
     select(-c(area, group, sex, type, region)) %>%
-    group_by(year) %>%
+    group_by(year, gear) %>%
     summarize(median = sum(value)) %>%
     ungroup()
 
@@ -765,7 +766,10 @@ plot_biomass_catch <- function(model,
     geom_bar(data = ct,
              stat = "identity",
              width = between_bars,
-             fill = "black") +
+             position = "stack",
+             aes(fill = gear)) +
+    scale_fill_viridis_d( ) +
+    guides( fill = FALSE ) +
     scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10))
   if(!is.na(xlim[1])){
     g <- g +
