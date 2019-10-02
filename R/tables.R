@@ -217,7 +217,7 @@ decision_tables_mp <- function(df,
   df$label <- gsub("_", "\\\\_", df$label)
 
   df <- df %>%
-    mutate(mp = as.character(mp),
+    mutate(om,
            obj1 = paste0(f(obj1 * 100, dec.points = perc_dec_pts), "\\%"),
            obj2 = paste0(f(obj2 * 100, dec.points = perc_dec_pts), "\\%"),
            obj3 = f(obj3, dec.points = dec_pts),
@@ -292,7 +292,7 @@ decision_tables_mp <- function(df,
                                latex.amp(),
                                latex.nline),
                         paste0(latex.cline("3-7"),
-                               latex.bold(en2fr("MP", translate = translate)),
+                               latex.bold(en2fr("OM", translate = translate)),
                                latex.amp(),
                                latex.bold(en2fr("MP", translate = translate)),
                                latex.amp(),
@@ -311,7 +311,16 @@ decision_tables_mp <- function(df,
                                latex.nline,
                                latex.cline("1-9")))
 
-
+  # Horizontal line locations for separating groups of OMs
+  last_ddm <- which(df$om == "DDM")
+  last_dim <- which(df$om == "DIM")
+  last_ddm <- last_ddm[length(last_ddm)]
+  last_dim <- last_dim[length(last_dim)]
+  new_rows$pos[[5]] <- last_ddm
+  new_rows$pos[[6]] <- last_dim
+  new_rows$command <- c(new_rows$command,
+                        latex.cline("1-9"),
+                        latex.cline("1-9"))
 
   size.string <- latex.size.str(font.size, space.size)
   print(xtable(df,
