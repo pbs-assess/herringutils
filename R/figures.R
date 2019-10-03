@@ -27,7 +27,6 @@ plot_catch <- function(df,
   g
 }
 
-
 #' Plot weight-at-age time series from a data frames as extracted from iscam data (dat) files
 #'
 #' @param df a data frame as constructed by [get_wa()]
