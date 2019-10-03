@@ -86,6 +86,7 @@ hcr <- function(bt, bo, row){
 #' @param bt biomass vector for years
 #' @param ref.hr reference harvest rate
 #' @param min.esc minimum escapement to base catch limit on
+#' @param abs.esc if TRUE, `min.esc` is absolute. If FALSE, it is relative
 #' @param catch.cap catch cap to use if calculated catch limit is higher
 #' @param bo initial biomass used in reletive biomass calculation
 #'
@@ -132,6 +133,7 @@ hcr.min.esc <- function(bt,
 #' @param num.end.yrs number of years at the end of the biomass vector to use
 #' @param ref.hr reference harvest rate
 #' @param min.esc minimum escapement to base catch limit on
+#' @param abs.esc if TRUE, `min.esc` is absolute. If FALSE, it is relative
 #' @param catch.cap catch cap to use if calculated catch limit is higher
 #' @param bo initial biomass used in reletive biomass calculation
 #'

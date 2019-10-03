@@ -17,6 +17,8 @@ hcr.min.esc.slow(bt, num.end.yrs = 3, ref.hr, min.esc, abs.esc = FALSE,
 
 \item{min.esc}{minimum escapement to base catch limit on}
 
+\item{abs.esc}{if TRUE, `min.esc` is absolute. If FALSE, it is relative}
+
 \item{catch.cap}{catch cap to use if calculated catch limit is higher}
 
 \item{bo}{initial biomass used in reletive biomass calculation}

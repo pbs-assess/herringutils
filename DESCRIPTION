@@ -13,6 +13,7 @@ Encoding: UTF-8
 Imports:
   dplyr,
   ggplot2,
+  cowplot,
   rosettafish,
   reshape2,
   csasdown,
@@ -25,6 +26,8 @@ Imports:
   tibble,
   zoo,
   xtable,
-  kableExtra
+  kableExtra,
+  stats,
+  grid
 LazyData: true
 RoxygenNote: 6.1.1

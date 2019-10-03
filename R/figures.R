@@ -1069,6 +1069,9 @@ plot_biomass_phase <- function(model,
 #'
 #' @return a ggplot object
 #' @export
+#' @importFrom stats quantile
+#' @importFrom grid unit
+#' @importFrom cowplot plot_grid
 plot_hcr <- function(hcr.lst,
                      sbt.lst,
                      mp = "",
@@ -1286,14 +1289,14 @@ plot_hcr <- function(hcr.lst,
     ylab("")  +
     theme(plot.margin = ff)
 
-  cowplot::plot_grid(h,
-                     j,
-                     i,
-                     g,
-                     nrow = 2,
-                     ncol = 2,
-                     align = "hv",
-                     axis = "tblr")
+  plot_grid(h,
+            j,
+            i,
+            g,
+            nrow = 2,
+            ncol = 2,
+            align = "hv",
+            axis = "tblr")
 }
 
 #' Plot Beverton-holt
