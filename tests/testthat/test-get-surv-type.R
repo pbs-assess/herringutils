@@ -1,3 +1,6 @@
+library(tibble)
+library(gfiscamutils)
+library(herringutils)
 context("Test the get_surv_ind() function")
 
 load(here::here("R/sysdata.rda"))

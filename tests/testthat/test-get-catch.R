@@ -1,3 +1,7 @@
+library(tibble)
+library(gfiscamutils)
+library(herringutils)
+
 context("Test the get_catch() function")
 
 load(here::here("R/sysdata.rda"))

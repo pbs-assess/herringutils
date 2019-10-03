@@ -1,3 +1,7 @@
+library(tibble)
+library(gfiscamutils)
+library(herringutils)
+
 context("Test the get_pa() function")
 
 load(here::here("R/sysdata.rda"))
