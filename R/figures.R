@@ -703,7 +703,7 @@ plot_biomass_catch <- function(model,
                                line_size = 2,
                                ribbon_alpha = 0.5,
                                lrp_ribbon_alpha = 0.35,
-                               between_bars = 0.5,
+                               between_bars = 0.75,
                                refpt_show = "0.3sbo",
                                xlim = NA,
                                show_x_axis = TRUE,
@@ -754,6 +754,11 @@ plot_biomass_catch <- function(model,
     geom_rect(data = lrp, aes(xmin = -Inf, xmax = Inf, ymin = lrp$lower, ymax = lrp$upper),
               alpha = lrp_ribbon_alpha,
               fill = "red") +
+    geom_bar(data = ct,
+             stat = "identity",
+             width = between_bars,
+             position = "stack",
+             aes(fill = gear)) +
     geom_line(size = line_size,
               na.rm = TRUE) +
     geom_ribbon(aes(ymin = lower, ymax = upper), alpha = ribbon_alpha) +
@@ -764,11 +769,6 @@ plot_biomass_catch <- function(model,
                   aes(ymin = lower, ymax = upper),
                   size = errorbar_size,
                   width = 0) +
-    geom_bar(data = ct,
-             stat = "identity",
-             width = between_bars,
-             position = "stack",
-             aes(fill = gear)) +
     scale_fill_viridis_d( ) +
     guides( fill = FALSE ) +
     scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10))
