@@ -99,7 +99,7 @@ hcr.min.esc <- function(bt,
                         catch.cap = 0,
                         bo = 1){
   bt <- bt[length(bt)]
-  catch.lim <- 0
+  tac <- 0
   dep <- bt / bo
 
   if(abs.esc){
@@ -111,19 +111,19 @@ hcr.min.esc <- function(bt,
     return(c(0, 0))
   }
   if(dep > min.esc && dep <= min.esc / (1 - ref.hr)){
-    catch.lim <- bt - min.esc.val
+    tac <- bt - min.esc.val
   }
   if(dep > min.esc / (1 - ref.hr)){
-    catch.lim <- ref.hr * bt
+    tac <- ref.hr * bt
   }
   if(is.na(catch.cap)){
     catch.cap <- 0
   }
-  if(catch.cap > 0 && catch.lim > catch.cap){
-    catch.lim <- catch.cap
+  if(catch.cap > 0 && tac > catch.cap){
+    tac <- catch.cap
   }
-  targ.hr <- catch.lim / (catch.lim + bt)
-  c(catch.lim, targ.hr)
+  hr <- tac / (tac + bt)
+  c(tac, hr)
 }
 
 #' Calculate catch limit based on a minimum escapement and reference harvest rate,
@@ -148,7 +148,7 @@ hcr.min.esc.slow <- function(bt,
                              bo = 1){
 
   bt <- bt[(length(bt) - num.end.yrs):length(bt)]
-  catch.lim <- 0
+  tac <- 0
   if(abs.esc){
     min.esc <- min.esc / bo
   }
@@ -162,19 +162,19 @@ hcr.min.esc.slow <- function(bt,
     return(c(0, 0))
   }
   if(dep > min.esc && dep <= min.esc / (1 - ref.hr)){
-    catch.lim <- last.bt - min.esc.val
+    tac <- last.bt - min.esc.val
   }
   if(dep > min.esc / (1 - ref.hr)){
-    catch.lim <- ref.hr * last.bt
+    tac <- ref.hr * last.bt
   }
   if(is.na(catch.cap)){
     catch.cap <- 0
   }
-  if(catch.cap > 0 && catch.lim > catch.cap){
-    catch.lim <- catch.cap
+  if(catch.cap > 0 && tac > catch.cap){
+    tac <- catch.cap
   }
-  targ.hr <- catch.lim / (catch.lim + bt)
-  c(catch.lim, targ.hr)
+  hr <- tac / (tac + bt)
+  c(tac, hr)
 }
 
 #' Calculate catch limit based on biomass reference points and reference harvest rate
@@ -196,7 +196,7 @@ hcr.hs <- function(bt,
                    bo = 1){
 
   bt <- bt[length(bt)]
-  targ.hr <- 0
+  hr <- 0
   dep <- bt / bo
 
   if(dep <= lrp){
@@ -204,19 +204,19 @@ hcr.hs <- function(bt,
   }
 
   if(dep > lrp && dep <= usr){
-    targ.hr <- (dep - lrp) * ref.hr / (usr - lrp)
+    hr <- (dep - lrp) * ref.hr / (usr - lrp)
   }
   if(dep > usr){
-    targ.hr <- ref.hr
+    hr <- ref.hr
   }
-  catch.lim <- targ.hr * bt
+  tac <- hr * bt
   if(is.na(catch.cap)){
     catch.cap <- 0
   }
-  if(catch.cap > 0 && catch.lim > catch.cap){
-    catch.lim <- catch.cap
+  if(catch.cap > 0 && tac > catch.cap){
+    tac <- catch.cap
   }
-  c(catch.lim, targ.hr)
+  c(tac, hr)
 }
 
 #' Calculate catch limit based on biomass reference points and reference harvest rate,
@@ -241,7 +241,7 @@ hcr.hs.slow <- function(bt,
                         bo = 1){
 
   bt <- bt[(length(bt) - num.end.yrs):length(bt)]
-  targ.hr <- 0
+  hr <- 0
   n.yrs <- length(bt)
   last.bt <- bt[n.yrs]
   dep <- last.bt / bo
@@ -252,17 +252,17 @@ hcr.hs.slow <- function(bt,
   }
 
   if(dep > lrp && dep <= usr){
-    targ.hr <- (dep - lrp) * ref.hr / (usr - lrp)
+    hr <- (dep - lrp) * ref.hr / (usr - lrp)
   }
   if(dep > usr){
-    targ.hr <- ref.hr
+    hr <- ref.hr
   }
-  catch.lim <- targ.hr * last.bt
+  tac <- hr * last.bt
   if(is.na(catch.cap)){
     catch.cap <- 0
   }
-  if(catch.cap > 0 && catch.lim > catch.cap){
-    catch.lim <- catch.cap
+  if(catch.cap > 0 && tac > catch.cap){
+    tac <- catch.cap
   }
-  c(catch.lim, targ.hr)
+  c(tac, hr)
 }
