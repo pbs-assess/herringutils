@@ -123,7 +123,6 @@ hcr.min.esc <- function(bt,
     tac <- catch.cap
   }
   hr <- tac / (tac + bt)
-  if(hr > 0.16)browser()
   c(tac, hr)
 }
 
