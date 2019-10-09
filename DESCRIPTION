@@ -29,5 +29,6 @@ Imports:
   kableExtra,
   stats,
   grid
+Depends: R (>= 3.5.0)
 LazyData: true
 RoxygenNote: 6.1.1

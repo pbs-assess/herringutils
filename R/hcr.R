@@ -34,44 +34,31 @@ hcr <- function(bt, bo, row){
              is.na(row$usr) &&
              !is.na(row$esc) &&
              !is.na(row$abs_esc)){
-      if(!is.na(row$slowyrs) && row$slowyrs > 1){
-        val <- hcr.min.esc.slow(bt,
-                                num.end.yrs = row$slowyrs,
-                                ref.hr = row$hr,
-                                min.esc = row$esc,
-                                abs.esc = row$abs_esc,
-                                catch.cap = row$cap,
-                                bo = bo)
-      }else{
+      if(!is.na(row$num_end_yrs)){
         val <- hcr.min.esc(bt,
                            ref.hr = row$hr,
                            min.esc = row$esc,
                            abs.esc = row$abs_esc,
                            catch.cap = row$cap,
-                           bo = bo)
+                           bo = bo,
+                           num.end.yrs = row$num_end_yrs)
       }
     }else if(!is.na(row$lrp) &&
              !is.na(row$usr) &&
              is.na(row$esc)){
-      if(!is.na(row$slowyrs) && row$slowyrs > 1){
-        val <- hcr.hs.slow(bt,
-                           num.end.yrs = row$slowyrs,
+      if(!is.na(row$num_end_yrs)){
+        val <- hcr.ref.pts(bt,
                            ref.hr = row$hr,
                            lrp = row$lrp,
                            usr = row$usr,
                            catch.cap = row$cap,
-                           bo = bo)
-      }else{
-        val <- hcr.hs(bt,
-                      ref.hr = row$hr,
-                      lrp = row$lrp,
-                      usr = row$usr,
-                      catch.cap = row$cap,
-                      bo = bo)
+                           bo = bo,
+                           num.end.yrs = row$num_end_yrs)
       }
     }else{
       stop("The row given does not have variables set correctly. Row:\n", paste(row, collapse = ", "))
     }
+    val
   }
 
   lapply(seq_along(bt),
@@ -81,7 +68,7 @@ hcr <- function(bt, bo, row){
                       row = row)})
 }
 
-#' Calculate catch limit based on a minimum escapement and reference harvest rate
+#' Calculate TAC and TAC-based harvest rate based on a minimum escapement and reference harvest rate
 #'
 #' @param bt biomass vector for years
 #' @param ref.hr reference harvest rate
@@ -89,6 +76,7 @@ hcr <- function(bt, bo, row){
 #' @param abs.esc if TRUE, `min.esc` is absolute. If FALSE, it is relative
 #' @param catch.cap catch cap to use if calculated catch limit is higher
 #' @param bo initial biomass used in reletive biomass calculation
+#' @param num.end.yrs mean of these last N years at the end of the biomass vector to use
 #'
 #' @return catch limit
 #' @export
@@ -97,117 +85,18 @@ hcr.min.esc <- function(bt,
                         min.esc,
                         abs.esc = FALSE,
                         catch.cap = 0,
-                        bo = 1){
-  bt <- bt[length(bt)]
-  tac <- 0
-  dep <- bt / bo
-
+                        bo = 1,
+                        num.end.yrs = 1){
+  bt <- mean(tail(bt, num.end.yrs))
   if(abs.esc){
     min.esc <- min.esc / bo
   }
   min.esc.val <- min.esc * bo
 
-  if(dep <= min.esc){
-    return(c(0, 0))
-  }
-  if(dep > min.esc && dep <= min.esc / (1 - ref.hr)){
-    tac <- bt - min.esc.val
-  }
-  if(dep > min.esc / (1 - ref.hr)){
-    tac <- ref.hr * bt
-  }
-  if(is.na(catch.cap)){
-    catch.cap <- 0
-  }
-  if(catch.cap > 0 && tac > catch.cap){
-    tac <- catch.cap
-  }
-  hr <- tac / (tac + bt)
-  c(tac, hr)
-}
-
-#' Calculate catch limit based on a minimum escapement and reference harvest rate,
-#'  using the last N years for the calculation
-#'
-#' @param bt biomass vector for years
-#' @param num.end.yrs number of years at the end of the biomass vector to use
-#' @param ref.hr reference harvest rate
-#' @param min.esc minimum escapement to base catch limit on
-#' @param abs.esc if TRUE, `min.esc` is absolute. If FALSE, it is relative
-#' @param catch.cap catch cap to use if calculated catch limit is higher
-#' @param bo initial biomass used in reletive biomass calculation
-#'
-#' @return catch limit
-#' @export
-hcr.min.esc.slow <- function(bt,
-                             num.end.yrs = 3,
-                             ref.hr,
-                             min.esc,
-                             abs.esc = FALSE,
-                             catch.cap = 0,
-                             bo = 1){
-
-  bt <- bt[(length(bt) - num.end.yrs):length(bt)]
-  tac <- 0
-  if(abs.esc){
-    min.esc <- min.esc / bo
-  }
-  min.esc.val <- min.esc * bo
-
-  last.bt <- bt[length(bt)]
-  dep <- last.bt / bo
-  bt.diff <- bt - min.esc
-
-  if(any(bt.diff <= 0)){
-    return(c(0, 0))
-  }
-  if(dep > min.esc && dep <= min.esc / (1 - ref.hr)){
-    tac <- last.bt - min.esc.val
-  }
-  if(dep > min.esc / (1 - ref.hr)){
-    tac <- ref.hr * last.bt
-  }
-  if(is.na(catch.cap)){
-    catch.cap <- 0
-  }
-  if(catch.cap > 0 && tac > catch.cap){
-    tac <- catch.cap
-  }
-  hr <- tac / (tac + bt)
-  c(tac, hr)
-}
-
-#' Calculate catch limit based on biomass reference points and reference harvest rate
-#'
-#' @param bt biomass vector for years
-#' @param ref.hr reference harvest rate
-#' @param lrp limit reference point
-#' @param usr upper stock reference point
-#' @param catch.cap catch cap to use if calculated catch limit is higher
-#' @param bo initial biomass used in reletive biomass calculation
-#'
-#' @return a vector of length 2 made up of the catch limit and corresponding target harvest rate
-#' @export
-hcr.hs <- function(bt,
-                   ref.hr,
-                   lrp,
-                   usr,
-                   catch.cap = 0,
-                   bo = 1){
-
-  bt <- bt[length(bt)]
-  hr <- 0
-  dep <- bt / bo
-
-  if(dep <= lrp){
-    return(c(0, 0))
-  }
-
-  if(dep > lrp && dep <= usr){
-    hr <- (dep - lrp) * ref.hr / (usr - lrp)
-  }
-  if(dep > usr){
-    hr <- ref.hr
+  if(bt > min.esc.val){
+    hr <- min((bt - min.esc.val) / bt, ref.hr)
+  }else{
+    hr <- 0
   }
   tac <- hr * bt
   if(is.na(catch.cap)){
@@ -215,54 +104,45 @@ hcr.hs <- function(bt,
   }
   if(catch.cap > 0 && tac > catch.cap){
     tac <- catch.cap
+    hr <- (bt - catch.cap) / bt
   }
   c(tac, hr)
 }
 
-#' Calculate catch limit based on biomass reference points and reference harvest rate,
-#'  using the last N years for the calculation
+#' Calculate TAC and TAC-based harvest rate based on biomass reference points and reference harvest rate
 #'
 #' @param bt biomass vector for years
-#' @param num.end.yrs number of years at the end of the biomass vector to use
 #' @param ref.hr reference harvest rate
 #' @param lrp limit reference point
 #' @param usr upper stock reference point
 #' @param catch.cap catch cap to use if calculated catch limit is higher
 #' @param bo initial biomass used in reletive biomass calculation
+#' @param num.end.yrs mean of these last N years at the end of the biomass vector to use
 #'
 #' @return a vector of length 2 made up of the catch limit and corresponding target harvest rate
 #' @export
-hcr.hs.slow <- function(bt,
-                        num.end.yrs = 3,
+hcr.ref.pts <- function(bt,
                         ref.hr,
                         lrp,
                         usr,
                         catch.cap = 0,
-                        bo = 1){
-
-  bt <- bt[(length(bt) - num.end.yrs):length(bt)]
-  hr <- 0
-  n.yrs <- length(bt)
-  last.bt <- bt[n.yrs]
-  dep <- last.bt / bo
-  bt.diff <- bt - lrp
-
-  if(any(bt.diff <= 0)){
-    return(c(0, 0))
-  }
-
-  if(dep > lrp && dep <= usr){
-    hr <- (dep - lrp) * ref.hr / (usr - lrp)
-  }
-  if(dep > usr){
+                        bo = 1,
+                        num.end.yrs = 1){
+  bt <- mean(tail(bt, num.end.yrs))
+  if(bt >= usr){
     hr <- ref.hr
+  }else if(lrp * bt <= bt && bt < usr * bt){
+    hr <- ref.hr * ((bt - lrp * bo) / (lrp * bt))
+  }else{
+    hr <- 0
   }
-  tac <- hr * last.bt
+  tac <- hr * bt
   if(is.na(catch.cap)){
     catch.cap <- 0
   }
   if(catch.cap > 0 && tac > catch.cap){
     tac <- catch.cap
+    hr <- (bt - catch.cap) / bt
   }
   c(tac, hr)
 }

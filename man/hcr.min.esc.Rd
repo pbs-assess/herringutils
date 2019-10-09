@@ -2,10 +2,10 @@
 % Please edit documentation in R/hcr.R
 \name{hcr.min.esc}
 \alias{hcr.min.esc}
-\title{Calculate catch limit based on a minimum escapement and reference harvest rate}
+\title{Calculate TAC and TAC-based harvest rate based on a minimum escapement and reference harvest rate}
 \usage{
 hcr.min.esc(bt, ref.hr, min.esc, abs.esc = FALSE, catch.cap = 0,
-  bo = 1)
+  bo = 1, num.end.yrs = 1)
 }
 \arguments{
 \item{bt}{biomass vector for years}
@@ -19,10 +19,12 @@ hcr.min.esc(bt, ref.hr, min.esc, abs.esc = FALSE, catch.cap = 0,
 \item{catch.cap}{catch cap to use if calculated catch limit is higher}
 
 \item{bo}{initial biomass used in reletive biomass calculation}
+
+\item{num.end.yrs}{mean of these last N years at the end of the biomass vector to use}
 }
 \value{
 catch limit
 }
 \description{
-Calculate catch limit based on a minimum escapement and reference harvest rate
+Calculate TAC and TAC-based harvest rate based on a minimum escapement and reference harvest rate
 }
