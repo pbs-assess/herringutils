@@ -323,11 +323,15 @@ decision_tables_mp <- function(df,
   # Horizontal line locations for separating groups of OMs
   last_ddm <- which(df$om == "DDM")
   last_dim <- which(df$om == "DIM")
-  last_ddm <- last_ddm[length(last_ddm)]
-  last_dim <- last_dim[length(last_dim)]
+  last_conm <- which(df$om == "conM")
+  last_ddm <- tail(last_ddm, 1)
+  last_dim <- tail(last_dim, 1)
+  last_conm <- tail(last_conm, 1)
   new_rows$pos[[5]] <- last_ddm
   new_rows$pos[[6]] <- last_dim
+  new_rows$pos[[7]] <- last_conm
   new_rows$command <- c(new_rows$command,
+                        latex.cline("1-9"),
                         latex.cline("1-9"),
                         latex.cline("1-9"))
 
@@ -340,11 +344,11 @@ decision_tables_mp <- function(df,
         include.rownames = FALSE,
         include.colnames = FALSE,
         sanitize.text.function = function(x){x},
-        size = size.string,
+        size = size.string ,
         add.to.row = new_rows,
         table.placement = placement,
         tabular.environment = "tabularx",
-        width = "\\textwidth",
-        hline.after = nrow(df))
+        hline.after = NULL,
+        width = "\\textwidth")
 
 }
