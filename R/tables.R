@@ -347,8 +347,6 @@ decision_tables_mp <- function(df,
         size = size.string ,
         add.to.row = new_rows,
         table.placement = placement,
-        tabular.environment = "tabularx",
-        hline.after = NULL,
-        width = "\\textwidth")
-
+        tabular.environment = "tabular",
+        hline.after = NULL)
 }
