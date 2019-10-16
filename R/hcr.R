@@ -129,10 +129,10 @@ hcr.ref.pts <- function(bt,
                         bo = 1,
                         num.end.yrs = 1){
   bt <- mean(tail(bt, num.end.yrs))
-  if(bt >= usr){
+  if(bt >= usr * bo){
     hr <- ref.hr
   }else if(lrp * bo <= bt && bt < usr * bo){
-    hr <- ref.hr * ((bt - lrp * bo) / (lrp * bo))
+    hr <- ref.hr * ((bt - lrp * bo) / ((usr - lrp) * bo))
   }else{
     hr <- 0
   }
