@@ -207,9 +207,9 @@ spawn_index_table <- function(tab,
   tab <- tab %>%
     rename( Year=year ) %>%
     filter(Year >= first_yr) %>%
-    mutate( value=value*1000, value=ifelse(value==0, NA, value) ) %>%
+    mutate( value=value*1000 ) %>%
     select( Year, value, region) %>%
-    dcast(Year ~ region, value.var = "value")
+    dcast(Year ~ region, value.var = "value", drop=FALSE)
   tab <- add_cols_and_reorder(tab, by = by_vec)
   names(tab)[names(tab) == "Year"] <- en2fr("Year", translate)
   sar <- en2fr("SAR", translate)
