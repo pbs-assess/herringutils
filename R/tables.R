@@ -190,7 +190,7 @@ spawn_index_by_area_table <- function(tab,
 #' @param translate Logical. Translate to french if TRUE
 #' @param ... arguments passed to [csas_table()]
 #'
-#' @importFrom dplyr filter select rename
+#' @importFrom dplyr filter select rename mutate
 #' @importFrom reshape2 dcast
 #' @importFrom rosettafish en2fr
 #' @importFrom csasdown csas_table
@@ -207,6 +207,7 @@ spawn_index_table <- function(tab,
   tab <- tab %>%
     rename( Year=year ) %>%
     filter(Year >= first_yr) %>%
+    mutate( value=value*1000 ) %>%
     select( Year, value, region) %>%
     dcast(Year ~ region, value.var = "value")
   tab <- add_cols_and_reorder(tab, by = by_vec)
