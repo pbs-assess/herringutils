@@ -111,15 +111,17 @@ consecutive_group <- function(vec) {
 #' @param tab data frame with years as the first column, and N columns of data
 #'  with names
 #' @param by a vector of names, which correspond to the names of the columns in tab
+#' @param replace_na logical; replace NAs with zeros (default TRUE)
 #'
 #' @importFrom gfutilities f
 #' @return a modified data frame
 add_cols_and_reorder <- function(tab,
-                                 by){
+                                 by,
+                                 replace_na=TRUE){
   if(any(!by %in% colnames(tab))){
     tab[by[!by %in% colnames(tab)]] <- NA
   }
-  tab[is.na(tab)] <- 0
+  if(replace_na) tab[is.na(tab)] <- 0
   tab[-1] <- apply(tab[-1], c(1,2), f)
   tab_no_yr <- tab[-1]
   tab_no_yr <- tab_no_yr[,match(by, names(tab_no_yr))]

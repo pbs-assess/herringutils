@@ -6,13 +6,15 @@
 the table, ignoring the first column in the order given in the `by` vector.
 Set all NAs to 0 in the data columns only.}
 \usage{
-add_cols_and_reorder(tab, by)
+add_cols_and_reorder(tab, by, replace_na = TRUE)
 }
 \arguments{
 \item{tab}{data frame with years as the first column, and N columns of data
 with names}
 
 \item{by}{a vector of names, which correspond to the names of the columns in tab}
+
+\item{replace_na}{logical; replace NAs with zeros (default TRUE)}
 }
 \value{
 a modified data frame
