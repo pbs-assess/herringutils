@@ -181,6 +181,48 @@ spawn_index_by_area_table <- function(tab,
                      bold = TRUE)
 }
 
+#' Table for the spawn index in multiple areas
+#'
+#' @param tab data.frame as read in by [readr::read_csv()]
+#' @param by_vec a vector of names, which correspond to the names of the columns in tab
+#' @param first_yr first year to show in table
+#' @param cap caption for table
+#' @param translate Logical. Translate to french if TRUE
+#' @param ... arguments passed to [csas_table()]
+#'
+#' @importFrom dplyr filter select rename
+#' @importFrom reshape2 dcast
+#' @importFrom rosettafish en2fr
+#' @importFrom csasdown csas_table
+#'
+#' @export
+#' @importFrom kableExtra add_header_above
+#' @return a [csasdown::csas_table()]
+spawn_index_table <- function(tab,
+                              by_vec,
+                              first_yr,
+                              cap = "",
+                              translate = FALSE,
+                              ...){
+  tab <- tab %>%
+    rename( Year=year ) %>%
+    filter(Year >= first_yr) %>%
+    select( Year, value, region) %>%
+    dcast(Year ~ region, value.var = "value")
+  tab <- add_cols_and_reorder(tab, by = by_vec)
+  names(tab)[names(tab) == "Year"] <- en2fr("Year", translate)
+  sar <- en2fr("SAR", translate)
+  ahead <- c(" "=1, sar=(ncol(tab)-1))
+  names(ahead) <- c(" ", sar)
+  csas_table(tab,
+             format = "latex",
+             align = c("l", rep("r", 5)),
+             caption = cap,
+             ...)  %>%
+    add_header_above(ahead,
+                     bold = TRUE)
+}
+
 #' Make decision table based on MP data
 #'
 #' @param df data brought in from CSV files found in the herringsr project's data directory
