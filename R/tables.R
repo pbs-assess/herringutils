@@ -207,7 +207,7 @@ spawn_index_table <- function(tab,
   tab <- tab %>%
     rename( Year=year ) %>%
     filter(Year >= first_yr) %>%
-    mutate( value=value*1000 ) %>%
+    mutate( value=value*1000, value=ifelse(0, NA, value) ) %>%
     select( Year, value, region) %>%
     dcast(Year ~ region, value.var = "value")
   tab <- add_cols_and_reorder(tab, by = by_vec)
