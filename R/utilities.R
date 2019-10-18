@@ -106,7 +106,7 @@ consecutive_group <- function(vec) {
 
 #' Add missing columns with names in `by` not in the column names of `tab`. Order
 #' the table, ignoring the first column in the order given in the `by` vector.
-#' Set all NAs to 0 in the data columns only.
+#' Optionally, set all NAs to 0s in the data columns only.
 #'
 #' @param tab data frame with years as the first column, and N columns of data
 #'  with names

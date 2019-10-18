@@ -4,7 +4,7 @@
 \alias{add_cols_and_reorder}
 \title{Add missing columns with names in `by` not in the column names of `tab`. Order
 the table, ignoring the first column in the order given in the `by` vector.
-Set all NAs to 0 in the data columns only.}
+Optionally, set all NAs to 0s in the data columns only.}
 \usage{
 add_cols_and_reorder(tab, by, replace_na = TRUE)
 }
@@ -22,5 +22,5 @@ a modified data frame
 \description{
 Add missing columns with names in `by` not in the column names of `tab`. Order
 the table, ignoring the first column in the order given in the `by` vector.
-Set all NAs to 0 in the data columns only.
+Optionally, set all NAs to 0s in the data columns only.
 }
