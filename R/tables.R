@@ -362,7 +362,7 @@ decision_tables_mp <- function(df,
                                latex.amp(),
                                latex.nline,
                                latex.cline("1-9")))
-
+  df$om <- en2fr(df$om, translate, allow_missing = TRUE)
   # Horizontal line locations for separating groups of OMs
   last_ddm <- which(df$om == "DDM")
   last_dim <- which(df$om == "DIM")
