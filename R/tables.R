@@ -243,7 +243,6 @@ spawn_index_table <- function(tab,
 #' @export
 #' @importFrom xtable xtable
 #' @importFrom dplyr as_tibble mutate
-#' @importfrom gfutilities latex.cline latex.amp latex.bold latex.mcol latex.nline latex.hline latex.size.str
 decision_tables_mp <- function(df,
                                xcaption = "Default",
                                xlabel = "tab:default",
