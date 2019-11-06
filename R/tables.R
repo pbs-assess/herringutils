@@ -342,9 +342,13 @@ decision_tables_mp <- function(df,
                                latex.amp(),
                                latex.bold(en2fr("MP", translate = translate)),
                                latex.amp(),
-                               "$P(\\mli{SB}_t > 0.3\\mli{SB}_0)$",
+                               ifelse(translate,
+                                      "$P(\\mli{BR}_t > 0.3\\mli{BR}_0)$",
+                                      "$P(\\mli{SB}_t > 0.3\\mli{SB}_0)$"),
                                latex.amp(),
-                               "$P(\\mli{SB}_t \\geq 0.6\\mli{SB}_0)$",
+                               ifelse( translate,
+                                       "$P(\\mli{BR}_t \\geq 0.6\\mli{BR}_0)$",
+                                       "$P(\\mli{SB}_t \\geq 0.6\\mli{SB}_0)$"),
                                latex.amp(),
                                en2fr("AAV", translate = translate),
                                latex.amp(),
@@ -370,7 +374,6 @@ decision_tables_mp <- function(df,
                         latex.cline("1-9"),
                         latex.cline("1-9"),
                         latex.cline("1-9"))
-
   size.string <- latex.size.str(font.size, space.size)
   df$om <- en2fr(df$om, translate, allow_missing = TRUE)
   print(xtable(df,
