@@ -261,13 +261,8 @@ decision_tables_mp <- function(df,
 
   # If the conservation target is less than 75%, show -- for TAC and hr
   df <- df %>%
-   mutate(tac = ifelse(obj1 < 0.75, " NA", tac),
-          targ.hr = ifelse(obj1 < 0.75, " NA", targ.hr))
-
-  wherena <- apply(df, c(1,2), function(x){grep(" *NA", x)}) == 1
-  df[!is.na(wherena)] <- "--"
-  df$tac[is.na(df$tac)] <- "--"
-  df$targ.hr[is.na(df$targ.hr)] <- "--"
+   mutate(tac = ifelse(obj1 < 0.75, NA, tac),
+          targ.hr = ifelse(obj1 < 0.75, NA, targ.hr))
 
   df <- df %>%
     mutate(om,
@@ -276,9 +271,9 @@ decision_tables_mp <- function(df,
            obj3 = f(obj3, dec.points = dec_pts),
            obj4 = f(obj4, dec.points = dec_pts),
            catch = paste0(f(catch * 100, dec.points = perc_dec_pts), "\\%"),
-           tac = ifelse(tac == "--", "--", f(as.numeric(tac), dec.points = dec_pts)),
-           targ.hr = ifelse(targ.hr == "--", "--", f(as.numeric(targ.hr), dec.points = dec_pts)))
-
+           tac = ifelse(tac == "--", "--", f(tac, dec.points = dec_pts)),
+           targ.hr = ifelse(targ.hr == "--", "--", f(targ.hr, dec.points = dec_pts)))
+  df[is.na(df)] <- "--"
 
   if(!is.na(inc_mps[1])){
     df <- df %>%
