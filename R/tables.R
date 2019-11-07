@@ -156,6 +156,7 @@ sok_harvest_table <- function(tab,
 #'
 #' @param tab data.frame as read in by [readr::read_csv()]
 #' @param cap caption for table
+#' @param first_yr Earliest year to show in the table
 #' @param translate Logical. Translate to french if TRUE
 #' @param ... arguments passed to [csas_table()]
 #'
@@ -164,8 +165,10 @@ sok_harvest_table <- function(tab,
 #' @return a [csasdown::csas_table()]
 spawn_index_by_area_table <- function(tab,
                                       cap = "",
+                                      first_yr,
                                       translate = FALSE,
                                       ...){
+  tab <- filter( tab, Year>=first_yr )
   names(tab) <- gsub("&", "\\\\&", names(tab))
   tab[-c(1, 2)] <- apply(tab[-c(1, 2)], c(1,2), f, 3)
   tab[2] <- apply(tab[2], c(1,2), f)
