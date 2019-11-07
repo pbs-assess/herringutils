@@ -162,6 +162,7 @@ sok_harvest_table <- function(tab,
 #'
 #' @export
 #' @importFrom kableExtra add_header_above
+#' @importFrom dplyr filter
 #' @return a [csasdown::csas_table()]
 spawn_index_by_area_table <- function(tab,
                                       cap = "",
