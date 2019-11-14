@@ -148,7 +148,7 @@ plot_pa <- function(df,
   g <- ggplot(dfm, aes(x = Year)) +
     geom_point(aes(y = Age,
                    size = ifelse(Proportion, Proportion, NA)),
-                   na.rm = TRUE) +
+               na.rm = TRUE) +
     geom_path(data = dfm_ci,
               aes(y = MeanAge, group = GroupID),
               size = 1.25,
@@ -271,7 +271,7 @@ plot_harvest_rate <- function(df,
              region = as.character(region))
     yrs <- as.numeric(min(j$year):max(j$year))
     all_yrs <- tibble(year = yrs,
-                  region = rep(regions[[x]], length(yrs)))
+                      region = rep(regions[[x]], length(yrs)))
     j <- j %>%
       full_join(all_yrs, by = c("year", "region"))  %>%
       arrange(year)
@@ -471,9 +471,9 @@ plot_scaled_abundance <- function(df,
     scale_shape_manual(values = c(2, 1)) +
     scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10)) +
     geom_line(data = ssb,
-             aes(x = year, y = median, group = survey),
-             size = line_size,
-             na.rm = TRUE)
+              aes(x = year, y = median, group = survey),
+              size = line_size,
+              na.rm = TRUE)
   if(!is.na(xlim[1])){
     g <- g +
       coord_cartesian(xlim = xlim, expand = TRUE)
@@ -557,7 +557,7 @@ plot_natural_mortality <- function(model,
     scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10))
   if(!is.na(xlim[1])){
     g <- g +
-       coord_cartesian(xlim = xlim, expand = TRUE)
+      coord_cartesian(xlim = xlim, expand = TRUE)
   }
   if(!is.na(annot)){
     g <- g +
@@ -572,8 +572,9 @@ plot_natural_mortality <- function(model,
   g <- modify_axes_labels(g,
                           x_label_text = newline_format(en2fr("Year", translate),
                                                         x_axis_label_newline_length),
-                          y_label_text = newline_format(en2fr("Instantaneous natural mortality", translate),
-                                                        y_axis_label_newline_length),
+                          y_label_text = newline_format(
+                            en2fr("Instantaneous natural mortality", translate),
+                            y_axis_label_newline_length),
                           show_x_axis = show_x_axis,
                           show_y_axis = show_y_axis,
                           x_axis_label_size = x_axis_label_size,
@@ -872,8 +873,8 @@ plot_recruitment_devs <- function(model,
                   size = errorbar_size,
                   width = 0) +
     #geom_line(aes(y = runmean),
-           #   color = "red",
-             # size = line_size) +
+    #   color = "red",
+    # size = line_size) +
     scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10))
   if(!is.na(xlim[1])){
     g <- g +
@@ -1335,7 +1336,7 @@ plot_bh <- function(models,
   g <- ggplot(d, aes(x = sbt, y = rt)) +
     geom_point(aes(color = year,
                    shape = year),
-                   na.rm = TRUE) #+
+               na.rm = TRUE) #+
   # geom_point( data=filter(bhSub, Year==max(yrRange)), shape=24,
   #             colour="black", fill="white") +
   # geom_point( data=bhPredSub, aes(x=sbo, y=ro), shape=8 ) +
