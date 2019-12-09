@@ -32,7 +32,7 @@ get_catch <- function(models,
            group %in% group,
            sex %in% sex,
            type %in% type) %>%
-    left_join(gear) %>%
+    left_join(gear, by="gear") %>%
     select(-gear) %>%
     rename(gear = gearname) %>%
     mutate(region = fct_relevel(region, models_names))
@@ -64,7 +64,7 @@ get_wa <- function(models,
     filter(area %in% area,
            group %in% group,
            sex %in% sex) %>%
-    left_join(gear) %>%
+    left_join(gear, by="gear") %>%
     select(-gear) %>%
     rename(gear = gearname) %>%
     mutate(region = fct_relevel(region, models_names))
@@ -98,7 +98,7 @@ get_pa <- function(models,
     filter(area %in% area,
            group %in% group,
            sex %in% sex) %>%
-    left_join(gear) %>%
+    left_join(gear, by="gear") %>%
     select(-gear) %>%
     rename(gear = gearname) %>%
     mutate(region = fct_relevel(region, models_names))
@@ -132,7 +132,7 @@ get_surv_ind <- function(models,
     filter(area %in% area,
            group %in% group,
            sex %in% sex) %>%
-    left_join(gear) %>%
+    left_join(gear, by="gear") %>%
     select(-gear) %>%
     rename(gear = gearname,
            year = iyr,
