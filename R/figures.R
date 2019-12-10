@@ -573,9 +573,10 @@ plot_natural_mortality <- function(model,
                           x_label_text = newline_format(en2fr("Year", translate),
                                                         x_axis_label_newline_length),
                           y_label_text = newline_format(
-                            paste0(
-                              en2fr("Instantaneous natural mortality", translate),
-                              " (/", en2fr("Year", translate), ")"),
+                            paste0( en2fr("Instantaneous natural mortality",
+                                          translate), " (/",
+                                    en2fr("Year", translate, case="lower"),
+                                    ")"),
                             y_axis_label_newline_length),
                           show_x_axis = show_x_axis,
                           show_y_axis = show_y_axis,
