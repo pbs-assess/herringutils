@@ -998,6 +998,11 @@ plot_biomass_phase <- function(model,
   names(lrp) <- c("year", "lower", "median", "upper")
   lrp[1,1] <- min(sbt$year) - 2
   lrp[,1] <- as.numeric(lrp[,1])
+  # # Add 0.38SB_0 (for HG)
+  # lrp2 <- lrp %>%
+  #   mutate( lower=lower/0.3*0.38,
+  #           median=median/0.3*0.38,
+  #           upper=upper/0.3*0.38 )
 
   g <- ggplot(dd, aes(x = median,
                       y = production)) +
@@ -1014,6 +1019,16 @@ plot_biomass_phase <- function(model,
               alpha = lrp_ribbon_alpha,
               fill = "red",
               inherit.aes = FALSE) +
+    # geom_vline(xintercept = lrp2$median,
+    #            color = "blue",
+    #            size = line_size) +
+    # geom_rect(data = lrp2, aes(xmin = lrp2$lower,
+    #                           xmax = lrp2$upper,
+    #                           ymin = -Inf,
+    #                           ymax = Inf),
+    #           alpha = lrp_ribbon_alpha,
+    #           fill = "blue",
+    #           inherit.aes = FALSE) +
     geom_point(data = filter(dd, year != max(year)),
                aes(color = year,
                    shape = shp),
