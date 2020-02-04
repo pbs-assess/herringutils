@@ -638,8 +638,8 @@ plot_recruitment <- function(model,
            mpd = mpd / 1000)
 
   g <- ggplot(rec, aes(x = year, y = median)) +
-    geom_point(size = point_size,
-               na.rm = TRUE) +
+    geom_point(size = point_size, na.rm = TRUE) +
+    geom_line( size=0.5, colour="darkgrey" ) +
     geom_errorbar(aes(ymin = lower, ymax = upper), size = line_size / 2, width = 0) +
     scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10))
   if(!is.na(xlim[1])){
@@ -872,6 +872,7 @@ plot_recruitment_devs <- function(model,
                linetype = zeroline_type) +
     geom_point(size = point_size,
                na.rm = TRUE) +
+    geom_line( size=0.5, colour="darkgrey" ) +
     geom_errorbar(aes(ymin = lower, ymax = upper),
                   size = errorbar_size,
                   width = 0) +
