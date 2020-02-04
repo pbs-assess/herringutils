@@ -4,8 +4,7 @@
 \alias{spawn_index_by_area_table}
 \title{Table for spawn index by area}
 \usage{
-spawn_index_by_area_table(tab, cap = "", first_yr, translate = FALSE,
-  ...)
+spawn_index_by_area_table(tab, cap = "", first_yr, translate = FALSE, ...)
 }
 \arguments{
 \item{tab}{data.frame as read in by [readr::read_csv()]}

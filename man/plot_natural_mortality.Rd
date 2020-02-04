@@ -4,12 +4,22 @@
 \alias{plot_natural_mortality}
 \title{Plot natural mortality mcmc median and credibility interval}
 \usage{
-plot_natural_mortality(model, line_size = 0.75, ribbon_alpha = 0.5,
-  xlim = NA, show_x_axis = TRUE, show_y_axis = TRUE,
-  x_axis_label_size = 8, x_axis_tick_label_size = 8,
-  y_axis_label_size = 8, y_axis_tick_label_size = 8,
-  x_axis_label_newline_length = 30, y_axis_label_newline_length = 20,
-  annot = NA, translate = FALSE)
+plot_natural_mortality(
+  model,
+  line_size = 0.75,
+  ribbon_alpha = 0.5,
+  xlim = NA,
+  show_x_axis = TRUE,
+  show_y_axis = TRUE,
+  x_axis_label_size = 8,
+  x_axis_tick_label_size = 8,
+  y_axis_label_size = 8,
+  y_axis_tick_label_size = 8,
+  x_axis_label_newline_length = 30,
+  y_axis_label_newline_length = 20,
+  annot = NA,
+  translate = FALSE
+)
 }
 \arguments{
 \item{model}{an iscam model}

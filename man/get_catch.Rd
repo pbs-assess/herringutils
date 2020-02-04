@@ -7,15 +7,13 @@
 \alias{get_surv_ind}
 \title{Summarize catch by region and gear}
 \usage{
-get_catch(models, models_names, gear, area = 1, group = 1, sex = 0,
-  type = 1)
+get_catch(models, models_names, gear, area = 1, group = 1, sex = 0, type = 1)
 
 get_wa(models, models_names, gear, area = 1, group = 1, sex = 0)
 
 get_pa(models, models_names, gear, area = 1, group = 1, sex = 0)
 
-get_surv_ind(models, models_names, gear, area = 1, group = 1,
-  sex = 0)
+get_surv_ind(models, models_names, gear, area = 1, group = 1, sex = 0)
 }
 \arguments{
 \item{models}{list of iscam models. Must be a [gfiscamutils::model.lst.class] type}

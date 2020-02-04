@@ -4,9 +4,15 @@
 \alias{plot_spawn_ind}
 \title{Plot survey indices from data frames as extracted from iscam data (dat) files}
 \usage{
-plot_spawn_ind(df, xlim = c(1000, 3000), ylim = NA, new_surv_yr = NA,
-  new_surv_yr_type = "dashed", new_surv_yr_size = 0.25,
-  translate = FALSE)
+plot_spawn_ind(
+  df,
+  xlim = c(1000, 3000),
+  ylim = NA,
+  new_surv_yr = NA,
+  new_surv_yr_type = "dashed",
+  new_surv_yr_size = 0.25,
+  translate = FALSE
+)
 }
 \arguments{
 \item{df}{a data frame as constructed by [get_surv_ind()]}

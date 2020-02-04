@@ -5,13 +5,28 @@
 \title{Plot estimated biommass median and credible interval, projected biomass with credible interval,
 catch history, and LRP line with credible interval}
 \usage{
-plot_biomass_catch(model, catch_df, point_size = 3, errorbar_size = 1,
-  line_size = 0.75, ribbon_alpha = 0.5, lrp_ribbon_alpha = 0.35,
-  between_bars = 0.75, refpt_show = "0.3sbo", xlim = NA,
-  show_x_axis = TRUE, show_y_axis = TRUE, x_axis_label_size = 8,
-  x_axis_tick_label_size = 8, y_axis_label_size = 8,
-  y_axis_tick_label_size = 8, x_axis_label_newline_length = 30,
-  y_axis_label_newline_length = 20, annot = NA, translate = FALSE)
+plot_biomass_catch(
+  model,
+  catch_df,
+  point_size = 3,
+  errorbar_size = 1,
+  line_size = 0.75,
+  ribbon_alpha = 0.5,
+  lrp_ribbon_alpha = 0.35,
+  between_bars = 0.75,
+  refpt_show = "0.3sbo",
+  xlim = NA,
+  show_x_axis = TRUE,
+  show_y_axis = TRUE,
+  x_axis_label_size = 8,
+  x_axis_tick_label_size = 8,
+  y_axis_label_size = 8,
+  y_axis_tick_label_size = 8,
+  x_axis_label_newline_length = 30,
+  y_axis_label_newline_length = 20,
+  annot = NA,
+  translate = FALSE
+)
 }
 \arguments{
 \item{model}{an iscam model object}

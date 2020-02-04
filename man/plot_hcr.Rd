@@ -4,10 +4,20 @@
 \alias{plot_hcr}
 \title{Plot Harvest control rules as pairs plots}
 \usage{
-plot_hcr(hcr.lst, sbt.lst, mp = "", region = "", probs = c(0.025,
-  0.975), point.size = 0.05, line.width = 0.5, show.medians = TRUE,
-  show.means = TRUE, show.x.axes = FALSE, axis.text.size = 7,
-  panel.text.size = 3)
+plot_hcr(
+  hcr.lst,
+  sbt.lst,
+  mp = "",
+  region = "",
+  probs = c(0.025, 0.975),
+  point.size = 0.05,
+  line.width = 0.5,
+  show.medians = TRUE,
+  show.means = TRUE,
+  show.x.axes = FALSE,
+  axis.text.size = 7,
+  panel.text.size = 3
+)
 }
 \arguments{
 \item{hcr.lst}{A list of length equal to the length of the sbt list, of vectors of length two,

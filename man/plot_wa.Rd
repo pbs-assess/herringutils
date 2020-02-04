@@ -4,8 +4,14 @@
 \alias{plot_wa}
 \title{Plot weight-at-age time series from a data frames as extracted from iscam data (dat) files}
 \usage{
-plot_wa(df, circle_age = 3, xlim = c(1000, 3000), ylim = c(0, NA),
-  n_roll = 5, translate = FALSE)
+plot_wa(
+  df,
+  circle_age = 3,
+  xlim = c(1000, 3000),
+  ylim = c(0, NA),
+  n_roll = 5,
+  translate = FALSE
+)
 }
 \arguments{
 \item{df}{a data frame as constructed by [get_wa()]}

@@ -4,8 +4,15 @@
 \alias{hcr.min.esc}
 \title{Calculate TAC and TAC-based harvest rate based on a minimum escapement and reference harvest rate}
 \usage{
-hcr.min.esc(bt, ref.hr, min.esc, abs.esc = FALSE, catch.cap = 0,
-  bo = 1, num.end.yrs = 1)
+hcr.min.esc(
+  bt,
+  ref.hr,
+  min.esc,
+  abs.esc = FALSE,
+  catch.cap = 0,
+  bo = 1,
+  num.end.yrs = 1
+)
 }
 \arguments{
 \item{bt}{biomass vector for years}

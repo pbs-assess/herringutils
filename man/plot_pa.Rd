@@ -4,8 +4,15 @@
 \alias{plot_pa}
 \title{Plot proportions-at-age time series from a data frames as extracted from iscam data (dat) files}
 \usage{
-plot_pa(df, age_plus = 10, conf = 0.9, xlim = c(1000, 3000),
-  ylim = c(0, NA), size_range = c(0.5, 2), translate = FALSE)
+plot_pa(
+  df,
+  age_plus = 10,
+  conf = 0.9,
+  xlim = c(1000, 3000),
+  ylim = c(0, NA),
+  size_range = c(0.5, 2),
+  translate = FALSE
+)
 }
 \arguments{
 \item{df}{a data frame as constructed by [get_pa()]}

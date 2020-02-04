@@ -4,8 +4,7 @@
 \alias{sok_harvest_table}
 \title{Table for the Spawn on kelp harvest for herring}
 \usage{
-sok_harvest_table(tab, by_vec, first_yr, cap = "", translate = FALSE,
-  ...)
+sok_harvest_table(tab, by_vec, first_yr, cap = "", translate = FALSE, ...)
 }
 \arguments{
 \item{tab}{data.frame as read in by [readr::read_csv()]}

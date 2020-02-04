@@ -4,8 +4,7 @@
 \alias{hcr.ref.pts}
 \title{Calculate TAC and TAC-based harvest rate based on biomass reference points and reference harvest rate}
 \usage{
-hcr.ref.pts(bt, ref.hr, lrp, usr, catch.cap = 0, bo = 1,
-  num.end.yrs = 1)
+hcr.ref.pts(bt, ref.hr, lrp, usr, catch.cap = 0, bo = 1, num.end.yrs = 1)
 }
 \arguments{
 \item{bt}{biomass vector for years}

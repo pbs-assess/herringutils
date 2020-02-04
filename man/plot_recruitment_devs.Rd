@@ -5,13 +5,26 @@
 \title{Plot recruitment deviations as points and errorbars, with a running mean of the median
 values}
 \usage{
-plot_recruitment_devs(model, run_mean_yrs = 3, point_size = 2,
-  line_size = 2, errorbar_size = 1, zeroline_size = 1,
-  zeroline_type = "dashed", xlim = NA, show_x_axis = TRUE,
-  show_y_axis = TRUE, x_axis_label_size = 8,
-  x_axis_tick_label_size = 8, y_axis_label_size = 8,
-  y_axis_tick_label_size = 8, x_axis_label_newline_length = 30,
-  y_axis_label_newline_length = 20, annot = NA, translate = FALSE)
+plot_recruitment_devs(
+  model,
+  run_mean_yrs = 3,
+  point_size = 2,
+  line_size = 2,
+  errorbar_size = 1,
+  zeroline_size = 1,
+  zeroline_type = "dashed",
+  xlim = NA,
+  show_x_axis = TRUE,
+  show_y_axis = TRUE,
+  x_axis_label_size = 8,
+  x_axis_tick_label_size = 8,
+  y_axis_label_size = 8,
+  y_axis_tick_label_size = 8,
+  x_axis_label_newline_length = 30,
+  y_axis_label_newline_length = 20,
+  annot = NA,
+  translate = FALSE
+)
 }
 \arguments{
 \item{model}{an iscam model object}

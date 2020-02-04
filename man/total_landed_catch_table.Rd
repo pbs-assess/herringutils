@@ -4,8 +4,14 @@
 \alias{total_landed_catch_table}
 \title{Table showing the total landed catch by area for herring}
 \usage{
-total_landed_catch_table(tab, by_vec, first_yr, cap = "",
-  translate = FALSE, ...)
+total_landed_catch_table(
+  tab,
+  by_vec,
+  first_yr,
+  cap = "",
+  translate = FALSE,
+  ...
+)
 }
 \arguments{
 \item{tab}{data.frame as returned from [gfiscamutils::get_catch()]}

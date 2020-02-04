@@ -6,13 +6,26 @@
 Plot the median SSB as a line, with points which are survey index scaled by catchability value
 for the survey}
 \usage{
-plot_scaled_abundance(df, model, gear, new_surv_yr = NA,
-  point_size = 2, line_size = 0.75, xlim = NA, show_x_axis = TRUE,
-  show_y_axis = TRUE, x_axis_label_size = 8,
-  x_axis_tick_label_size = 8, y_axis_label_size = 8,
-  y_axis_tick_label_size = 8, x_axis_label_newline_length = 30,
-  y_axis_label_newline_length = 20, annot = NA, show_legend = FALSE,
-  translate = FALSE)
+plot_scaled_abundance(
+  df,
+  model,
+  gear,
+  new_surv_yr = NA,
+  point_size = 2,
+  line_size = 0.75,
+  xlim = NA,
+  show_x_axis = TRUE,
+  show_y_axis = TRUE,
+  x_axis_label_size = 8,
+  x_axis_tick_label_size = 8,
+  y_axis_label_size = 8,
+  y_axis_tick_label_size = 8,
+  x_axis_label_newline_length = 30,
+  y_axis_label_newline_length = 20,
+  annot = NA,
+  show_legend = FALSE,
+  translate = FALSE
+)
 }
 \arguments{
 \item{df}{Data frame of the survey estimates, as constructed by [get_surv_ind()]}

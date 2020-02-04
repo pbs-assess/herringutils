@@ -5,9 +5,16 @@
 \title{Plot density of MCMC posterior for projected biomass with quantiles and
  reference point (also with quantiles)}
 \usage{
-plot_proj_biomass_density(models, regions, yr, tac = 0,
-  refpt = "X03B0", line_size = 1, ribbon_alpha = 0.35,
-  translate = FALSE)
+plot_proj_biomass_density(
+  models,
+  regions,
+  yr,
+  tac = 0,
+  refpt = "X03B0",
+  line_size = 1,
+  ribbon_alpha = 0.35,
+  translate = FALSE
+)
 }
 \arguments{
 \item{models}{list of iscam model objects}

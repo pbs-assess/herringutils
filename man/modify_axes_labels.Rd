@@ -4,10 +4,17 @@
 \alias{modify_axes_labels}
 \title{Add or omit the x and y label and tick mark text to a ggplot.}
 \usage{
-modify_axes_labels(g, x_label_text = "", y_label_text = "",
-  show_x_axis = TRUE, show_y_axis = TRUE, x_axis_label_size = 8,
-  x_axis_tick_label_size = 8, y_axis_label_size = 8,
-  y_axis_tick_label_size = 8)
+modify_axes_labels(
+  g,
+  x_label_text = "",
+  y_label_text = "",
+  show_x_axis = TRUE,
+  show_y_axis = TRUE,
+  x_axis_label_size = 8,
+  x_axis_tick_label_size = 8,
+  y_axis_label_size = 8,
+  y_axis_tick_label_size = 8
+)
 }
 \arguments{
 \item{g}{a ggplot object}
