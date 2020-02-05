@@ -1325,11 +1325,14 @@ plot_hcr <- function(hcr.lst,
 #'
 #' @param models iscam models list
 #' @param regions the regions to include
+#' @param translate Logical; translate labels to french?
 #'
 #' @export
 #' @importFrom tibble enframe
+#' @importFrom scales comma
 plot_bh <- function(models,
-                    regions){
+                    regions,
+                    translate = FALSE){
   # Note sbt goes from start year to end year + 1
   # rt goes from start year + start age to end year
 
@@ -1350,12 +1353,19 @@ plot_bh <- function(models,
   d <- sbt %>%
     full_join(rt, by = "year") %>%
     rename(sbt = value.x,
-           rt = value.y) #%>%
+           rt = value.y) %>%
+    mutate(year = as.numeric(year))#%>%
   #mutate(year = factor(year))
-  g <- ggplot(d, aes(x = sbt, y = rt)) +
-    geom_point(aes(color = year,
-                   shape = year),
-               na.rm = TRUE) #+
+  g <- ggplot(d, aes(x = sbt, y = rt, color = year)) +
+    labs( x=paste(en2fr("Spawning biomass", translate), "(t)"),
+          y=paste(en2fr("Recruitment", translate), "(millions)") )+
+    geom_point(data=filter(d, year!=max(year)), na.rm = TRUE) +
+    geom_point(data=filter(d, year==max(year)), na.rm = TRUE, shape = 24,
+               color = "black", fill = "white",) +
+    guides(color = FALSE, shape = FALSE) +
+    scale_color_gradient(low = "lightgrey", high = "black") +
+    scale_x_continuous( labels=comma ) +
+    scale_y_continuous( labels=comma )
   # geom_point( data=filter(bhSub, Year==max(yrRange)), shape=24,
   #             colour="black", fill="white") +
   # geom_point( data=bhPredSub, aes(x=sbo, y=ro), shape=8 ) +

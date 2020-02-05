@@ -4,12 +4,14 @@
 \alias{plot_bh}
 \title{Plot Beverton-holt}
 \usage{
-plot_bh(models, regions)
+plot_bh(models, regions, translate = FALSE)
 }
 \arguments{
 \item{models}{iscam models list}
 
 \item{regions}{the regions to include}
+
+\item{translate}{Logical; translate labels to french?}
 }
 \description{
 Plot Beverton-holt
