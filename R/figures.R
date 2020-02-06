@@ -1342,7 +1342,7 @@ plot_bh <- function(model,
                  year=as.numeric(colnames(sbtDat)) )
 
   rtDat <- model$mcmccalcs$recr.quants
-  rt <- tibble( rt=rtDat["50%", ]/1000,
+  rt <- tibble( rt=rtDat["50%", ],
                 year=as.numeric(colnames(rtDat)) )
 
   d <- sbt %>%
@@ -1350,7 +1350,7 @@ plot_bh <- function(model,
     na.omit( )
 
   x <- model$mcmccalcs$p.quants
-  d0 <- tibble( sbt=x["50%", "sbo"], rt=x["50%", "ro"]/1000 )
+  d0 <- tibble( sbt=x["50%", "sbo"], rt=x["50%", "ro"] )
 
   p <- tibble( sbt=seq(from=0, to=max(d$sbt), length.out=100) )
 
@@ -1364,8 +1364,7 @@ plot_bh <- function(model,
     geom_point( data=d0, shape=8 ) +
     guides(color = FALSE, shape = FALSE) +
     scale_color_gradient(low = "lightgrey", high = "black") +
-    scale_x_continuous( labels=comma ) +
-    scale_y_continuous( labels=comma )
+    scale_y_continuous( labels=function(x) x/1000 )
   # geom_point( data=filter(bhSub, Year==max(yrRange)), shape=24,
   #             colour="black", fill="white") +
   # geom_point( data=bhPredSub, aes(x=sbo, y=ro), shape=8 ) +
