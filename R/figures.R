@@ -21,7 +21,7 @@ plot_catch <- function(df,
     scale_fill_viridis_d( ) +
     theme(legend.position = "top") +
     labs(x = en2fr("Year", translate),
-         y = paste(en2fr("Catch", translate), " (1000 t)"),
+         y = paste(en2fr("Catch", translate), " (1,000 t)"),
          fill = en2fr("Gear", translate)) +
     facet_wrap( ~ region, ncol = 2, dir = "v", scales = "free_y" )
   g
@@ -219,7 +219,7 @@ plot_spawn_ind <- function(df,
     expand_limits(x = xlim[1]:xlim[2]) +
     labs(shape = en2fr("Survey period", translate),
          x = en2fr("Year", translate),
-         y = paste0(en2fr("Spawn index", translate), " (1000 t)")) +
+         y = paste0(en2fr("Spawn index", translate), " (1,000 t)")) +
     facet_wrap(~ Region, ncol = 2, dir = "v", scales = "free_y" ) +
     theme(legend.position="top")
   if(!is.na(ylim[1])){
@@ -495,7 +495,7 @@ plot_scaled_abundance <- function(df,
   g <- modify_axes_labels(g,
                           x_label_text = newline_format(en2fr("Year", translate),
                                                         x_axis_label_newline_length),
-                          y_label_text = newline_format(paste0(en2fr("Scaled abundance", translate), " (1000 t)"),
+                          y_label_text = newline_format(paste0(en2fr("Scaled abundance", translate), " (1,000 t)"),
                                                         y_axis_label_newline_length),
                           show_x_axis = show_x_axis,
                           show_y_axis = show_y_axis,
@@ -659,7 +659,7 @@ plot_recruitment <- function(model,
   g <- modify_axes_labels(g,
                           x_label_text = newline_format(en2fr("Year", translate),
                                                         x_axis_label_newline_length),
-                          y_label_text = newline_format(paste(en2fr("Number of age-2 recruits", translate), " (1000 millions)"),
+                          y_label_text = newline_format(paste(en2fr("Number of age-2 recruits", translate), " (1,000 millions)"),
                                                         y_axis_label_newline_length),
                           show_x_axis = show_x_axis,
                           show_y_axis = show_y_axis,
@@ -795,7 +795,7 @@ plot_biomass_catch <- function(model,
   g <- modify_axes_labels(g,
                           x_label_text = newline_format(en2fr("Year", translate),
                                                         x_axis_label_newline_length),
-                          y_label_text = newline_format(paste0(en2fr("Spawning biomass", translate), " (1000 t)"),
+                          y_label_text = newline_format(paste0(en2fr("Spawning biomass", translate), " (1,000 t)"),
                                                         y_axis_label_newline_length),
                           show_x_axis = show_x_axis,
                           show_y_axis = show_y_axis,
@@ -1060,9 +1060,9 @@ plot_biomass_phase <- function(model,
                size = 3)
   }
   g <- modify_axes_labels(g,
-                          x_label_text = newline_format(paste0(en2fr("Spawning biomass", translate), " (1000 t)"),
+                          x_label_text = newline_format(paste0(en2fr("Spawning biomass", translate), " (1,000 t)"),
                                                         x_axis_label_newline_length),
-                          y_label_text = newline_format(paste0(en2fr("Spawning biomass production", translate), " (1000 t)"),
+                          y_label_text = newline_format(paste0(en2fr("Spawning biomass production", translate), " (1,000 t)"),
                                                         y_axis_label_newline_length),
                           show_x_axis = show_x_axis,
                           show_y_axis = show_y_axis,
@@ -1330,38 +1330,38 @@ plot_hcr <- function(hcr.lst,
 #' @export
 #' @importFrom tibble enframe
 #' @importFrom scales comma
-plot_bh <- function(models,
+plot_bh <- function(model,
                     regions,
                     translate = FALSE){
   # Note sbt goes from start year to end year + 1
   # rt goes from start year + start age to end year
 
   # lapply !!!
-  sbt <- model$mpd$sbt
-  rt <- model$mpd$rt
+  sbtDat <- model$mcmccalcs$sbt.quants
+  sbt <- tibble( sbt=sbtDat["50%", ],
+                 year=as.numeric(colnames(sbtDat)) )
 
-  sbt_yrs <- model$mpd$yrs
-  names(sbt) <- sbt_yrs
-  sbt <- enframe(sbt) %>%
-    rename(year = name)
-  sage <- model$dat$start.age
-  rt_yrs <- sbt_yrs[(sage + 1):(length(sbt_yrs) - 1)]
-  names(rt) <- rt_yrs
-  rt <- enframe(rt) %>%
-    rename(year = name)
+  rtDat <- model$mcmccalcs$recr.quants
+  rt <- tibble( rt=rtDat["50%", ]/1000,
+                year=as.numeric(colnames(rtDat)) )
 
   d <- sbt %>%
     full_join(rt, by = "year") %>%
-    rename(sbt = value.x,
-           rt = value.y) %>%
-    mutate(year = as.numeric(year))#%>%
-  #mutate(year = factor(year))
-  g <- ggplot(d, aes(x = sbt, y = rt, color = year)) +
-    labs( x=paste(en2fr("Spawning biomass", translate), "(t)"),
-          y=paste(en2fr("Recruitment", translate), "(millions)") )+
-    geom_point(data=filter(d, year!=max(year)), na.rm = TRUE) +
+    na.omit( )
+
+  x <- model$mcmccalcs$p.quants
+  d0 <- tibble( sbt=x["50%", "sbo"], rt=x["50%", "ro"]/1000 )
+
+  p <- tibble( sbt=seq(from=0, to=max(d$sbt), length.out=100) )
+
+  g <- ggplot(d, aes(x = sbt, y = rt)) +
+    labs( x=paste(en2fr("Spawning biomass", translate), "(1,000 t)"),
+          y=paste(en2fr("Recruitment", translate), "(1,000 millions)") )+
+    geom_point(data=filter(d, year!=max(year)), aes(color = year),
+               na.rm = TRUE) +
     geom_point(data=filter(d, year==max(year)), na.rm = TRUE, shape = 24,
-               color = "black", fill = "white",) +
+               color = "black", fill = "white") +
+    geom_point( data=d0, shape=8 ) +
     guides(color = FALSE, shape = FALSE) +
     scale_color_gradient(low = "lightgrey", high = "black") +
     scale_x_continuous( labels=comma ) +
