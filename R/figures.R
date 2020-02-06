@@ -1330,13 +1330,15 @@ plot_hcr <- function(hcr.lst,
 #' @export
 #' @importFrom tibble enframe
 #' @importFrom scales comma
-plot_bh <- function(model,
+plot_bh <- function(models,
                     regions,
                     translate = FALSE){
   # Note sbt goes from start year to end year + 1
   # rt goes from start year + start age to end year
 
   # lapply !!!
+  model <- models
+
   sbtDat <- model$mcmccalcs$sbt.quants
   sbt <- tibble( sbt=sbtDat["50%", ],
                  year=as.numeric(colnames(sbtDat)) )
@@ -1353,6 +1355,7 @@ plot_bh <- function(model,
   d0 <- tibble( sbt=x["50%", "sbo"], rt=x["50%", "ro"] )
 
   p <- tibble( sbt=seq(from=0, to=max(d$sbt), length.out=100) )
+  # TODO: Calculate rt using alpha and beta parameters
 
   g <- ggplot(d, aes(x = sbt, y = rt)) +
     labs( x=paste(en2fr("Spawning biomass", translate), "(1,000 t)"),
@@ -1365,10 +1368,5 @@ plot_bh <- function(model,
     guides(color = FALSE, shape = FALSE) +
     scale_color_gradient(low = "lightgrey", high = "black") +
     scale_y_continuous( labels=function(x) x/1000 )
-  # geom_point( data=filter(bhSub, Year==max(yrRange)), shape=24,
-  #             colour="black", fill="white") +
-  # geom_point( data=bhPredSub, aes(x=sbo, y=ro), shape=8 ) +
-  # geom_line( data=bhPredSub ) +
-
   g
 }
