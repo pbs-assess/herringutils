@@ -1352,11 +1352,14 @@ plot_bh <- function(models,
     na.omit( )
 
   x <- model$mcmccalcs$p.quants
-  d0 <- tibble( sbt=x["50%", "sbo"], rt=x["50%", "ro"] )
+  h <- x["50%", "h"]
+  r0 <- x["50%", "ro"]
+  sb0 <- x["50%", "sbo"]
+  alpha <- 4*h*r0/(sb0*(1-h))
+  beta <-(5*h-1)/(sb0*(1-h))
 
-  # TODO: Need medians, not MPDs
-  alpha <- model$mpd$so
-  beta <- model$mpd$beta
+  d0 <- tibble( sbt=sb0, rt=r0 )
+
   p <- tibble( sbt=seq(from=0, to=max(c(d$sbt, d0$sbt)), length.out=100),
                rt=alpha*sbt/(1+beta*sbt))
 
