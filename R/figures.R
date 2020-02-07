@@ -659,7 +659,7 @@ plot_recruitment <- function(model,
   g <- modify_axes_labels(g,
                           x_label_text = newline_format(en2fr("Year", translate),
                                                         x_axis_label_newline_length),
-                          y_label_text = newline_format(paste(en2fr("Number of age-2 recruits", translate), " (1,000 millions)"),
+                          y_label_text = newline_format(paste(en2fr("Recruitment", translate), " (1,000 millions)"),
                                                         y_axis_label_newline_length),
                           show_x_axis = show_x_axis,
                           show_y_axis = show_y_axis,
@@ -1354,12 +1354,16 @@ plot_bh <- function(models,
   x <- model$mcmccalcs$p.quants
   d0 <- tibble( sbt=x["50%", "sbo"], rt=x["50%", "ro"] )
 
-  p <- tibble( sbt=seq(from=0, to=max(d$sbt), length.out=100) )
-  # TODO: Calculate rt using alpha and beta parameters
+  # TODO: Need medians, not MPDs
+  alpha <- model$mpd$so
+  beta <- model$mpd$beta
+  p <- tibble( sbt=seq(from=0, to=max(c(d$sbt, d0$sbt)), length.out=100),
+               rt=alpha*sbt/(1+beta*sbt))
 
   g <- ggplot(d, aes(x = sbt, y = rt)) +
     labs( x=paste(en2fr("Spawning biomass", translate), "(1,000 t)"),
           y=paste(en2fr("Recruitment", translate), "(1,000 millions)") )+
+    geom_line( data=p ) +
     geom_point(data=filter(d, year!=max(year)), aes(color = year),
                na.rm = TRUE) +
     geom_point(data=filter(d, year==max(year)), na.rm = TRUE, shape = 24,
