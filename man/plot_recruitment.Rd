@@ -18,6 +18,9 @@ plot_recruitment(
   x_axis_label_newline_length = 30,
   y_axis_label_newline_length = 20,
   annot = NA,
+  show_r0 = TRUE,
+  line_size_r0 = 0.5,
+  r0_ribbon_alpha = 0.35,
   translate = FALSE
 )
 }
@@ -28,7 +31,8 @@ plot_recruitment(
 
 \item{line_size}{thickness of errorbars}
 
-\item{xlim}{x-limits for the plot. Implemented with [ggplot2::coord_cartesian()]}
+\item{xlim}{x-limits for the plot. Implemented with
+[ggplot2::coord_cartesian()]}
 
 \item{show_x_axis}{see [modify_axes_labels()]}
 
@@ -48,6 +52,13 @@ plot_recruitment(
 
 \item{annot}{a character to place in parentheses in the top left of the plot.
 If NA, nothing will appear}
+
+\item{show_r0}{Add horizontal like for unfished recruitment R_0, and shaded
+rectangle for CI.}
+
+\item{line_size_r0}{Thickness for horizontal line}
+
+\item{r0_ribbon_alpha}{Alpha for R_0 rectangle (uncertainty).}
 
 \item{translate}{Logical. If TRUE, translate to french}
 }

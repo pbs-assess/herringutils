@@ -10,7 +10,7 @@
 #' @return A ggplot object
 plot_catch <- function(df,
                        xlim = c(1000, 3000),
-                       translate = FALSE){
+                       translate = FALSE) {
   df <- df %>%
     filter(year >= xlim[1])
   g <- ggplot(df, aes(x = year, y = value)) +
@@ -18,12 +18,14 @@ plot_catch <- function(df,
     scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10)) +
     coord_cartesian(xlim) +
     expand_limits(x = xlim[1]:xlim[2]) +
-    scale_fill_viridis_d( ) +
+    scale_fill_viridis_d() +
     theme(legend.position = "top") +
-    labs(x = en2fr("Year", translate),
-         y = paste(en2fr("Catch", translate), " (1,000 t)"),
-         fill = en2fr("Gear", translate)) +
-    facet_wrap( ~ region, ncol = 2, dir = "v", scales = "free_y" )
+    labs(
+      x = en2fr("Year", translate),
+      y = paste(en2fr("Catch", translate), " (1,000 t)"),
+      fill = en2fr("Gear", translate)
+    ) +
+    facet_wrap(~region, ncol = 2, dir = "v", scales = "free_y")
   g
 }
 
@@ -49,16 +51,20 @@ plot_wa <- function(df,
                     circle_age = 3,
                     xlim = c(1000, 3000),
                     ylim = c(0, NA),
-                    n_roll=5,
-                    translate = FALSE){
+                    n_roll = 5,
+                    translate = FALSE) {
   df <- df %>%
-    filter(year >= xlim[1], gear%in%c(en2fr("Other", translate=french),
-                                      en2fr("RoeSN", translate=french)))
+    filter(year >= xlim[1], gear %in% c(
+      en2fr("Other", translate = french),
+      en2fr("RoeSN", translate = french)
+    ))
   dfm <- melt(df, id.vars = c("year", "area", "group", "sex", "region", "gear")) %>%
     as_tibble() %>%
-    rename(Year = year,
-           Age = variable,
-           Weight = value) %>%
+    rename(
+      Year = year,
+      Age = variable,
+      Weight = value
+    ) %>%
     select(-c(area, group, sex)) %>%
     group_by(region, Age) %>%
     mutate(muWeight = rollmean(x = Weight, k = n_roll, align = "right", na.pad = TRUE)) %>%
@@ -69,25 +75,34 @@ plot_wa <- function(df,
   dfm <- dfm %>%
     filter(Age != circle_age)
   g <- ggplot(dfm) +
-    geom_line(aes(x = Year,
-                  y = muWeight,
-                  group = Age),
-              na.rm = TRUE) +
-    geom_point(data = dfm_circle_age,
-               aes(x = Year, y = Weight),
-               shape = 1,
-               size = 2,
-               na.rm = TRUE) +
-    geom_line(data = dfm_circle_age,
-              aes(x = Year, y = muWeight),
-              size = 1.25,
-              na.rm = TRUE) +
+    geom_line(aes(
+      x = Year,
+      y = muWeight,
+      group = Age
+    ),
+    na.rm = TRUE
+    ) +
+    geom_point(
+      data = dfm_circle_age,
+      aes(x = Year, y = Weight),
+      shape = 1,
+      size = 2,
+      na.rm = TRUE
+    ) +
+    geom_line(
+      data = dfm_circle_age,
+      aes(x = Year, y = muWeight),
+      size = 1.25,
+      na.rm = TRUE
+    ) +
     scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10)) +
     coord_cartesian(xlim, ylim) +
     expand_limits(x = xlim[1]:xlim[2]) +
-    labs(x = en2fr("Year", translate),
-         y = paste0(en2fr("Weight-at-age", translate), " (kg)")) +
-    facet_wrap( ~ region, ncol = 2, dir = "v" )
+    labs(
+      x = en2fr("Year", translate),
+      y = paste0(en2fr("Weight-at-age", translate), " (kg)")
+    ) +
+    facet_wrap(~region, ncol = 2, dir = "v")
   g
 }
 
@@ -114,19 +129,25 @@ plot_pa <- function(df,
                     xlim = c(1000, 3000),
                     ylim = c(0, NA),
                     size_range = c(0.5, 2),
-                    translate = FALSE){
+                    translate = FALSE) {
   df <- df %>%
-    filter(year >= xlim[1], gear%in%c(en2fr("Other", translate=french),
-                                      en2fr("RoeSN", translate=french)))
+    filter(year >= xlim[1], gear %in% c(
+      en2fr("Other", translate = french),
+      en2fr("RoeSN", translate = french)
+    ))
   dfm <- melt(df, id.vars = c("year", "area", "group", "sex", "region", "gear")) %>%
     as_tibble() %>%
-    rename(Region = region,
-           Year = year,
-           Age = variable,
-           Number = value) %>%
+    rename(
+      Region = region,
+      Year = year,
+      Age = variable,
+      Number = value
+    ) %>%
     select(-c(area, group, sex)) %>%
-    mutate(Age = as.numeric(as.character(Age)),
-           Age = ifelse(Age > age_plus, age_plus, Age)) %>%
+    mutate(
+      Age = as.numeric(as.character(Age)),
+      Age = ifelse(Age > age_plus, age_plus, Age)
+    ) %>%
     group_by(Region, Year, Age) %>%
     summarize(Number = sum(Number)) %>%
     mutate(Proportion = Number / ifelse(all(is.na(Number)), NA, sum(Number, na.rm = TRUE))) %>%
@@ -138,32 +159,43 @@ plot_pa <- function(df,
     select(Region, Year, Age, Proportion) %>%
     mutate(Age = as.numeric(Age)) %>%
     group_by(Region, Year) %>%
-    summarize(MeanAge = weighted.mean(x = Age, w = Proportion),
-              sBar = qnorm(1 - (1 - conf) / 2) * sum(sqrt(Proportion * (1 - Proportion)) / sqrt(Age)),
-              Lower = exp(log(MeanAge) - log(sBar)),
-              Upper = exp(log(MeanAge) + log(sBar))) %>%
+    summarize(
+      MeanAge = weighted.mean(x = Age, w = Proportion),
+      sBar = qnorm(1 - (1 - conf) / 2) * sum(sqrt(Proportion * (1 - Proportion)) / sqrt(Age)),
+      Lower = exp(log(MeanAge) - log(sBar)),
+      Upper = exp(log(MeanAge) + log(sBar))
+    ) %>%
     ungroup() %>%
     mutate(GroupID = consecutive_group(Year))
 
   g <- ggplot(dfm, aes(x = Year)) +
-    geom_point(aes(y = Age,
-                   size = ifelse(Proportion, Proportion, NA)),
-               na.rm = TRUE) +
-    geom_path(data = dfm_ci,
-              aes(y = MeanAge, group = GroupID),
-              size = 1.25,
-              na.rm = TRUE) +
+    geom_point(aes(
+      y = Age,
+      size = ifelse(Proportion, Proportion, NA)
+    ),
+    na.rm = TRUE
+    ) +
+    geom_path(
+      data = dfm_ci,
+      aes(y = MeanAge, group = GroupID),
+      size = 1.25,
+      na.rm = TRUE
+    ) +
     scale_size_continuous(range = size_range) +
-    geom_ribbon(data = dfm_ci,
-                aes(ymin = Lower, ymax = Upper, group = GroupID),
-                alpha = 0.25) +
+    geom_ribbon(
+      data = dfm_ci,
+      aes(ymin = Lower, ymax = Upper, group = GroupID),
+      alpha = 0.25
+    ) +
     scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10)) +
     coord_cartesian(xlim, ylim) +
     expand_limits(x = xlim[1]:xlim[2]) +
-    labs(size = en2fr("Proportion", translate),
-         x = en2fr("Year", translate),
-         y = en2fr("Age", translate)) +
-    facet_wrap(~ Region, ncol = 2, dir = "v" ) +
+    labs(
+      size = en2fr("Proportion", translate),
+      x = en2fr("Year", translate),
+      y = en2fr("Age", translate)
+    ) +
+    facet_wrap(~Region, ncol = 2, dir = "v") +
     theme(legend.position = "top")
   g
 }
@@ -190,39 +222,49 @@ plot_spawn_ind <- function(df,
                            new_surv_yr = NA,
                            new_surv_yr_type = "dashed",
                            new_surv_yr_size = 0.25,
-                           translate = FALSE){
-  stopifnot(!is.na(new_surv_yr),
-            is.numeric(new_surv_yr),
-            length(new_surv_yr) == 1)
+                           translate = FALSE) {
+  stopifnot(
+    !is.na(new_surv_yr),
+    is.numeric(new_surv_yr),
+    length(new_surv_yr) == 1
+  )
 
   df <- df %>%
     filter(year >= xlim[1]) %>%
-    mutate(gear = ifelse(year < new_surv_yr, "Surface", "Dive"),
-           gear = factor(gear)) %>%
+    mutate(
+      gear = ifelse(year < new_surv_yr, "Surface", "Dive"),
+      gear = factor(gear)
+    ) %>%
     select(-qind)
 
   dfm <- melt(df, id.vars = c("year", "area", "group", "sex", "region", "wt", "timing", "gear")) %>%
     as_tibble() %>%
-    rename(Region = region,
-           Year = year,
-           Index = value) %>%
+    rename(
+      Region = region,
+      Year = year,
+      Index = value
+    ) %>%
     select(-c(area, group, sex, wt, timing))
 
   g <- ggplot(dfm, aes(x = Year, y = Index)) +
     geom_point(aes(shape = gear),
-               na.rm = TRUE) +
+      na.rm = TRUE
+    ) +
     geom_line(aes(group = gear),
-              na.rm = TRUE) +
+      na.rm = TRUE
+    ) +
     scale_shape_manual(values = c(2, 1)) +
     geom_vline(xintercept = new_surv_yr - 0.5, linetype = new_surv_yr_type, size = new_surv_yr_size) +
     scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10)) +
     expand_limits(x = xlim[1]:xlim[2]) +
-    labs(shape = en2fr("Survey period", translate),
-         x = en2fr("Year", translate),
-         y = paste0(en2fr("Spawn index", translate), " (1,000 t)")) +
-    facet_wrap(~ Region, ncol = 2, dir = "v", scales = "free_y" ) +
-    theme(legend.position="top")
-  if(!is.na(ylim[1])){
+    labs(
+      shape = en2fr("Survey period", translate),
+      x = en2fr("Year", translate),
+      y = paste0(en2fr("Spawn index", translate), " (1,000 t)")
+    ) +
+    facet_wrap(~Region, ncol = 2, dir = "v", scales = "free_y") +
+    theme(legend.position = "top")
+  if (!is.na(ylim[1])) {
     g <- g +
       coord_cartesian(xlim, ylim)
   }
@@ -251,29 +293,33 @@ plot_harvest_rate <- function(df,
                               ribbon_alpha = 0.35,
                               ylim = c(0, 1),
                               h_line = 0.2,
-                              translate = FALSE){
+                              translate = FALSE) {
   dfm <- df %>%
     group_by(year, region) %>%
     summarize(ct = sum(value)) %>%
     ungroup()
 
-  ssb <- lapply(seq_along(models), function(x){
-    j <-  t(models[[x]]$mcmccalcs$sbt.quants) %>%
+  ssb <- lapply(seq_along(models), function(x) {
+    j <- t(models[[x]]$mcmccalcs$sbt.quants) %>%
       as_tibble(rownames = "year") %>%
       mutate(year = as.numeric(year))
     names(j) <- c("year", "lower", "median", "upper", "mpd")
     j <- j %>%
       full_join(dfm, by = "year") %>%
       filter(region == regions[[x]]) %>%
-      mutate(utlower = ct / (ct + lower),
-             ut = ct / (ct + median),
-             utupper = ct / (ct + upper),
-             region = as.character(region))
+      mutate(
+        utlower = ct / (ct + lower),
+        ut = ct / (ct + median),
+        utupper = ct / (ct + upper),
+        region = as.character(region)
+      )
     yrs <- as.numeric(min(j$year):max(j$year))
-    all_yrs <- tibble(year = yrs,
-                      region = rep(regions[[x]], length(yrs)))
+    all_yrs <- tibble(
+      year = yrs,
+      region = rep(regions[[x]], length(yrs))
+    )
     j <- j %>%
-      full_join(all_yrs, by = c("year", "region"))  %>%
+      full_join(all_yrs, by = c("year", "region")) %>%
       arrange(year)
   }) %>%
     bind_rows()
@@ -282,16 +328,20 @@ plot_harvest_rate <- function(df,
   ssb <- arrange(transform(ssb, region = factor(region, levels = regions)), region)
 
   g <- ggplot(ssb, aes(x = year, y = ut)) +
-    geom_line(size = line_size,
-              na.rm = TRUE) +
+    geom_line(
+      size = line_size,
+      na.rm = TRUE
+    ) +
     geom_ribbon(aes(ymin = utlower, ymax = utupper), alpha = ribbon_alpha) +
     geom_hline(yintercept = h_line, linetype = "dashed") +
     scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10)) +
-    labs(x = en2fr("Year", translate),
-         y = en2fr("Effective harvest rate", translate)) +
-    facet_wrap(~ region, ncol = 2, dir = "v" )
+    labs(
+      x = en2fr("Year", translate),
+      y = en2fr("Effective harvest rate", translate)
+    ) +
+    facet_wrap(~region, ncol = 2, dir = "v")
 
-  if(!is.na(ylim[1])){
+  if (!is.na(ylim[1])) {
     g <- g +
       coord_cartesian(ylim = ylim, expand = TRUE)
   }
@@ -321,10 +371,9 @@ plot_proj_biomass_density <- function(models,
                                       refpt = "X03B0",
                                       line_size = 1,
                                       ribbon_alpha = 0.35,
-                                      translate = FALSE){
-
-  get_qnt <- function(field){
-    lapply(seq_along(models), function(x){
+                                      translate = FALSE) {
+  get_qnt <- function(field) {
+    lapply(seq_along(models), function(x) {
       j <- models[[x]]$mcmccalcs$proj.quants %>%
         as_tibble() %>%
         filter(TAC == tac) %>%
@@ -341,7 +390,7 @@ plot_proj_biomass_density <- function(models,
   sb_quants <- get_qnt(paste0("B", yr))
   rp_quants <- get_qnt(refpt)
 
-  proj <- lapply(seq_along(models), function(x){
+  proj <- lapply(seq_along(models), function(x) {
     j <- models[[x]]$mcmc$proj %>%
       filter(TAC == tac) %>%
       select(paste0("B", yr)) %>%
@@ -359,33 +408,49 @@ plot_proj_biomass_density <- function(models,
   g <- ggplot(proj) +
     geom_density(aes(x = biomass), fill = "grey") +
     scale_x_continuous(breaks = pretty_breaks(6), limits = c(0, NA)) +
-    geom_vline(data = sb_quants,
-               aes(xintercept = median),
-               size = line_size) +
-    geom_vline(data = sb_quants,
-               aes(xintercept = lower),
-               linetype = "dashed",
-               size = line_size) +
-    geom_vline(data = sb_quants,
-               aes(xintercept = upper),
-               linetype = "dashed",
-               size = line_size) +
-    geom_vline(data = rp_quants,
-               aes(xintercept = median),
-               color = "red",
-               size = line_size) +
-    geom_rect(data = rp_quants,
-              aes(xmin = lower,
-                  xmax = upper,
-                  ymin = -Inf,
-                  ymax = Inf),
-              alpha = ribbon_alpha,
-              color = "transparent",
-              fill = "red") +
-    labs(x = paste0(en2fr("Projected spawning biomass in", translate), " ", yr,
-                    " (1000 t)"),
-         y = en2fr("Density", translate)) +
-    facet_wrap(~ region, ncol = 2, dir = "v", scales = "free")
+    geom_vline(
+      data = sb_quants,
+      aes(xintercept = median),
+      size = line_size
+    ) +
+    geom_vline(
+      data = sb_quants,
+      aes(xintercept = lower),
+      linetype = "dashed",
+      size = line_size
+    ) +
+    geom_vline(
+      data = sb_quants,
+      aes(xintercept = upper),
+      linetype = "dashed",
+      size = line_size
+    ) +
+    geom_vline(
+      data = rp_quants,
+      aes(xintercept = median),
+      color = "red",
+      size = line_size
+    ) +
+    geom_rect(
+      data = rp_quants,
+      aes(
+        xmin = lower,
+        xmax = upper,
+        ymin = -Inf,
+        ymax = Inf
+      ),
+      alpha = ribbon_alpha,
+      color = "transparent",
+      fill = "red"
+    ) +
+    labs(
+      x = paste0(
+        en2fr("Projected spawning biomass in", translate), " ", yr,
+        " (1000 t)"
+      ),
+      y = en2fr("Density", translate)
+    ) +
+    facet_wrap(~region, ncol = 2, dir = "v", scales = "free")
   g
 }
 
@@ -436,11 +501,11 @@ plot_scaled_abundance <- function(df,
                                   y_axis_label_newline_length = 20,
                                   annot = NA,
                                   show_legend = FALSE,
-                                  translate = FALSE){
-  if(length(unique(df$region)) > 1){
+                                  translate = FALSE) {
+  if (length(unique(df$region)) > 1) {
     stop("There is more than one region in the df data frame", call. = FALSE)
   }
-  pars <- model$mcmccalcs$p.quants[2,]
+  pars <- model$mcmccalcs$p.quants[2, ]
   qs <- pars[grep("^q[0-9]$", names(pars))]
   names(qs) <- gsub("q", "", names(qs))
   qs <- qs %>%
@@ -449,60 +514,74 @@ plot_scaled_abundance <- function(df,
     mutate(qind = as.numeric(qind))
 
   dfm <- full_join(df, qs, by = "qind") %>%
-    rename(qmedian = value.y,
-           spawn = value.x) %>%
+    rename(
+      qmedian = value.y,
+      spawn = value.x
+    ) %>%
     mutate(abundance = spawn / qmedian)
 
   proj <- model$mcmccalcs$proj.quants
   proj_yr <- as.numeric(gsub("B", "", colnames(proj)[2]))
-  proj_sbt <- as.numeric(c(proj_yr, proj[,2]))
+  proj_sbt <- as.numeric(c(proj_yr, proj[, 2]))
 
   ssb <- t(model$mcmccalcs$sbt.quants) %>%
     as_tibble(rownames = "year") %>%
     rename(median = `50%`) %>%
-    mutate(survey = ifelse(year < new_surv_yr, "Surface", "Dive"),
-           year = as.numeric(year)) %>%
+    mutate(
+      survey = ifelse(year < new_surv_yr, "Surface", "Dive"),
+      year = as.numeric(year)
+    ) %>%
     filter(year != proj_yr)
 
   g <- ggplot(dfm, aes(x = year, y = abundance)) +
     geom_point(aes(shape = gear),
-               size = point_size,
-               na.rm = TRUE) +
+      size = point_size,
+      na.rm = TRUE
+    ) +
     scale_shape_manual(values = c(2, 1)) +
     scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10)) +
-    geom_line(data = ssb,
-              aes(x = year, y = median, group = survey),
-              size = line_size,
-              na.rm = TRUE)
-  if(!is.na(xlim[1])){
+    geom_line(
+      data = ssb,
+      aes(x = year, y = median, group = survey),
+      size = line_size,
+      na.rm = TRUE
+    )
+  if (!is.na(xlim[1])) {
     g <- g +
       coord_cartesian(xlim = xlim, expand = TRUE)
   }
-  if(!is.na(annot)){
+  if (!is.na(annot)) {
     g <- g +
-      annotate(geom = "text",
-               x = -Inf,
-               y = Inf,
-               label = paste0("(", annot, ")"),
-               vjust = 1.3,
-               hjust = -0.1,
-               size = 3)
+      annotate(
+        geom = "text",
+        x = -Inf,
+        y = Inf,
+        label = paste0("(", annot, ")"),
+        vjust = 1.3,
+        hjust = -0.1,
+        size = 3
+      )
   }
-  if(!show_legend){
+  if (!show_legend) {
     g <- g +
       guides(shape = FALSE, linetype = FALSE)
   }
   g <- modify_axes_labels(g,
-                          x_label_text = newline_format(en2fr("Year", translate),
-                                                        x_axis_label_newline_length),
-                          y_label_text = newline_format(paste0(en2fr("Scaled abundance", translate), " (1,000 t)"),
-                                                        y_axis_label_newline_length),
-                          show_x_axis = show_x_axis,
-                          show_y_axis = show_y_axis,
-                          x_axis_label_size = x_axis_label_size,
-                          x_axis_tick_label_size = x_axis_tick_label_size,
-                          y_axis_label_size = y_axis_label_size,
-                          y_axis_tick_label_size = y_axis_tick_label_size)
+    x_label_text = newline_format(
+      en2fr("Year", translate),
+      x_axis_label_newline_length
+    ),
+    y_label_text = newline_format(
+      paste0(en2fr("Scaled abundance", translate), " (1,000 t)"),
+      y_axis_label_newline_length
+    ),
+    show_x_axis = show_x_axis,
+    show_y_axis = show_y_axis,
+    x_axis_label_size = x_axis_label_size,
+    x_axis_tick_label_size = x_axis_tick_label_size,
+    y_axis_label_size = y_axis_label_size,
+    y_axis_tick_label_size = y_axis_tick_label_size
+  )
   g
 }
 
@@ -543,7 +622,7 @@ plot_natural_mortality <- function(model,
                                    x_axis_label_newline_length = 30,
                                    y_axis_label_newline_length = 20,
                                    annot = NA,
-                                   translate = FALSE){
+                                   translate = FALSE) {
   m <- model$mcmccalcs$nat.mort.quants %>%
     t() %>%
     as_tibble(rownames = "year") %>%
@@ -551,39 +630,51 @@ plot_natural_mortality <- function(model,
   names(m) <- c("year", "lower", "median", "upper")
 
   g <- ggplot(m, aes(x = year, y = median)) +
-    geom_line(size = line_size,
-              na.rm = TRUE) +
+    geom_line(
+      size = line_size,
+      na.rm = TRUE
+    ) +
     geom_ribbon(aes(ymin = lower, ymax = upper), alpha = ribbon_alpha) +
     scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10))
-  if(!is.na(xlim[1])){
+  if (!is.na(xlim[1])) {
     g <- g +
       coord_cartesian(xlim = xlim, expand = TRUE)
   }
-  if(!is.na(annot)){
+  if (!is.na(annot)) {
     g <- g +
-      annotate(geom = "text",
-               x = -Inf,
-               y = Inf,
-               label = paste0("(", annot, ")"),
-               vjust = 1.3,
-               hjust = -0.1,
-               size = 3)
+      annotate(
+        geom = "text",
+        x = -Inf,
+        y = Inf,
+        label = paste0("(", annot, ")"),
+        vjust = 1.3,
+        hjust = -0.1,
+        size = 3
+      )
   }
   g <- modify_axes_labels(g,
-                          x_label_text = newline_format(en2fr("Year", translate),
-                                                        x_axis_label_newline_length),
-                          y_label_text = newline_format(
-                            paste0( en2fr("Instantaneous natural mortality",
-                                          translate), " (/",
-                                    en2fr("Year", translate, case="lower"),
-                                    ")"),
-                            y_axis_label_newline_length),
-                          show_x_axis = show_x_axis,
-                          show_y_axis = show_y_axis,
-                          x_axis_label_size = x_axis_label_size,
-                          x_axis_tick_label_size = x_axis_tick_label_size,
-                          y_axis_label_size = y_axis_label_size,
-                          y_axis_tick_label_size = y_axis_tick_label_size)
+    x_label_text = newline_format(
+      en2fr("Year", translate),
+      x_axis_label_newline_length
+    ),
+    y_label_text = newline_format(
+      paste0(
+        en2fr(
+          "Instantaneous natural mortality",
+          translate
+        ), " (/",
+        en2fr("Year", translate, case = "lower"),
+        ")"
+      ),
+      y_axis_label_newline_length
+    ),
+    show_x_axis = show_x_axis,
+    show_y_axis = show_y_axis,
+    x_axis_label_size = x_axis_label_size,
+    x_axis_tick_label_size = x_axis_tick_label_size,
+    y_axis_label_size = y_axis_label_size,
+    y_axis_tick_label_size = y_axis_tick_label_size
+  )
   g
 }
 
@@ -592,7 +683,8 @@ plot_natural_mortality <- function(model,
 #' @param model an iscam model object
 #' @param point_size Size of points for median recruitment
 #' @param line_size thickness of errorbars
-#' @param xlim x-limits for the plot. Implemented with [ggplot2::coord_cartesian()]
+#' @param xlim x-limits for the plot. Implemented with
+#'   [ggplot2::coord_cartesian()]
 #' @param show_x_axis see [modify_axes_labels()]
 #' @param show_y_axis see [modify_axes_labels()]
 #' @param x_axis_label_size see [modify_axes_labels()]
@@ -601,14 +693,18 @@ plot_natural_mortality <- function(model,
 #' @param y_axis_tick_label_size see [modify_axes_labels()]
 #' @param x_axis_label_newline_length see [newline_format()]
 #' @param y_axis_label_newline_length see [newline_format()]
+#' @param show_r0 Add horizontal like for unfished recruitment R_0, and shaded
+#'   rectangle for CI.
+#' @param line_size_r0 Thickness for horizontal line
+#' @param r0_ribbon_alpha Alpha for R_0 rectangle (uncertainty).
 #' @param annot a character to place in parentheses in the top left of the plot.
-#' If NA, nothing will appear
+#'   If NA, nothing will appear
 #' @param translate Logical. If TRUE, translate to french
 #'
 #' @importFrom dplyr mutate as_tibble
 #' @importFrom reshape2 melt
-#' @importFrom ggplot2 ggplot aes geom_point geom_errorbar ylab annotate
-#' xlab theme element_text element_blank
+#' @importFrom ggplot2 ggplot aes geom_point geom_errorbar ylab annotate xlab
+#'   theme element_text element_blank
 #' @export
 #' @return A ggplot object
 plot_recruitment <- function(model,
@@ -624,51 +720,77 @@ plot_recruitment <- function(model,
                              x_axis_label_newline_length = 30,
                              y_axis_label_newline_length = 20,
                              annot = NA,
-                             translate = FALSE){
-
+                             show_r0 = TRUE,
+                             line_size_r0 = 0.5,
+                             r0_ribbon_alpha = 0.35,
+                             translate = FALSE) {
   rec <- model$mcmccalcs$recr.quants %>%
     t() %>%
     as_tibble(rownames = "year") %>%
     mutate(year = as.numeric(year))
   names(rec) <- c("year", "lower", "median", "upper", "mpd")
   rec <- rec %>%
-    mutate(lower = lower / 1000,
-           median = median / 1000,
-           upper = upper / 1000,
-           mpd = mpd / 1000)
+    mutate(
+      lower = lower / 1000,
+      median = median / 1000,
+      upper = upper / 1000,
+      mpd = mpd / 1000
+    )
+
+  r0 <- model$mcmccalcs$p.quants[, "ro"] / 1000
+  names(r0) <- c("lower", "median", "upper")
 
   g <- ggplot(rec, aes(x = year, y = median)) +
     geom_point(size = point_size, na.rm = TRUE) +
-    geom_line( size=0.5, colour="darkgrey" ) +
-    geom_errorbar(aes(ymin = lower, ymax = upper), size = line_size / 2, width = 0) +
+    geom_line(size = 0.5, colour = "darkgrey") +
+    geom_errorbar(aes(ymin = lower, ymax = upper),
+      size = line_size / 2,
+      width = 0
+    ) +
     scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10))
-  if(!is.na(xlim[1])){
+  if (!is.na(xlim[1])) {
     g <- g +
       coord_cartesian(xlim = xlim, expand = TRUE)
   }
-  if(!is.na(annot)){
+  if (!is.na(annot)) {
     g <- g +
-      annotate(geom = "text",
-               x = -Inf,
-               y = Inf,
-               label = paste0("(", annot, ")"),
-               vjust = 1.3,
-               hjust = -0.1,
-               size = 3)
+      annotate(
+        geom = "text",
+        x = -Inf,
+        y = Inf,
+        label = paste0("(", annot, ")"),
+        vjust = 1.3,
+        hjust = -0.1,
+        size = 3
+      )
   }
-  g <- modify_axes_labels(g,
-                          x_label_text = newline_format(en2fr("Year", translate),
-                                                        x_axis_label_newline_length),
-                          y_label_text = newline_format(paste(en2fr("Recruitment", translate), " (1,000 millions)"),
-                                                        y_axis_label_newline_length),
-                          show_x_axis = show_x_axis,
-                          show_y_axis = show_y_axis,
-                          x_axis_label_size = x_axis_label_size,
-                          x_axis_tick_label_size = x_axis_tick_label_size,
-                          y_axis_label_size = y_axis_label_size,
-                          y_axis_tick_label_size = y_axis_tick_label_size)
-  g
 
+  if (show_r0) {
+    g <- g +
+      geom_hline(yintercept = r0["median"], size = line_size_r0) +
+      annotate(
+        geom = "rect", xmin = -Inf, xmax = Inf, ymin = r0["lower"],
+        ymax = r0["upper"], alpha = r0_ribbon_alpha
+      )
+  }
+
+  g <- modify_axes_labels(g,
+    x_label_text = newline_format(
+      en2fr("Year", translate),
+      x_axis_label_newline_length
+    ),
+    y_label_text = newline_format(
+      paste(en2fr("Recruitment", translate), " (1,000 millions)"),
+      y_axis_label_newline_length
+    ),
+    show_x_axis = show_x_axis,
+    show_y_axis = show_y_axis,
+    x_axis_label_size = x_axis_label_size,
+    x_axis_tick_label_size = x_axis_tick_label_size,
+    y_axis_label_size = y_axis_label_size,
+    y_axis_tick_label_size = y_axis_tick_label_size
+  )
+  g
 }
 
 #' Plot estimated biommass median and credible interval, projected biomass with credible interval,
@@ -721,14 +843,13 @@ plot_biomass_catch <- function(model,
                                x_axis_label_newline_length = 30,
                                y_axis_label_newline_length = 20,
                                annot = NA,
-                               translate = FALSE){
-
-  if(length(unique(catch_df$region)) > 1){
+                               translate = FALSE) {
+  if (length(unique(catch_df$region)) > 1) {
     stop("There is more than one region in the catch_df data frame", call. = FALSE)
   }
   proj <- model$mcmccalcs$proj.quants
   proj_yr <- as.numeric(gsub("B", "", colnames(proj)[2]))
-  proj_sbt <- as.numeric(c(proj_yr, proj[,2]))
+  proj_sbt <- as.numeric(c(proj_yr, proj[, 2]))
   names(proj_sbt) <- c("year", "lower", "median", "upper")
   proj_sbt <- as_tibble(t(proj_sbt))
 
@@ -746,63 +867,82 @@ plot_biomass_catch <- function(model,
     ungroup()
 
   lrp <- model$mcmccalcs$r.quants
-  lrp <- lrp[,-1] %>%
+  lrp <- lrp[, -1] %>%
     as_tibble(rownames = "refpt") %>%
     filter(refpt == refpt_show)
   names(lrp) <- c("year", "lower", "median", "upper")
-  lrp[1,1] <- min(sbt$year) - 2
-  lrp[,1] <- as.numeric(lrp[,1])
+  lrp[1, 1] <- min(sbt$year) - 2
+  lrp[, 1] <- as.numeric(lrp[, 1])
 
   g <- ggplot(sbt, aes(x = year, y = median)) +
-    geom_hline(yintercept = lrp$median,
-               color = "red",
-               size = line_size) +
-    geom_rect(data = lrp, aes(xmin = -Inf, xmax = Inf, ymin = lrp$lower, ymax = lrp$upper),
-              alpha = lrp_ribbon_alpha,
-              fill = "red") +
-    geom_bar(data = ct,
-             stat = "identity",
-             width = between_bars,
-             position = "stack",
-             aes(fill = gear)) +
-    geom_line(size = line_size,
-              na.rm = TRUE) +
+    geom_hline(
+      yintercept = lrp$median,
+      color = "red",
+      size = line_size
+    ) +
+    geom_rect(
+      data = lrp, aes(xmin = -Inf, xmax = Inf, ymin = lrp$lower, ymax = lrp$upper),
+      alpha = lrp_ribbon_alpha,
+      fill = "red"
+    ) +
+    geom_bar(
+      data = ct,
+      stat = "identity",
+      width = between_bars,
+      position = "stack",
+      aes(fill = gear)
+    ) +
+    geom_line(
+      size = line_size,
+      na.rm = TRUE
+    ) +
     geom_ribbon(aes(ymin = lower, ymax = upper), alpha = ribbon_alpha) +
-    geom_point(data = proj_sbt,
-               size = point_size,
-               na.rm = TRUE) +
-    geom_errorbar(data = proj_sbt,
-                  aes(ymin = lower, ymax = upper),
-                  size = errorbar_size,
-                  width = 0) +
-    scale_fill_viridis_d( ) +
-    guides( fill = FALSE ) +
+    geom_point(
+      data = proj_sbt,
+      size = point_size,
+      na.rm = TRUE
+    ) +
+    geom_errorbar(
+      data = proj_sbt,
+      aes(ymin = lower, ymax = upper),
+      size = errorbar_size,
+      width = 0
+    ) +
+    scale_fill_viridis_d() +
+    guides(fill = FALSE) +
     scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10))
-  if(!is.na(xlim[1])){
+  if (!is.na(xlim[1])) {
     g <- g +
       coord_cartesian(xlim = xlim, expand = TRUE)
   }
-  if(!is.na(annot)){
+  if (!is.na(annot)) {
     g <- g +
-      annotate(geom = "text",
-               x = -Inf,
-               y = Inf,
-               label = paste0("(", annot, ")"),
-               vjust = 1.3,
-               hjust = -0.1,
-               size = 3)
+      annotate(
+        geom = "text",
+        x = -Inf,
+        y = Inf,
+        label = paste0("(", annot, ")"),
+        vjust = 1.3,
+        hjust = -0.1,
+        size = 3
+      )
   }
   g <- modify_axes_labels(g,
-                          x_label_text = newline_format(en2fr("Year", translate),
-                                                        x_axis_label_newline_length),
-                          y_label_text = newline_format(paste0(en2fr("Spawning biomass", translate), " (1,000 t)"),
-                                                        y_axis_label_newline_length),
-                          show_x_axis = show_x_axis,
-                          show_y_axis = show_y_axis,
-                          x_axis_label_size = x_axis_label_size,
-                          x_axis_tick_label_size = x_axis_tick_label_size,
-                          y_axis_label_size = y_axis_label_size,
-                          y_axis_tick_label_size = y_axis_tick_label_size)
+    x_label_text = newline_format(
+      en2fr("Year", translate),
+      x_axis_label_newline_length
+    ),
+    y_label_text = newline_format(
+      paste0(en2fr("Spawning biomass", translate), " (1,000 t)"),
+      y_axis_label_newline_length
+    ),
+    show_x_axis = show_x_axis,
+    show_y_axis = show_y_axis,
+    x_axis_label_size = x_axis_label_size,
+    x_axis_tick_label_size = x_axis_tick_label_size,
+    y_axis_label_size = y_axis_label_size,
+    y_axis_tick_label_size = y_axis_tick_label_size
+  )
   g
 }
 
@@ -852,8 +992,7 @@ plot_recruitment_devs <- function(model,
                                   x_axis_label_newline_length = 30,
                                   y_axis_label_newline_length = 20,
                                   annot = NA,
-                                  translate = FALSE){
-
+                                  translate = FALSE) {
   recdev <- model$mcmccalcs$recr.devs.quants %>%
     t() %>%
     as_tibble(rownames = "year") %>%
@@ -861,50 +1000,64 @@ plot_recruitment_devs <- function(model,
   names(recdev) <- c("year", "lower", "median", "upper")
 
   recdev <- recdev %>%
-    mutate(runmean = rollmean(x = median,
-                              k = run_mean_yrs,
-                              align = "right",
-                              na.pad = TRUE))
+    mutate(runmean = rollmean(
+      x = median,
+      k = run_mean_yrs,
+      align = "right",
+      na.pad = TRUE
+    ))
 
   g <- ggplot(recdev, aes(x = year, y = median)) +
-    geom_hline(yintercept = 0,
-               size = zeroline_size,
-               linetype = zeroline_type) +
-    geom_point(size = point_size,
-               na.rm = TRUE) +
-    geom_line( size=0.5, colour="darkgrey" ) +
+    geom_hline(
+      yintercept = 0,
+      size = zeroline_size,
+      linetype = zeroline_type
+    ) +
+    geom_point(
+      size = point_size,
+      na.rm = TRUE
+    ) +
+    geom_line(size = 0.5, colour = "darkgrey") +
     geom_errorbar(aes(ymin = lower, ymax = upper),
-                  size = errorbar_size,
-                  width = 0) +
-    #geom_line(aes(y = runmean),
+      size = errorbar_size,
+      width = 0
+    ) +
+    # geom_line(aes(y = runmean),
     #   color = "red",
     # size = line_size) +
     scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10))
-  if(!is.na(xlim[1])){
+  if (!is.na(xlim[1])) {
     g <- g +
       coord_cartesian(xlim = xlim, expand = TRUE)
   }
-  if(!is.na(annot)){
+  if (!is.na(annot)) {
     g <- g +
-      annotate(geom = "text",
-               x = -Inf,
-               y = Inf,
-               label = paste0("(", annot, ")"),
-               vjust = 1.3,
-               hjust = -0.1,
-               size = 3)
+      annotate(
+        geom = "text",
+        x = -Inf,
+        y = Inf,
+        label = paste0("(", annot, ")"),
+        vjust = 1.3,
+        hjust = -0.1,
+        size = 3
+      )
   }
   g <- modify_axes_labels(g,
-                          x_label_text = newline_format(en2fr("Year", translate),
-                                                        x_axis_label_newline_length),
-                          y_label_text = newline_format(en2fr("Log recruitment deviations", translate),
-                                                        y_axis_label_newline_length),
-                          show_x_axis = show_x_axis,
-                          show_y_axis = show_y_axis,
-                          x_axis_label_size = x_axis_label_size,
-                          x_axis_tick_label_size = x_axis_tick_label_size,
-                          y_axis_label_size = y_axis_label_size,
-                          y_axis_tick_label_size = y_axis_tick_label_size)
+    x_label_text = newline_format(
+      en2fr("Year", translate),
+      x_axis_label_newline_length
+    ),
+    y_label_text = newline_format(
+      en2fr("Log recruitment deviations", translate),
+      y_axis_label_newline_length
+    ),
+    show_x_axis = show_x_axis,
+    show_y_axis = show_y_axis,
+    x_axis_label_size = x_axis_label_size,
+    x_axis_tick_label_size = x_axis_tick_label_size,
+    y_axis_label_size = y_axis_label_size,
+    y_axis_tick_label_size = y_axis_tick_label_size
+  )
   g
 }
 
@@ -960,12 +1113,13 @@ plot_biomass_phase <- function(model,
                                x_axis_label_newline_length = 30,
                                y_axis_label_newline_length = 20,
                                annot = NA,
-                               translate = FALSE){
-
-  stopifnot(!is.na(new_surv_yr),
-            is.numeric(new_surv_yr),
-            length(new_surv_yr) == 1)
-  if(length(unique(catch_df$region)) > 1){
+                               translate = FALSE) {
+  stopifnot(
+    !is.na(new_surv_yr),
+    is.numeric(new_surv_yr),
+    length(new_surv_yr) == 1
+  )
+  if (length(unique(catch_df$region)) > 1) {
     stop("There is more than one region in the catch_df data frame", call. = FALSE)
   }
   sbt <- model$mcmccalcs$sbt.quants %>%
@@ -981,45 +1135,57 @@ plot_biomass_phase <- function(model,
     ungroup()
 
   dd <- full_join(sbt, ct, by = "year") %>%
-    mutate(catch = ifelse(is.na(catch), 0, catch),
-           mediannext = lead(median),
-           catchnext = lead(catch),
-           production = mediannext - median + catchnext,
-           prodrate = production / median) %>%
+    mutate(
+      catch = ifelse(is.na(catch), 0, catch),
+      mediannext = lead(median),
+      catchnext = lead(catch),
+      production = mediannext - median + catchnext,
+      prodrate = production / median
+    ) %>%
     na.omit() %>%
     filter(year >= new_surv_yr)
 
-  dd <- dd[-nrow(dd),] %>%
+  dd <- dd[-nrow(dd), ] %>%
     mutate(shp = factor(0))
 
   lrp <- model$mcmccalcs$r.quants
-  lrp <- lrp[,-1] %>%
+  lrp <- lrp[, -1] %>%
     as_tibble(rownames = "refpt") %>%
     filter(refpt == refpt_show)
   names(lrp) <- c("year", "lower", "median", "upper")
-  lrp[1,1] <- min(sbt$year) - 2
-  lrp[,1] <- as.numeric(lrp[,1])
+  lrp[1, 1] <- min(sbt$year) - 2
+  lrp[, 1] <- as.numeric(lrp[, 1])
   # # Add 0.38SB_0 (for HG)
   # lrp2 <- lrp %>%
   #   mutate( lower=lower/0.3*0.38,
   #           median=median/0.3*0.38,
   #           upper=upper/0.3*0.38 )
 
-  g <- ggplot(dd, aes(x = median,
-                      y = production)) +
-    geom_hline(yintercept = 0,
-               size = zeroline_size,
-               linetype = zeroline_type) +
-    geom_vline(xintercept = lrp$median,
-               color = "red",
-               size = line_size) +
-    geom_rect(data = lrp, aes(xmin = lrp$lower,
-                              xmax = lrp$upper,
-                              ymin = -Inf,
-                              ymax = Inf),
-              alpha = lrp_ribbon_alpha,
-              fill = "red",
-              inherit.aes = FALSE) +
+  g <- ggplot(dd, aes(
+    x = median,
+    y = production
+  )) +
+    geom_hline(
+      yintercept = 0,
+      size = zeroline_size,
+      linetype = zeroline_type
+    ) +
+    geom_vline(
+      xintercept = lrp$median,
+      color = "red",
+      size = line_size
+    ) +
+    geom_rect(
+      data = lrp, aes(
+        xmin = lrp$lower,
+        xmax = lrp$upper,
+        ymin = -Inf,
+        ymax = Inf
+      ),
+      alpha = lrp_ribbon_alpha,
+      fill = "red",
+      inherit.aes = FALSE
+    ) +
     # geom_vline(xintercept = lrp2$median,
     #            color = "blue",
     #            size = line_size) +
@@ -1030,46 +1196,62 @@ plot_biomass_phase <- function(model,
     #           alpha = lrp_ribbon_alpha,
     #           fill = "blue",
     #           inherit.aes = FALSE) +
-    geom_point(data = filter(dd, year != max(year)),
-               aes(color = year,
-                   shape = shp),
-               size = point_size,
-               na.rm = TRUE) +
-    geom_point(data = filter(dd, year == max(year)),
-               shape = 24,
-               color = "black",
-               fill = "white",
-               size = point_size,
-               na.rm = TRUE) +
+    geom_point(
+      data = filter(dd, year != max(year)),
+      aes(
+        color = year,
+        shape = shp
+      ),
+      size = point_size,
+      na.rm = TRUE
+    ) +
+    geom_point(
+      data = filter(dd, year == max(year)),
+      shape = 24,
+      color = "black",
+      fill = "white",
+      size = point_size,
+      na.rm = TRUE
+    ) +
     scale_color_gradient(low = "lightgrey", high = "black") +
-    geom_path(size = path_line_size,
-              na.rm = TRUE) +
+    geom_path(
+      size = path_line_size,
+      na.rm = TRUE
+    ) +
     geom_text_repel(aes(label = year),
-                    segment.colour = "lightgrey",
-                    size = text_size) +
+      segment.colour = "lightgrey",
+      size = text_size
+    ) +
     guides(color = FALSE, shape = FALSE) +
     expand_limits(x = 0)
-  if(!is.na(annot)){
+  if (!is.na(annot)) {
     g <- g +
-      annotate(geom = "text",
-               x = -Inf,
-               y = Inf,
-               label = paste0("(", annot, ")"),
-               vjust = 1.3,
-               hjust = -0.1,
-               size = 3)
+      annotate(
+        geom = "text",
+        x = -Inf,
+        y = Inf,
+        label = paste0("(", annot, ")"),
+        vjust = 1.3,
+        hjust = -0.1,
+        size = 3
+      )
   }
   g <- modify_axes_labels(g,
-                          x_label_text = newline_format(paste0(en2fr("Spawning biomass", translate), " (1,000 t)"),
-                                                        x_axis_label_newline_length),
-                          y_label_text = newline_format(paste0(en2fr("Spawning biomass production", translate), " (1,000 t)"),
-                                                        y_axis_label_newline_length),
-                          show_x_axis = show_x_axis,
-                          show_y_axis = show_y_axis,
-                          x_axis_label_size = x_axis_label_size,
-                          x_axis_tick_label_size = x_axis_tick_label_size,
-                          y_axis_label_size = y_axis_label_size,
-                          y_axis_tick_label_size = y_axis_tick_label_size)
+    x_label_text = newline_format(
+      paste0(en2fr("Spawning biomass", translate), " (1,000 t)"),
+      x_axis_label_newline_length
+    ),
+    y_label_text = newline_format(
+      paste0(en2fr("Spawning biomass production", translate), " (1,000 t)"),
+      y_axis_label_newline_length
+    ),
+    show_x_axis = show_x_axis,
+    show_y_axis = show_y_axis,
+    x_axis_label_size = x_axis_label_size,
+    x_axis_tick_label_size = x_axis_tick_label_size,
+    y_axis_label_size = y_axis_label_size,
+    y_axis_tick_label_size = y_axis_tick_label_size
+  )
   g
 }
 
@@ -1105,74 +1287,91 @@ plot_hcr <- function(hcr.lst,
                      show.means = TRUE,
                      show.x.axes = FALSE,
                      axis.text.size = 7,
-                     panel.text.size = 3){
-
+                     panel.text.size = 3) {
   label <- paste0(region, "\n", gsub("_", "\n", mp))
   tac <- sapply(hcr.lst, "[[", 1)
   hr <- sapply(hcr.lst, "[[", 2)
   sbt <- sapply(sbt.lst, "[[", length(sbt.lst[[1]]))
-  df <- tibble(tac = tac,
-               hr = hr,
-               sbt = sbt)
-  if(all(is.na(df$hr)) || all(is.na(df$tac))){
+  df <- tibble(
+    tac = tac,
+    hr = hr,
+    sbt = sbt
+  )
+  if (all(is.na(df$hr)) || all(is.na(df$tac))) {
     df <- data.frame()
     g <- ggplot(df) +
       geom_point() +
       annotate("text", x = 100, y = 20, label = "No data", size = panel.text.size) +
-      theme(axis.text.x = element_blank(),
-            axis.text.y = element_blank(),
-            axis.ticks = element_blank(),
-            panel.grid.major = element_blank(),
-            panel.grid.minor = element_blank()) +
+      theme(
+        axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank()
+      ) +
       xlab("") +
       ylab("")
     h <- ggplot(df) +
       geom_point() +
       annotate("text", x = 100, y = 20, label = "No data", size = panel.text.size) +
-      theme(axis.text.x = element_blank(),
-            axis.text.y = element_blank(),
-            axis.ticks = element_blank(),
-            panel.grid.major = element_blank(),
-            panel.grid.minor = element_blank()) +
+      theme(
+        axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank()
+      ) +
       xlab("") +
       ylab("")
     i <- ggplot(df) +
       geom_point() +
       annotate("text", x = 100, y = 20, label = "No data", size = panel.text.size) +
-      theme(axis.text.x = element_blank(),
-            axis.text.y = element_blank(),
-            axis.ticks = element_blank(),
-            panel.grid.major = element_blank(),
-            panel.grid.minor = element_blank()) +
+      theme(
+        axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank()
+      ) +
       xlab("") +
       ylab("")
-  }else{
+  } else {
     g <- ggplot(df, aes(x = tac, y = hr)) +
-      geom_point(size = point.size,
-                 na.rm = TRUE) +
-      theme(axis.text.y = element_blank(),
-            axis.ticks.y = element_blank(),
-            axis.title = element_text(size = axis.text.size)) +
+      geom_point(
+        size = point.size,
+        na.rm = TRUE
+      ) +
+      theme(
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        axis.title = element_text(size = axis.text.size)
+      ) +
       ylab("") +
       xlab("TAC")
 
     h <- ggplot(df, aes(x = sbt, y = tac)) +
-      geom_point(size = point.size,
-                 na.rm = TRUE) +
-      theme(axis.text.x = element_blank(),
-            axis.ticks.x = element_blank(),
-            axis.title = element_text(size = axis.text.size)) +
+      geom_point(
+        size = point.size,
+        na.rm = TRUE
+      ) +
+      theme(
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.title = element_text(size = axis.text.size)
+      ) +
       xlab("") +
       ylab("TAC")
 
     i <- ggplot(df, aes(x = sbt, y = hr)) +
-      geom_point(size = point.size,
-                 na.rm = TRUE) +
+      geom_point(
+        size = point.size,
+        na.rm = TRUE
+      ) +
       theme(axis.title = element_text(size = axis.text.size)) +
       xlab("Projected SBt") +
       ylab("Harvest Rate")
 
-    if(show.medians){
+    if (show.medians) {
       quants.tac <- as_tibble(t(as.data.frame(quantile(tac, probs = probs, na.rm = TRUE)))) %>%
         rename(lower = 1, upper = 2)
       quants.hr <- as_tibble(t(as.data.frame(quantile(hr, probs = probs, na.rm = TRUE)))) %>%
@@ -1180,117 +1379,165 @@ plot_hcr <- function(hcr.lst,
       quants.sbt <- as_tibble(t(as.data.frame(quantile(sbt, probs = probs)))) %>%
         rename(lower = 1, upper = 2)
       g <- g +
-        geom_vline(xintercept = median(tac),
-                   color = "red",
-                   size = line.width,
-                   linetype = "dashed") +
-        geom_rect(data = quants.hr,
-                  aes(ymin = quants.hr$lower,
-                      ymax = quants.hr$upper,
-                      xmin = -Inf,
-                      xmax = Inf),
-                  inherit.aes = FALSE,
-                  alpha = 0.2,
-                  color = "transparent",
-                  fill = "red") +
-        geom_rect(data = quants.tac,
-                  aes(xmin = quants.tac$lower,
-                      xmax = quants.tac$upper,
-                      ymin = -Inf,
-                      ymax = Inf),
-                  inherit.aes = FALSE,
-                  alpha = 0.2,
-                  color = "transparent",
-                  fill = "red") +
-        geom_hline(yintercept = median(hr),
-                   color = "red",
-                   size = line.width,
-                   linetype = "dashed")
+        geom_vline(
+          xintercept = median(tac),
+          color = "red",
+          size = line.width,
+          linetype = "dashed"
+        ) +
+        geom_rect(
+          data = quants.hr,
+          aes(
+            ymin = quants.hr$lower,
+            ymax = quants.hr$upper,
+            xmin = -Inf,
+            xmax = Inf
+          ),
+          inherit.aes = FALSE,
+          alpha = 0.2,
+          color = "transparent",
+          fill = "red"
+        ) +
+        geom_rect(
+          data = quants.tac,
+          aes(
+            xmin = quants.tac$lower,
+            xmax = quants.tac$upper,
+            ymin = -Inf,
+            ymax = Inf
+          ),
+          inherit.aes = FALSE,
+          alpha = 0.2,
+          color = "transparent",
+          fill = "red"
+        ) +
+        geom_hline(
+          yintercept = median(hr),
+          color = "red",
+          size = line.width,
+          linetype = "dashed"
+        )
       h <- h +
-        geom_hline(yintercept = median(tac),
-                   color = "red",
-                   size = line.width,
-                   linetype = "dashed") +
-        geom_vline(xintercept = median(sbt),
-                   color = "red",
-                   size = line.width,
-                   linetype = "dashed") +
-        geom_rect(data = quants.sbt,
-                  aes(xmin = quants.sbt$lower,
-                      xmax = quants.sbt$upper,
-                      ymin = -Inf,
-                      ymax = Inf),
-                  inherit.aes = FALSE,
-                  alpha = 0.2,
-                  color = "transparent",
-                  fill = "red") +
-        geom_rect(data = quants.tac,
-                  aes(ymin = quants.tac$lower,
-                      ymax = quants.tac$upper,
-                      xmin = -Inf,
-                      xmax = Inf),
-                  inherit.aes = FALSE,
-                  alpha = 0.2,
-                  color = "transparent",
-                  fill = "red")
+        geom_hline(
+          yintercept = median(tac),
+          color = "red",
+          size = line.width,
+          linetype = "dashed"
+        ) +
+        geom_vline(
+          xintercept = median(sbt),
+          color = "red",
+          size = line.width,
+          linetype = "dashed"
+        ) +
+        geom_rect(
+          data = quants.sbt,
+          aes(
+            xmin = quants.sbt$lower,
+            xmax = quants.sbt$upper,
+            ymin = -Inf,
+            ymax = Inf
+          ),
+          inherit.aes = FALSE,
+          alpha = 0.2,
+          color = "transparent",
+          fill = "red"
+        ) +
+        geom_rect(
+          data = quants.tac,
+          aes(
+            ymin = quants.tac$lower,
+            ymax = quants.tac$upper,
+            xmin = -Inf,
+            xmax = Inf
+          ),
+          inherit.aes = FALSE,
+          alpha = 0.2,
+          color = "transparent",
+          fill = "red"
+        )
       i <- i +
-        geom_hline(yintercept = median(hr),
-                   color = "red",
-                   size = line.width,
-                   linetype = "dashed") +
-        geom_vline(xintercept = median(sbt),
-                   color = "red",
-                   size = line.width,
-                   linetype = "dashed") +
-        geom_rect(data = quants.sbt,
-                  aes(xmin = quants.sbt$lower,
-                      xmax = quants.sbt$upper,
-                      ymin = -Inf,
-                      ymax = Inf),
-                  inherit.aes = FALSE,
-                  alpha = 0.2,
-                  color = "transparent",
-                  fill = "red") +
-        geom_rect(data = quants.hr,
-                  aes(ymin = quants.hr$lower,
-                      ymax = quants.hr$upper,
-                      xmin = -Inf,
-                      xmax = Inf),
-                  inherit.aes = FALSE,
-                  alpha = 0.2,
-                  color = "transparent",
-                  fill = "red")
+        geom_hline(
+          yintercept = median(hr),
+          color = "red",
+          size = line.width,
+          linetype = "dashed"
+        ) +
+        geom_vline(
+          xintercept = median(sbt),
+          color = "red",
+          size = line.width,
+          linetype = "dashed"
+        ) +
+        geom_rect(
+          data = quants.sbt,
+          aes(
+            xmin = quants.sbt$lower,
+            xmax = quants.sbt$upper,
+            ymin = -Inf,
+            ymax = Inf
+          ),
+          inherit.aes = FALSE,
+          alpha = 0.2,
+          color = "transparent",
+          fill = "red"
+        ) +
+        geom_rect(
+          data = quants.hr,
+          aes(
+            ymin = quants.hr$lower,
+            ymax = quants.hr$upper,
+            xmin = -Inf,
+            xmax = Inf
+          ),
+          inherit.aes = FALSE,
+          alpha = 0.2,
+          color = "transparent",
+          fill = "red"
+        )
     }
-    if(show.means){
+    if (show.means) {
       g <- g +
-        geom_vline(xintercept = mean(tac),
-                   color = "green",
-                   size = line.width,
-                   linetype = "dashed") +
-        geom_hline(yintercept = mean(hr),
-                   color = "green",
-                   size = line.width,
-                   linetype = "dashed")
+        geom_vline(
+          xintercept = mean(tac),
+          color = "green",
+          size = line.width,
+          linetype = "dashed"
+        ) +
+        geom_hline(
+          yintercept = mean(hr),
+          color = "green",
+          size = line.width,
+          linetype = "dashed"
+        )
       h <- h +
-        geom_hline(yintercept = mean(tac),
-                   color = "green",
-                   size = line.width,
-                   linetype = "dashed")
+        geom_hline(
+          yintercept = mean(tac),
+          color = "green",
+          size = line.width,
+          linetype = "dashed"
+        )
       i <- i +
-        geom_hline(yintercept = mean(hr),
-                   color = "green",
-                   size = line.width,
-                   linetype = "dashed")
+        geom_hline(
+          yintercept = mean(hr),
+          color = "green",
+          size = line.width,
+          linetype = "dashed"
+        )
     }
   }
-  if(!show.x.axes){
+  if (!show.x.axes) {
     i <- i +
-      theme(axis.text.x = element_blank(),
-            axis.ticks.x = element_blank()) +
+      theme(
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank()
+      ) +
       xlab("")
     g <- g +
-      theme(axis.text.x = element_blank(),
-            axis.ticks.x = element_blank()) +
+      theme(
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank()
+      ) +
       xlab("")
   }
   ff <- unit(c(0, 0, 0, 0), "cm")
@@ -1302,23 +1549,26 @@ plot_hcr <- function(hcr.lst,
     theme(plot.margin = ff)
   j <- ggplot() +
     annotate("text", x = 100, y = 20, label = label, size = panel.text.size) +
-    theme(axis.text.x = element_blank(),
-          axis.text.y = element_blank(),
-          axis.ticks = element_blank(),
-          panel.grid.major = element_blank(),
-          panel.grid.minor = element_blank()) +
+    theme(
+      axis.text.x = element_blank(),
+      axis.text.y = element_blank(),
+      axis.ticks = element_blank(),
+      panel.grid.major = element_blank(),
+      panel.grid.minor = element_blank()
+    ) +
     xlab("") +
-    ylab("")  +
+    ylab("") +
     theme(plot.margin = ff)
 
   plot_grid(h,
-            j,
-            i,
-            g,
-            nrow = 2,
-            ncol = 2,
-            align = "hv",
-            axis = "tblr")
+    j,
+    i,
+    g,
+    nrow = 2,
+    ncol = 2,
+    align = "hv",
+    axis = "tblr"
+  )
 }
 
 #' Plot Beverton-holt
@@ -1332,7 +1582,7 @@ plot_hcr <- function(hcr.lst,
 #' @importFrom scales comma
 plot_bh <- function(models,
                     regions,
-                    translate = FALSE){
+                    translate = FALSE) {
   # Note sbt goes from start year to end year + 1
   # rt goes from start year + start age to end year
 
@@ -1340,40 +1590,52 @@ plot_bh <- function(models,
   model <- models
 
   sbtDat <- model$mcmccalcs$sbt.quants
-  sbt <- tibble( sbt=sbtDat["50%", ],
-                 year=as.numeric(colnames(sbtDat)) )
+  sbt <- tibble(
+    sbt = sbtDat["50%", ],
+    year = as.numeric(colnames(sbtDat))
+  )
 
   rtDat <- model$mcmccalcs$recr.quants
-  rt <- tibble( rt=rtDat["50%", ],
-                year=as.numeric(colnames(rtDat)) )
+  rt <- tibble(
+    rt = rtDat["50%", ],
+    year = as.numeric(colnames(rtDat))
+  )
 
   d <- sbt %>%
     full_join(rt, by = "year") %>%
-    na.omit( )
+    na.omit()
 
   x <- model$mcmccalcs$p.quants
   h <- x["50%", "h"]
   r0 <- x["50%", "ro"]
   sb0 <- x["50%", "sbo"]
-  alpha <- 4*h*r0/(sb0*(1-h))
-  beta <-(5*h-1)/(sb0*(1-h))
+  alpha <- 4 * h * r0 / (sb0 * (1 - h))
+  beta <- (5 * h - 1) / (sb0 * (1 - h))
 
-  d0 <- tibble( sbt=sb0, rt=r0 )
+  d0 <- tibble(sbt = sb0, rt = r0)
 
-  p <- tibble( sbt=seq(from=0, to=max(c(d$sbt, d0$sbt)), length.out=100),
-               rt=alpha*sbt/(1+beta*sbt))
+  p <- tibble(
+    sbt = seq(from = 0, to = max(c(d$sbt, d0$sbt)), length.out = 100),
+    rt = alpha * sbt / (1 + beta * sbt)
+  )
 
   g <- ggplot(d, aes(x = sbt, y = rt)) +
-    labs( x=paste(en2fr("Spawning biomass", translate), "(1,000 t)"),
-          y=paste(en2fr("Recruitment", translate), "(1,000 millions)") )+
-    geom_line( data=p ) +
-    geom_point(data=filter(d, year!=max(year)), aes(color = year),
-               na.rm = TRUE) +
-    geom_point(data=filter(d, year==max(year)), na.rm = TRUE, shape = 24,
-               color = "black", fill = "white") +
-    geom_point( data=d0, shape=8 ) +
+    labs(
+      x = paste(en2fr("Spawning biomass", translate), "(1,000 t)"),
+      y = paste(en2fr("Recruitment", translate), "(1,000 millions)")
+    ) +
+    geom_line(data = p) +
+    geom_point(
+      data = filter(d, year != max(year)), aes(color = year),
+      na.rm = TRUE
+    ) +
+    geom_point(
+      data = filter(d, year == max(year)), na.rm = TRUE, shape = 24,
+      color = "black", fill = "white"
+    ) +
+    geom_point(data = d0, shape = 8) +
     guides(color = FALSE, shape = FALSE) +
     scale_color_gradient(low = "lightgrey", high = "black") +
-    scale_y_continuous( labels=function(x) x/1000 )
+    scale_y_continuous(labels = function(x) x / 1000)
   g
 }
