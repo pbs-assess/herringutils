@@ -767,7 +767,8 @@ plot_recruitment <- function(model,
 
   if (show_r0) {
     g <- g +
-      geom_hline(yintercept = r0["median"], size = line_size_r0) +
+      geom_hline(yintercept = r0["median"], size = line_size_r0,
+                 colour = "darkgrey") +
       annotate(
         geom = "rect", xmin = -Inf, xmax = Inf, ymin = r0["lower"],
         ymax = r0["upper"], alpha = r0_ribbon_alpha
