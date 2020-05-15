@@ -53,7 +53,6 @@ input_data_table <- function(tab,
   csas_table(tab,
              format = "latex",
              caption = cap,
-             longtable = FALSE,
              ...)
 
 }
@@ -98,7 +97,6 @@ total_landed_catch_table <- function(tab,
              format = "latex",
              align = c("l", rep("r", 5)),
              caption = cap,
-             longtable = FALSE,
              ...) %>%
     add_header_above(ahead,
                      bold = TRUE)
@@ -149,7 +147,6 @@ sok_harvest_table <- function(tab,
              format = "latex",
              align = c("l", rep("r", 5)),
              caption = cap,
-             longtable = FALSE,
              ...)  %>%
     add_header_above(ahead,
                      bold = TRUE)
@@ -181,7 +178,6 @@ spawn_index_by_area_table <- function(tab,
              format = "latex",
              align = c("l", rep("r", ncol(tab) - 1)),
              caption = cap,
-             longtable = FALSE,
              ...) %>%
     add_header_above(c("",
                        "",
@@ -227,7 +223,6 @@ spawn_index_table <- function(tab,
              format = "latex",
              align = c("l", rep("r", 5)),
              caption = cap,
-             longtable = FALSE,
              ...)  %>%
     add_header_above(ahead,
                      bold = TRUE)
