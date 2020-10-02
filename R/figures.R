@@ -233,7 +233,7 @@ plot_spawn_ind <- function(df,
     filter(year >= xlim[1]) %>%
     mutate(
       gear = ifelse(year < new_surv_yr, "Surface", "Dive"),
-      gear = factor(gear)
+      gear = factor(gear, levels=c("Surface", "Dive"))
     ) %>%
     select(-qind)
 
