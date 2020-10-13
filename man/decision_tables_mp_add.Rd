@@ -14,7 +14,6 @@ decision_tables_mp_add(
   last_col_header = "TAC",
   perc_dec_pts = 0,
   dec_pts = 2,
-  col_align = "cc|c|c|c|c|c|c|c|c|c|c",
   inc_mps = NA,
   translate = FALSE
 )
@@ -38,11 +37,11 @@ decision_tables_mp_add(
 
 \item{dec_pts}{number of decimal points to show for numerical non-percentage columns}
 
-\item{col_align}{string for alignment of columns. c=center, r=right, l=left, |=place vertical bar between column}
-
 \item{inc_mps}{include these MP numbers in the table. If NA, all will be included}
 
 \item{translate}{logical. Translate to French if TRUE}
+
+\item{col_align}{string for alignment of columns. c=center, r=right, l=left, |=place vertical bar between column}
 }
 \value{
 an [xtable::xtable()]
