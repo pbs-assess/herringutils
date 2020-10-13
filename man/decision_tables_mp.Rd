@@ -11,7 +11,6 @@ decision_tables_mp(
   font.size = 9,
   space.size = 10,
   placement = "ht",
-  last_col_header = "TAC",
   perc_dec_pts = 0,
   dec_pts = 2,
   inc_mps = NA,
@@ -30,8 +29,6 @@ decision_tables_mp(
 \item{space.size}{space between rows of data in the table}
 
 \item{placement}{latex placement for the table}
-
-\item{last_col_header}{title text for the last column}
 
 \item{perc_dec_pts}{number of decimal points to show for percentage columns}
 

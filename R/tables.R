@@ -235,7 +235,6 @@ spawn_index_table <- function(tab,
 #' @param xlabel latex label to use for the table
 #' @param font.size size of font for table data
 #' @param space.size space between rows of data in the table
-#' @param last_col_header title text for the last column
 #' @param placement latex placement for the table
 #' @param translate logical. Translate to French if TRUE
 #' @param perc_dec_pts number of decimal points to show for percentage columns
@@ -253,7 +252,6 @@ decision_tables_mp <- function(df,
                                font.size = 9,
                                space.size = 10,
                                placement = "ht",
-                               last_col_header = "TAC",
                                perc_dec_pts = 0,
                                dec_pts = 2,
                                inc_mps = NA,
@@ -302,6 +300,8 @@ decision_tables_mp <- function(df,
                                           "c|",
                                           latex.bold(en2fr("Yield", translate = translate))),
                                latex.amp(),
+                               latex.bold(assess_yr + 1),
+                               latex.amp(),
                                latex.nline),
                         paste0(latex.mcol(2,
                                           "c|",
@@ -323,7 +323,7 @@ decision_tables_mp <- function(df,
                                latex.bold(paste0(en2fr("Obj", translate = translate),
                                                  " 4")),
                                latex.amp(),
-                               latex.bold(last_col_header),
+                               latex.bold(en2fr("TAC", translate = translate)),
                                latex.amp(),
                                latex.bold(en2fr("HR", translate = translate)),
                                latex.nline),
@@ -400,7 +400,6 @@ decision_tables_mp <- function(df,
 #' @param xlabel latex label to use for the table
 #' @param font.size size of font for table data
 #' @param space.size space between rows of data in the table
-#' @param last_col_header title text for the last column
 #' @param placement latex placement for the table
 #' @param translate logical. Translate to French if TRUE
 #' @param perc_dec_pts number of decimal points to show for percentage columns
@@ -418,7 +417,6 @@ decision_tables_mp_add <- function(df,
                                    font.size = 9,
                                    space.size = 10,
                                    placement = "ht",
-                                   last_col_header = "TAC",
                                    perc_dec_pts = 0,
                                    dec_pts = 2,
                                    inc_mps = NA,
@@ -470,6 +468,8 @@ decision_tables_mp_add <- function(df,
                                           "c|",
                                           latex.bold(en2fr("Yield", translate = translate))),
                                latex.amp(),
+                               latex.bold(assess_yr + 1),
+                               latex.amp(),
                                latex.nline),
                         paste0(latex.mcol(2,
                                           "c|",
@@ -497,7 +497,7 @@ decision_tables_mp_add <- function(df,
                                latex.bold(paste0(en2fr("Obj", translate = translate),
                                                  " 4")),
                                latex.amp(),
-                               latex.bold(last_col_header),
+                               latex.bold(en2fr("TAC", translate = translate)),
                                latex.amp(),
                                latex.bold(en2fr("HR", translate = translate)),
                                latex.nline),
