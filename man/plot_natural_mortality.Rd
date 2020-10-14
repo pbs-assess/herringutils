@@ -15,9 +15,9 @@ plot_natural_mortality(
   x_axis_tick_label_size = 8,
   y_axis_label_size = 8,
   y_axis_tick_label_size = 8,
-  x_axis_label_newline_length = 30,
-  y_axis_label_newline_length = 20,
-  annot = NA,
+  x_axis_label_newline_length = 50,
+  y_axis_label_newline_length = 40,
+  annot = "b",
   translate = FALSE
 )
 }

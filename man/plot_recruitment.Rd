@@ -6,8 +6,8 @@
 \usage{
 plot_recruitment(
   model,
-  point_size = 2,
-  line_size = 2,
+  point_size = 1,
+  line_size = 1,
   xlim = NA,
   show_x_axis = TRUE,
   show_y_axis = TRUE,
@@ -15,9 +15,9 @@ plot_recruitment(
   x_axis_tick_label_size = 8,
   y_axis_label_size = 8,
   y_axis_tick_label_size = 8,
-  x_axis_label_newline_length = 30,
-  y_axis_label_newline_length = 20,
-  annot = NA,
+  x_axis_label_newline_length = 50,
+  y_axis_label_newline_length = 40,
+  annot = "c",
   show_r0 = TRUE,
   line_size_r0 = 0.5,
   r0_ribbon_alpha = 0.35,

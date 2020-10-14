@@ -11,7 +11,7 @@ plot_scaled_abundance(
   model,
   gear,
   new_surv_yr = NA,
-  point_size = 2,
+  point_size = 1,
   line_size = 0.75,
   xlim = NA,
   show_x_axis = TRUE,
@@ -20,9 +20,9 @@ plot_scaled_abundance(
   x_axis_tick_label_size = 8,
   y_axis_label_size = 8,
   y_axis_tick_label_size = 8,
-  x_axis_label_newline_length = 30,
-  y_axis_label_newline_length = 20,
-  annot = NA,
+  x_axis_label_newline_length = 50,
+  y_axis_label_newline_length = 40,
+  annot = "a",
   show_legend = FALSE,
   translate = FALSE
 )

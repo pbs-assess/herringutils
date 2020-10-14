@@ -8,11 +8,11 @@ plot_biomass_phase(
   model,
   catch_df,
   new_surv_yr = NA,
-  point_size = 3,
-  line_size = 2,
+  point_size = 2.5,
+  line_size = 0.5,
   path_line_size = 0.4,
   text_size = 2,
-  zeroline_size = 1,
+  zeroline_size = 0.5,
   zeroline_type = "dashed",
   lrp_ribbon_alpha = 0.35,
   refpt_show = "0.3sbo",
@@ -22,9 +22,9 @@ plot_biomass_phase(
   x_axis_tick_label_size = 8,
   y_axis_label_size = 8,
   y_axis_tick_label_size = 8,
-  x_axis_label_newline_length = 30,
-  y_axis_label_newline_length = 20,
-  annot = NA,
+  x_axis_label_newline_length = 50,
+  y_axis_label_newline_length = 40,
+  annot = "f",
   translate = FALSE
 )
 }

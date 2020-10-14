@@ -8,8 +8,8 @@ catch history, and LRP line with credible interval}
 plot_biomass_catch(
   model,
   catch_df,
-  point_size = 3,
-  errorbar_size = 1,
+  point_size = 1,
+  errorbar_size = 0.5,
   line_size = 0.75,
   ribbon_alpha = 0.5,
   lrp_ribbon_alpha = 0.35,
@@ -22,9 +22,9 @@ plot_biomass_catch(
   x_axis_tick_label_size = 8,
   y_axis_label_size = 8,
   y_axis_tick_label_size = 8,
-  x_axis_label_newline_length = 30,
-  y_axis_label_newline_length = 20,
-  annot = NA,
+  x_axis_label_newline_length = 50,
+  y_axis_label_newline_length = 40,
+  annot = "d",
   translate = FALSE
 )
 }
