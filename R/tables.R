@@ -135,9 +135,9 @@ sok_harvest_table <- function(tab,
     #select(-by_vec)
   tab <- add_cols_and_reorder(tab, by = by_vec)
   if(translate){
-    tab$DPR[tab$Year == 2016] <- "DT"
+    tab$DPR[tab$Year %in% c(2016, 2019)] <- "DT"
   }else{
-    tab$PRD[tab$Year == 2016] <- "WP"
+    tab$PRD[tab$Year %in% c(2016, 2019)] <- "WP"
   }
   names(tab)[names(tab) == "Year"] <- en2fr("Year", translate)
   sar <- en2fr("SAR", translate)
