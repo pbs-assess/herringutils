@@ -872,7 +872,7 @@ plot_biomass_catch <- function(model,
     as_tibble(rownames = "refpt") %>%
     filter(refpt == refpt_show)
   names(lrp) <- c("year", "lower", "median", "upper")
-  lrp[1, 1] <- min(sbt$year) - 2
+  lrp[1, 1] <- as.character(min(sbt$year) - 2)
   lrp[, 1] <- as.numeric(lrp[, 1])
 
   g <- ggplot(sbt, aes(x = year, y = median)) +
@@ -1154,7 +1154,7 @@ plot_biomass_phase <- function(model,
     as_tibble(rownames = "refpt") %>%
     filter(refpt == refpt_show)
   names(lrp) <- c("year", "lower", "median", "upper")
-  lrp[1, 1] <- min(sbt$year) - 2
+  lrp[1, 1] <- as.character(min(sbt$year) - 2)
   lrp[, 1] <- as.numeric(lrp[, 1])
   # # Add 0.38SB_0 (for HG)
   # lrp2 <- lrp %>%
