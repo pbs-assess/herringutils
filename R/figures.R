@@ -896,6 +896,8 @@ plot_biomass_catch <- function(model,
     # geom_hline(yintercept = lrp$median/0.3*0.5, linetype = "dashed") +
     # geom_hline(yintercept = lrp$median/0.3*1) +
     # geom_hline(yintercept = lrp$median/0.3*1.5, colour = "green") +
+    # annotate(geom = "rect", fill="black", alpha = 0.35,
+    #          xmin = -Inf, xmax = Inf, ymin = lrp$lower/0.3, ymax = lrp$upper/0.3) +
     # annotate(geom = "rect", fill="red", alpha = 0.35,
     #          xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = lrp$median) +
     # annotate(geom = "rect", fill="yellow", alpha = 0.35,
