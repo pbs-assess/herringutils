@@ -8,7 +8,7 @@ plot_spawn_ind(
   df,
   xlim = c(1000, 3000),
   ylim = NA,
-  new_surv_yr = NA,
+  new_surv_yr = new_surv_yr,
   new_surv_yr_type = "dashed",
   new_surv_yr_size = 0.25,
   translate = FALSE

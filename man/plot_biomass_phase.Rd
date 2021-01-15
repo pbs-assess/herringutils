@@ -7,7 +7,7 @@
 plot_biomass_phase(
   model,
   catch_df,
-  new_surv_yr = NA,
+  new_surv_yr = new_surv_yr,
   point_size = 2.5,
   line_size = 0.5,
   path_line_size = 0.4,

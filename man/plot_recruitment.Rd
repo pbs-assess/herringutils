@@ -9,7 +9,7 @@ plot_recruitment(
   point_size = 1,
   line_size = 1,
   xlim = NA,
-  show_x_axis = TRUE,
+  show_x_axis = FALSE,
   show_y_axis = TRUE,
   x_axis_label_size = 8,
   x_axis_tick_label_size = 8,
