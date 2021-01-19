@@ -10,7 +10,7 @@ plot_scaled_abundance(
   df,
   model,
   gear,
-  new_surv_yr = new_surv_yr,
+  new_surv_yr = NA,
   point_size = 1,
   line_size = 0.75,
   xlim = NA,
