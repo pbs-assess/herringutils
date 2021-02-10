@@ -16,7 +16,7 @@ plot_biomass_catch(
   between_bars = 0.75,
   refpt_show = "0.3sbo",
   xlim = NA,
-  show_x_axis = TRUE,
+  show_x_axis = FALSE,
   show_y_axis = TRUE,
   x_axis_label_size = 8,
   x_axis_tick_label_size = 8,
@@ -24,7 +24,7 @@ plot_biomass_catch(
   y_axis_tick_label_size = 8,
   x_axis_label_newline_length = 50,
   y_axis_label_newline_length = 40,
-  annot = NA,
+  annot = "d",
   translate = FALSE
 )
 }
