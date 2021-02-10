@@ -893,8 +893,9 @@ plot_biomass_catch <- function(model,
       position = "stack",
       aes(fill = gear)
     ) +
-    # geom_hline(yintercept = lrp$median/0.3*0.5, linetype = "dashed") +
-    # annotate(geom = "rect", fill="black", alpha = 0.35,
+    # geom_hline(yintercept = lrp$median/0.3*0.5, linetype = "dashed",
+    #            colour = "orange") +
+    # annotate(geom = "rect", fill="orange", alpha = 0.35,
     #          xmin = -Inf, xmax = Inf,
     #          ymin = lrp$lower/0.3*0.5, ymax = lrp$upper/0.3*0.5) +
     # geom_hline(yintercept = lrp$median/0.3*1) +
@@ -902,12 +903,9 @@ plot_biomass_catch <- function(model,
     #          xmin = -Inf, xmax = Inf,
     #          ymin = lrp$lower/0.3*1, ymax = lrp$upper/0.3*1) +
     # geom_hline(yintercept = lrp$median/0.3*1.125, linetype = "dashed",
-    #            colour = "lightgreen") +
-    # annotate(geom = "rect", fill="lightgreen", alpha = 0.35,
-    #          xmin = -Inf, xmax = Inf,
-    #          ymin = lrp$lower/0.3*1.125, ymax = lrp$upper/0.3*1.125) +
-    # geom_hline(yintercept = lrp$median/0.3*1.5, colour = "darkgreen") +
-    # annotate(geom = "rect", fill="darkgreen", alpha = 0.35,
+    #            colour = "darkgreen") +
+    # geom_hline(yintercept = lrp$median/0.3*1.5, colour = "green") +
+    # annotate(geom = "rect", fill="green", alpha = 0.35,
     #          xmin = -Inf, xmax = Inf,
     #          ymin = lrp$lower/0.3*1.5, ymax = lrp$upper/0.3*1.5) +
     # annotate(geom = "rect", fill="red", alpha = 0.35,
