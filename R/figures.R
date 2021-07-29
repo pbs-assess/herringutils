@@ -1716,6 +1716,9 @@ plot_spawn_section <- function(model,
   g <- ggplot(data = dat, mapping = aes(x = Year, y = Index)) +
     geom_point(mapping = aes(shape = Survey), size = 1, na.rm = TRUE) +
     geom_line(mapping = aes(group = Survey), size = 0.5) +
+    geom_vline(
+      xintercept = new_surv_yr - 0.5, linetype = "dashed", size = 0.25
+    ) +
     labs(x = en2fr("Year", translate),
          shape = en2fr("Survey period", translate)) +
     expand_limits(y = c(0, 100)) +
