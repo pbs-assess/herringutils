@@ -1667,3 +1667,74 @@ plot_bh <- function(models,
     scale_y_continuous(labels = function(x) x / 1000)
   g
 }
+
+#' Plot spawn index or scaled abundance by section
+#'
+#' @param model iscam model object (can be NA if scale is FALSE).
+#' @param data_file Chracter. Path and name of data file (CSV) with spawn by
+#' section and year.
+#' @param sections Vector of sections to include, or NA to include all.
+#' @param yr_range Start and end year, or NA to include all the data.
+#' @param scale Logical. Scale the spawn index using q?
+#' @param translate Logical. Translate to French?
+#'
+#' @export
+#' @importFrom tibble tibble
+#' @importFrom readr read_csv
+#' @importFrom dplyr mutate left_join filter
+#' @importFrom ggplot2 ggplot geom_point geom_line labs scale_shape_manual
+#' scale_x_continuous scale_y_continuous facet_wrap theme
+plot_spawn_section <- function(model,
+                               data_file,
+                               sections = NA,
+                               yr_range = NA,
+                               scale = TRUE,
+                               translate = FALSE){
+  yrBreaks <- seq(from = 1950, to = 2030, by = 10)
+  if( !is.na(model) & scale ){
+    qVals <- tibble(Survey = c("Surface", "Dive"),
+                    q = model$mcmccalcs$q.quants[2,])
+  }
+  dat <- read_csv(file = data_file, col_types=cols())
+  if(scale){
+    dat <- dat %>%
+      left_join( y=qVals, by="Survey") %>%
+      mutate(Index = Index / q)
+  }
+  if( !is.na(sections) ) {
+    dat <- dat %>%
+      mutate(Section = as.numeric(Section)) %>%
+      filter(Section %in% sections)
+  }
+  dat <- dat %>%
+    mutate(Survey = factor(Survey, levels = c("Surface", "Dive")),
+           Section = formatC(Section, width = 3, format = "d", flag = "0"))
+  if(!is.na(yr_range)) {
+    dat <- dat %>%
+      filter(Year %in% c(min(yr_range):max(yr_range)))
+  }
+  g <- ggplot(data = dat, mapping = aes(x = Year, y = Index)) +
+    geom_point(mapping = aes(shape = Survey), size = 1, na.rm = TRUE) +
+    geom_line(mapping = aes(group = Survey), size = 0.5) +
+    labs(x = en2fr("Year", translate),
+         shape = en2fr("Survey period", translate)) +
+    expand_limits(y = c(0, 100)) +
+    scale_shape_manual(values = c(2, 1)) +
+    scale_x_continuous(breaks = yrBreaks) +
+    scale_y_continuous(labels = function(x) x / 1000) +
+    facet_wrap(Section ~ ., scales = "free_y") +
+    theme(legend.position = "top",
+          axis.text.x = element_text(angle = 45, hjust = 1))
+  if(!is.na(yr_range)){
+    g <- g +
+      expand_limits(x = yr_range)
+  }
+  if(scale){
+    g <- g +
+      labs(y = paste0(en2fr("Scaled abundance", translate), " (1,000 t)"))
+  } else {
+    g <- g +
+      labs(y = paste0(en2fr("Spawn index", translate), " (1,000 t)"))
+  }
+  g
+}
