@@ -37,6 +37,7 @@ plot_catch <- function(df,
 #' @param xlim Limits for the years shown on the plot
 #' @param ylim limits for the weights shown on the plot
 #' @param n_roll Number of years to calculate the rolling mean (window)
+#' @param major Logical. Major SAR or not.
 #' @param translate Logical. If TRUE, translate to French
 #'
 #' @importFrom dplyr filter as_tibble rename mutate group_by ungroup select %>%
@@ -52,6 +53,7 @@ plot_wa <- function(df,
                     xlim = c(1000, 3000),
                     ylim = c(0, NA),
                     n_roll = 5,
+                    major = TRUE,
                     translate = FALSE) {
   df <- df %>%
     filter(year >= xlim[1], gear %in% c(
@@ -75,24 +77,11 @@ plot_wa <- function(df,
   dfm <- dfm %>%
     filter(Age != circle_age)
   g <- ggplot(dfm) +
-    geom_line(aes(
-      x = Year,
-      y = muWeight,
-      group = Age
-    ),
-    na.rm = TRUE
-    ) +
     geom_point(
       data = dfm_circle_age,
       aes(x = Year, y = Weight),
       shape = 1,
       size = 2,
-      na.rm = TRUE
-    ) +
-    geom_line(
-      data = dfm_circle_age,
-      aes(x = Year, y = muWeight),
-      size = 1.25,
       na.rm = TRUE
     ) +
     scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10)) +
@@ -103,6 +92,21 @@ plot_wa <- function(df,
       y = paste0(en2fr("Weight-at-age", translate), " (kg)")
     ) +
     facet_wrap(~region, ncol = 2, dir = "v")
+  if(major) {
+    g <- g +
+      geom_line(aes(x = Year, y = muWeight, group = Age ), na.rm = TRUE ) +
+      geom_line(
+        data = dfm_circle_age, aes(x = Year, y = muWeight), size = 1.25,
+        na.rm = TRUE
+      )
+  } else {
+    g <- g +
+      geom_line(aes(x = Year, y = Weight, group = Age ), na.rm = TRUE ) +
+      geom_line(
+        data = dfm_circle_age, aes(x = Year, y = Weight), size = 1.25,
+        na.rm = TRUE
+      )
+  }
   g
 }
 

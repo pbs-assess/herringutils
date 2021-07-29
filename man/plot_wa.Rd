@@ -10,6 +10,7 @@ plot_wa(
   xlim = c(1000, 3000),
   ylim = c(0, NA),
   n_roll = 5,
+  major = TRUE,
   translate = FALSE
 )
 }
@@ -23,6 +24,8 @@ plot_wa(
 \item{ylim}{limits for the weights shown on the plot}
 
 \item{n_roll}{Number of years to calculate the rolling mean (window)}
+
+\item{major}{Logical. Major SAR or not.}
 
 \item{translate}{Logical. If TRUE, translate to French}
 }
