@@ -6,8 +6,7 @@
 \usage{
 plot_spawn_ind(
   df,
-  xlim = c(1000, 3000),
-  ylim = NA,
+  yr_range = NA,
   new_surv_yr = NA,
   new_surv_yr_type = "dashed",
   new_surv_yr_size = 0.25,
@@ -17,9 +16,7 @@ plot_spawn_ind(
 \arguments{
 \item{df}{a data frame as constructed by [get_surv_ind()]}
 
-\item{xlim}{limits for the years shown on the plot}
-
-\item{ylim}{limits for the ages shown on the plot}
+\item{yr_range}{Start and end year, or NA to include all the data}
 
 \item{new_surv_yr}{Year in which the survey type changed. Will be shown as a vertical line}
 
@@ -28,6 +25,8 @@ plot_spawn_ind(
 \item{new_surv_yr_size}{ggplot line size for new_survey_yr}
 
 \item{translate}{Logical. If TRUE, translate to French}
+
+\item{ylim}{limits for the ages shown on the plot}
 }
 \value{
 A ggplot object

@@ -207,7 +207,7 @@ plot_pa <- function(df,
 #' Plot survey indices from data frames as extracted from iscam data (dat) files
 #'
 #' @param df a data frame as constructed by [get_surv_ind()]
-#' @param xlim limits for the years shown on the plot
+#' @param yr_range Start and end year, or NA to include all the data
 #' @param ylim limits for the ages shown on the plot
 #' @param translate Logical. If TRUE, translate to French
 #' @param new_surv_yr Year in which the survey type changed. Will be shown as a vertical line
@@ -221,8 +221,7 @@ plot_pa <- function(df,
 #' @export
 #' @return A ggplot object
 plot_spawn_ind <- function(df,
-                           xlim = c(1000, 3000),
-                           ylim = NA,
+                           yr_range = NA,
                            new_surv_yr = NA,
                            new_surv_yr_type = "dashed",
                            new_surv_yr_size = 0.25,
@@ -232,9 +231,13 @@ plot_spawn_ind <- function(df,
     is.numeric(new_surv_yr),
     length(new_surv_yr) == 1
   )
-
+  if(!is.na(yr_range)) {
+    df <- df %>%
+      filter(year %in% (min(yr_range):max(yr_range))) %>%
+      complete(year = min(yr_range):max(yr_range), region)
+  }
   df <- df %>%
-    filter(year >= xlim[1]) %>%
+    complete(year = min(df$year):max(df$year), region) %>%
     mutate(
       gear = ifelse(year < new_surv_yr, "Surface", "Dive"),
       gear = factor(gear, levels=c("Surface", "Dive"))
@@ -260,7 +263,6 @@ plot_spawn_ind <- function(df,
     scale_shape_manual(values = c(2, 1)) +
     geom_vline(xintercept = new_surv_yr - 0.5, linetype = new_surv_yr_type, size = new_surv_yr_size) +
     scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10)) +
-    expand_limits(x = xlim[1]:xlim[2]) +
     labs(
       shape = en2fr("Survey period", translate),
       x = en2fr("Year", translate),
@@ -268,9 +270,9 @@ plot_spawn_ind <- function(df,
     ) +
     facet_wrap(~Region, ncol = 2, dir = "v", scales = "free_y") +
     theme(legend.position = "top")
-  if (!is.na(ylim[1])) {
+  if(!is.na(yr_range)){
     g <- g +
-      coord_cartesian(xlim, ylim)
+      expand_limits(x = yr_range)
   }
   g
 }
