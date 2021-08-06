@@ -76,6 +76,10 @@ plot_wa <- function(df,
     filter(Age == circle_age)
   dfm <- dfm %>%
     filter(Age != circle_age)
+
+  dshade <- data.frame(Age = c(2:10), Shade = c(.8, 1, .9, .8, .4, .3, .2 , .1, .1))
+  dfm <- merge(dfm, dshade, by = "Age", all.x=TRUE)
+
   g <- ggplot(dfm) +
     geom_point(
       data = dfm_circle_age,
@@ -94,18 +98,20 @@ plot_wa <- function(df,
     facet_wrap(~region, ncol = 2, dir = "v")
   if(major) {
     g <- g +
-      geom_line(aes(x = Year, y = muWeight, group = Age ), na.rm = TRUE ) +
+      geom_line(aes(x = Year, y = muWeight, group = Age, alpha = Shade), na.rm = TRUE ) +
       geom_line(
-        data = dfm_circle_age, aes(x = Year, y = muWeight), size = 1.25,
+        data = dfm_circle_age, aes(x = Year, y = muWeight), size = .8,
         na.rm = TRUE
-      )
+      ) +
+      guides(alpha = "none")
   } else {
     g <- g +
-      geom_line(aes(x = Year, y = Weight, group = Age ), na.rm = TRUE ) +
+      geom_line(aes(x = Year, y = Weight, group = Age, alpha = Shade), na.rm = TRUE ) +
       geom_line(
-        data = dfm_circle_age, aes(x = Year, y = Weight), size = 1.25,
+        data = dfm_circle_age, aes(x = Year, y = Weight), size = .8,
         na.rm = TRUE
-      )
+      ) +
+      guides(alpha = "none")
   }
   g
 }
@@ -132,7 +138,7 @@ plot_pa <- function(df,
                     conf = 0.9,
                     xlim = c(1000, 3000),
                     ylim = c(0, NA),
-                    size_range = c(0.5, 2),
+                    size_range = c(0.5, 2.5),
                     translate = FALSE) {
   df <- df %>%
     filter(year >= xlim[1], gear %in% c(
@@ -175,15 +181,19 @@ plot_pa <- function(df,
   g <- ggplot(dfm, aes(x = Year)) +
     geom_point(aes(
       y = Age,
-      size = ifelse(Proportion, Proportion, NA)
-    ),
-    na.rm = TRUE
+      size = ifelse(Proportion, Proportion, NA),
+      alpha =  ifelse(Proportion, Proportion, NA)
+      ),
+    na.rm = TRUE,
+    show.legend = FALSE
     ) +
+    scale_alpha(range = c(0.4, 1))+
     geom_path(
       data = dfm_ci,
       aes(y = MeanAge, group = GroupID),
       size = 1.25,
-      na.rm = TRUE
+      na.rm = TRUE,
+      alpha = .3
     ) +
     scale_size_continuous(range = size_range) +
     geom_ribbon(
@@ -199,8 +209,8 @@ plot_pa <- function(df,
       x = en2fr("Year", translate),
       y = en2fr("Age", translate)
     ) +
-    facet_wrap(~Region, ncol = 2, dir = "v") +
-    theme(legend.position = "top")
+    facet_wrap(~Region, ncol = 1, dir = "v") +
+    guides(alpha = "none")
   g
 }
 
