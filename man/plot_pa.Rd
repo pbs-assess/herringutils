@@ -10,7 +10,7 @@ plot_pa(
   conf = 0.9,
   xlim = c(1000, 3000),
   ylim = c(0, NA),
-  size_range = c(0.5, 2),
+  size_range = c(0.5, 2.5),
   translate = FALSE
 )
 }
