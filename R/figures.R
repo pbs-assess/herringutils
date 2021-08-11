@@ -25,7 +25,7 @@ plot_catch <- function(df,
       y = paste(en2fr("Catch", translate), " (1,000 t)"),
       fill = en2fr("Gear", translate)
     ) +
-    facet_wrap(~region, ncol = 2, dir = "v", scales = "free_y")
+    facet_wrap(vars(region), ncol = 1, scales = "free_y")
   g
 }
 
@@ -95,7 +95,7 @@ plot_wa <- function(df,
       x = en2fr("Year", translate),
       y = paste0(en2fr("Weight-at-age", translate), " (kg)")
     ) +
-    facet_wrap(~region, ncol = 2, dir = "v")
+    facet_wrap(vars(region), ncol = 1)
   if(major) {
     g <- g +
       geom_line(aes(x = Year, y = muWeight, group = Age, alpha = Shade), na.rm = TRUE ) +
@@ -209,7 +209,7 @@ plot_pa <- function(df,
       x = en2fr("Year", translate),
       y = en2fr("Age", translate)
     ) +
-    facet_wrap(~Region, ncol = 1, dir = "v") +
+    facet_wrap(vars(Region), ncol = 1) +
     guides(alpha = "none")
   g
 }
@@ -278,7 +278,7 @@ plot_spawn_ind <- function(df,
       x = en2fr("Year", translate),
       y = paste0(en2fr("Spawn index", translate), " (1,000 t)")
     ) +
-    facet_wrap(~Region, ncol = 2, dir = "v", scales = "free_y") +
+    facet_wrap(vars(Region), ncol = 1, scales = "free_y") +
     theme(legend.position = "top")
   if(!is.na(yr_range)){
     g <- g +
@@ -355,7 +355,7 @@ plot_harvest_rate <- function(df,
       x = en2fr("Year", translate),
       y = en2fr("Effective harvest rate", translate)
     ) +
-    facet_wrap(~region, ncol = 2, dir = "v")
+    facet_wrap(vars(region), ncol = 1)
 
   if (!is.na(ylim[1])) {
     g <- g +
