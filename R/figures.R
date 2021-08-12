@@ -270,7 +270,7 @@ plot_spawn_ind <- function(df,
     geom_line(aes(group = gear),
       na.rm = TRUE
     ) +
-    scale_shape_manual(values = c(2, 1)) +
+    scale_shape_manual(values = c(1, 2)) +
     geom_vline(xintercept = new_surv_yr - 0.5, linetype = new_surv_yr_type, size = new_surv_yr_size) +
     scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10)) +
     labs(
@@ -1734,7 +1734,7 @@ plot_spawn_section <- function(model,
     labs(x = en2fr("Year", translate),
          shape = en2fr("Survey period", translate)) +
     expand_limits(y = c(0, 100)) +
-    scale_shape_manual(values = c(2, 1)) +
+    scale_shape_manual(values = c(1, 2)) +
     scale_x_continuous(breaks = yrBreaks) +
     scale_y_continuous(labels = function(x) x / 1000) +
     facet_wrap(Section ~ ., scales = "free_y") +
