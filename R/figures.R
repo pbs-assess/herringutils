@@ -29,6 +29,39 @@ plot_catch <- function(df,
   g
 }
 
+#' Plot incidental catch from a data frame
+#'
+#' @param df Data frame of incidental catch.
+#' @param xlim Year limits for the plot (or NA for none).
+#' @param translate Translate to French?
+#'
+#' @importFrom ggplot2 ggplot aes geom_col labs facet_wrap vars theme
+#'   scale_fill_viridis_d
+#' @importFrom dplyr mutate
+#' @importFrom rosettafish en2fr
+#' @importFrom scales comma
+#'
+#' @export
+#' @return A ggplot object.
+plot_ic <- function(df,
+                    xlim = c(NA, NA),
+                    translate = FALSE) {
+  df <- df %>%
+    mutate(
+      Number = Number / 1000,
+      Type = ifelse(translate, en2fr(Type, translate, case = "sentence"), Type)
+    )
+  g <- ggplot(data = df, mapping = aes(x = Year, y = Number, fill = Type)) +
+    geom_col() +
+    labs(x = en2fr("Year", translate, case = "sentence"),
+         y = paste0(en2fr("Number", translate, case = "sentence"), " (1,000)"),
+         fill = en2fr("Type", translate, case = "sentence")) +
+    scale_fill_viridis_d() +
+    scale_y_continuous(labels = comma) +
+    facet_wrap(vars(Region), ncol = 1, scales = "free_y") +
+    theme(legend.position = "top")
+  g
+}
 
 #' Plot weight-at-age time series from a data frames as extracted from iscam data (dat) files
 #'
