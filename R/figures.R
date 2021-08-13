@@ -47,10 +47,11 @@ plot_ic <- function(df,
                     xlim = c(NA, NA),
                     translate = FALSE) {
   df <- df %>%
-    mutate(
-      Number = Number / 1000,
-      Type = ifelse(translate, en2fr(Type, translate, case = "sentence"), Type)
-    )
+    mutate(Number = Number / 1000)
+  if(translate){
+    df <- df %>%
+      mutate(Type = en2fr(Type, translate, case = "sentence"))
+  }
   g <- ggplot(data = df, mapping = aes(x = Year, y = Number, fill = Type)) +
     geom_col() +
     labs(x = en2fr("Year", translate, case = "sentence"),
