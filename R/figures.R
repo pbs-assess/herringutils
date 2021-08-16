@@ -57,7 +57,7 @@ plot_ic <- function(df,
       filter(Year %in% xlim[1]:xlim[2])
   }
   g <- ggplot(data = df, mapping = aes(x = Year, y = Number, fill = Type)) +
-    geom_col() +
+    geom_col(position = "dodge") +
     labs(x = en2fr("Year", translate, case = "sentence"),
          y = paste0(en2fr("Number", translate, case = "sentence"), " (1,000)"),
          fill = en2fr("Type", translate, case = "sentence")) +
