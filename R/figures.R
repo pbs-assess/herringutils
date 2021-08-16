@@ -52,6 +52,10 @@ plot_ic <- function(df,
     df <- df %>%
       mutate(Type = en2fr(Type, translate, case = "sentence"))
   }
+  if(!all(is.na(xlim))){
+    df <- df %>%
+      filter(Year %in% xlim[1]:xlim[2])
+  }
   g <- ggplot(data = df, mapping = aes(x = Year, y = Number, fill = Type)) +
     geom_col() +
     labs(x = en2fr("Year", translate, case = "sentence"),
@@ -61,6 +65,10 @@ plot_ic <- function(df,
     scale_y_continuous(labels = comma) +
     facet_wrap(vars(Region), ncol = 1, scales = "free_y") +
     theme(legend.position = "top")
+  if(!all(is.na(xlim))){
+    g <- g +
+      expand_limits(x = xlim)
+  }
   g
 }
 
