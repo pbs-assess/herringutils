@@ -549,7 +549,7 @@ plot_scaled_abundance <- function(df,
                                   point_size = 1,
                                   line_size = 0.75,
                                   xlim = NA,
-                                  show_x_axis = FALSE,
+                                  show_x_axis = TRUE,
                                   show_y_axis = TRUE,
                                   x_axis_label_size = 8,
                                   x_axis_tick_label_size = 8,
@@ -640,6 +640,8 @@ plot_scaled_abundance <- function(df,
     y_axis_label_size = y_axis_label_size,
     y_axis_tick_label_size = y_axis_tick_label_size
   )
+  g <- g +
+    scale_x_continuous(position = "top")
   g
 }
 
@@ -671,7 +673,7 @@ plot_natural_mortality <- function(model,
                                    line_size = 0.75,
                                    ribbon_alpha = 0.5,
                                    xlim = NA,
-                                   show_x_axis = FALSE,
+                                   show_x_axis = TRUE,
                                    show_y_axis = TRUE,
                                    x_axis_label_size = 8,
                                    x_axis_tick_label_size = 8,
@@ -733,6 +735,8 @@ plot_natural_mortality <- function(model,
     y_axis_label_size = y_axis_label_size,
     y_axis_tick_label_size = y_axis_tick_label_size
   )
+  g <- g +
+    scale_x_continuous(position = "top")
   g
 }
 
