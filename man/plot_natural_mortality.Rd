@@ -9,7 +9,7 @@ plot_natural_mortality(
   line_size = 0.75,
   ribbon_alpha = 0.5,
   xlim = NA,
-  show_x_axis = FALSE,
+  show_x_axis = TRUE,
   show_y_axis = TRUE,
   x_axis_label_size = 8,
   x_axis_tick_label_size = 8,
