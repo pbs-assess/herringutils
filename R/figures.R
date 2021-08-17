@@ -46,8 +46,6 @@ plot_catch <- function(df,
 plot_ic <- function(df,
                     xlim = c(NA, NA),
                     translate = FALSE) {
-  df <- df %>%
-    mutate(Number = Number / 1000)
   if(translate){
     df <- df %>%
       mutate(Type = en2fr(Type, translate, case = "sentence"))
@@ -59,8 +57,7 @@ plot_ic <- function(df,
   g <- ggplot(data = df, mapping = aes(x = Year, y = Number, fill = Type)) +
     geom_col(position = "dodge") +
     labs(x = en2fr("Year", translate, case = "sentence"),
-         y = paste0(en2fr("Number of fish", translate, case = "sentence"),
-                    " (x 1,000)"),
+         y = en2fr("Number of fish", translate, case = "sentence"),
          fill = en2fr("Type", translate, case = "sentence")) +
     scale_fill_viridis_d() +
     scale_y_continuous(labels = comma) +
