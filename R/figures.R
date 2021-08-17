@@ -59,7 +59,8 @@ plot_ic <- function(df,
   g <- ggplot(data = df, mapping = aes(x = Year, y = Number, fill = Type)) +
     geom_col(position = "dodge") +
     labs(x = en2fr("Year", translate, case = "sentence"),
-         y = paste0(en2fr("Number", translate, case = "sentence"), " (1,000)"),
+         y = paste0(en2fr("Number of fish", translate, case = "sentence"),
+                    " (x 1,000)"),
          fill = en2fr("Type", translate, case = "sentence")) +
     scale_fill_viridis_d() +
     scale_y_continuous(labels = comma) +
