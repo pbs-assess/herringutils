@@ -1816,9 +1816,9 @@ plot_spawn_section <- function(model,
     scale_shape_manual(values = c(1, 2)) +
     scale_x_continuous(breaks = yrBreaks) +
     scale_y_continuous(labels = function(x) x / 1000) +
-    facet_wrap(Section ~ ., ncol = 2, scales = "free_y") + #labeller= variable_labeller) + #
-    theme(legend.position = "bottom",
-          axis.text.x = element_text(angle = 45, hjust = 1))
+    facet_wrap(Section ~ ., ncol = 2, scales = "free_y") + #, labeller= variable_labeller) + #
+    theme(legend.position = "top") # ,
+          #axis.text.x = element_text(angle = 45, hjust = 1))
   if(!is.na(yr_range)){
     g <- g +
       expand_limits(x = yr_range)
