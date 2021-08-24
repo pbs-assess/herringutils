@@ -820,7 +820,8 @@ plot_recruitment <- function(model,
       size = line_size / 2,
       width = 0
     ) +
-    scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10))
+    scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10)) +
+    expand_limits(y = 0)
   if (!is.na(xlim[1])) {
     g <- g +
       coord_cartesian(xlim = xlim, expand = TRUE)
