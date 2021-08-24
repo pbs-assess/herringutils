@@ -598,13 +598,20 @@ plot_scaled_abundance <- function(df,
       na.rm = TRUE
     ) +
     scale_shape_manual(values = c(2, 1)) +
-    scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10)) +
+    scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10),
+                       labels = NULL, name = NULL,
+                       sec.axis = sec_axis(
+                         ~ ., name = NULL,
+                         breaks = seq(from = 1900, to = 2100, by = 10),
+                         labels = seq(from = 1900, to = 2100, by = 10)),
+                       ) +
     geom_line(
       data = ssb,
       aes(x = year, y = median, group = survey),
       size = line_size,
       na.rm = TRUE
-    )
+    ) +
+    expand_limits(y = 0)
   if (!is.na(xlim[1])) {
     g <- g +
       coord_cartesian(xlim = xlim, expand = TRUE)
@@ -626,10 +633,10 @@ plot_scaled_abundance <- function(df,
       guides(shape = FALSE, linetype = FALSE)
   }
   g <- modify_axes_labels(g,
-    x_label_text = newline_format(
-      en2fr("Year", translate),
-      x_axis_label_newline_length
-    ),
+    # x_label_text = newline_format(
+    #   en2fr("Year", translate),
+    #   x_axis_label_newline_length
+    # ),
     y_label_text = newline_format(
       paste0(en2fr("Scaled abundance", translate), " (1,000 t)"),
       y_axis_label_newline_length
@@ -641,8 +648,6 @@ plot_scaled_abundance <- function(df,
     y_axis_label_size = y_axis_label_size,
     y_axis_tick_label_size = y_axis_tick_label_size
   )
-  g <- g +
-    scale_x_continuous(position = "top")
   g
 }
 
@@ -696,7 +701,14 @@ plot_natural_mortality <- function(model,
       na.rm = TRUE
     ) +
     geom_ribbon(aes(ymin = lower, ymax = upper), alpha = ribbon_alpha) +
-    scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10))
+    scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10),
+                       labels = NULL, name = NULL,
+                       sec.axis = sec_axis(
+                         ~ ., name = NULL,
+                         breaks = seq(from = 1900, to = 2100, by = 10),
+                         labels = seq(from = 1900, to = 2100, by = 10)),
+    ) +
+    expand_limits(y = 0)
   if (!is.na(xlim[1])) {
     g <- g +
       coord_cartesian(xlim = xlim, expand = TRUE)
@@ -714,10 +726,10 @@ plot_natural_mortality <- function(model,
       )
   }
   g <- modify_axes_labels(g,
-    x_label_text = newline_format(
-      en2fr("Year", translate),
-      x_axis_label_newline_length
-    ),
+    # x_label_text = newline_format(
+    #   en2fr("Year", translate),
+    #   x_axis_label_newline_length
+    # ),
     y_label_text = newline_format(
       paste0(
         en2fr(
@@ -736,8 +748,6 @@ plot_natural_mortality <- function(model,
     y_axis_label_size = y_axis_label_size,
     y_axis_tick_label_size = y_axis_tick_label_size
   )
-  g <- g +
-    scale_x_continuous(position = "top")
   g
 }
 
@@ -898,7 +908,7 @@ plot_biomass_catch <- function(model,
                                between_bars = 0.75,
                                refpt_show = "0.3sbo",
                                xlim = NA,
-                               show_x_axis = FALSE,
+                               show_x_axis = TRUE,
                                show_y_axis = TRUE,
                                x_axis_label_size = 8,
                                x_axis_tick_label_size = 8,
@@ -997,7 +1007,9 @@ plot_biomass_catch <- function(model,
     ) +
     scale_fill_viridis_d() +
     guides(fill = FALSE) +
-    scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10))
+    scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10),
+                       labels = seq(from = 1900, to = 2100, by = 10),
+                       name = NULL)
   if (!is.na(xlim[1])) {
     g <- g +
       coord_cartesian(xlim = xlim, expand = TRUE)
@@ -1015,10 +1027,10 @@ plot_biomass_catch <- function(model,
       )
   }
   g <- modify_axes_labels(g,
-    x_label_text = newline_format(
-      en2fr("Year", translate),
-      x_axis_label_newline_length
-    ),
+    # x_label_text = newline_format(
+    #   en2fr("Year", translate),
+    #   x_axis_label_newline_length
+    # ),
     y_label_text = newline_format(
       paste0(en2fr("Spawning biomass", translate), " (1,000 t)"),
       y_axis_label_newline_length
