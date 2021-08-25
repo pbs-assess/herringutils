@@ -1787,19 +1787,15 @@ plot_spawn_section <- function(model,
   }
 
   variable_names <- tribble(
-    ~Section, ~Name, ~NameFr,
-    "067", "067 Kitasu Bay", "067 baie de Kitasu",
-    "072", "072 Lower Spiller", "072 Lower Spiller",
-    "074", "074 Thompson/Styker", "074 Thompson/Styker",
-    "078", "078 Upper Spiller", "078 Upper Spiller")
+    ~Section, ~Name,
+    "067", "067 Kitasu Bay",
+    "072", "072 Lower Spiller",
+    "074", "074 Thompson/Styker",
+    "078", "078 Upper Spiller")
 
   if (translate) {
     variable_names <- variable_names %>%
-      select(Section, NameFr) %>%
-      rename(Name = NameFr)
-  } else {
-    variable_names <- variable_names %>%
-      select(Section, Name)
+      mutate(Name  = en2fr(Name))
   }
 
   dat <- dat %>%
