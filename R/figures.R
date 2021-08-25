@@ -1796,7 +1796,7 @@ plot_spawn_section <- function(model,
     "078", "078 Upper Spiller")
 
   variable_names <- variable_names %>%
-    mutate(Name  = en2fr(Name, translate))
+    mutate(Name  = en2fr(Name, translate, allow_missing = TRUE))
 
   dat <- dat %>%
     left_join(variable_names, by = "Section") %>%
