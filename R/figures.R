@@ -1751,7 +1751,7 @@ plot_bh <- function(models,
 #' @param translate Logical. Translate to French?
 #'
 #' @export
-#' @importFrom tibble tibble
+#' @importFrom tibble tibble tribble
 #' @importFrom readr read_csv
 #' @importFrom dplyr mutate left_join filter
 #' @importFrom ggplot2 ggplot geom_point geom_line labs scale_shape_manual
@@ -1786,25 +1786,25 @@ plot_spawn_section <- function(model,
       filter(Year %in% c(min(yr_range):max(yr_range)))
   }
 
-  variable_names_en <- list(
-    "067" = "067 Kitasu" ,
-    "072" = "072 Lower Spiller",
-    "073" = "073",
-    "074" = "074 Thompson/Styker",
-    "075"  = "075",
-    "076"  = "076",
-    "077"  = "077",
-    "078"  = "078 Upper Spiller",
-    "086"  = "086"
-  )
+  variable_names <- tribble(
+    ~Section, ~Name, ~NameFr,
+    "067", "067 Kitasu Bay", "067 baie de Kitasu",
+    "072", "072 Lower Spiller", "072 Lower Spiller",
+    "074", "074 Thompson/Styker", "074 Thompson/Styker",
+    "078", "078 Upper Spiller", "078 Upper Spiller")
 
-  variable_labeller <- function(variable, value){
-    if(translate){
-      return(variable_names_fr[value])
-    }else{
-      return(variable_names_en[value])
-    }
- }
+  if (translate) {
+    variable_names <- variable_names %>%
+      select(Section, NameFr) %>%
+      rename(Name = NameFr)
+  } else {
+    variable_names <- variable_names %>%
+      select(Section, Name)
+  }
+
+  dat <- dat %>%
+    left_join(variable_names, by = "Section") %>%
+    mutate(Name = ifelse(is.na(Name), Section, Name))
 
   g <- ggplot(data = dat, mapping = aes(x = Year, y = Index)) +
     geom_point(mapping = aes(shape = Survey), size = 1, na.rm = TRUE) +
@@ -1818,7 +1818,7 @@ plot_spawn_section <- function(model,
     scale_shape_manual(values = c(1, 2)) +
     scale_x_continuous(breaks = yrBreaks) +
     scale_y_continuous(labels = function(x) x / 1000) +
-    facet_wrap(Section ~ ., ncol = 2, scales = "free_y", labeller= variable_labeller) + #
+    facet_wrap(Name ~ ., ncol = 2, scales = "free_y") +
     theme(legend.position = "top")
   if(!is.na(yr_range)){
     g <- g +
