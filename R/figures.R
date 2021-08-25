@@ -747,7 +747,8 @@ plot_natural_mortality <- function(model,
     x_axis_tick_label_size = x_axis_tick_label_size,
     y_axis_label_size = y_axis_label_size,
     y_axis_tick_label_size = y_axis_tick_label_size
-  )
+  ) +
+    coord_cartesian(ylim=c(0, 1.0))
   g
 }
 
