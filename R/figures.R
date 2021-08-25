@@ -1786,36 +1786,25 @@ plot_spawn_section <- function(model,
       filter(Year %in% c(min(yr_range):max(yr_range)))
   }
 
-#  variable_names_en <- list(
-#    "067" = "067 (Kitasu Bay)" ,
-#    "072" = "072 (Lower Spiller)",
-#    "073" = "073",
-#    "074" = "074 (Thompson/Styker)",
-#    "075"  = "075",
-#    "076"  = "076",
-#    "077"  = "077",
-#    "078"  = "078 (Upper Spiller)",
-#    "086"  = "086"
-#  )
-#  variable_names_fr <- list(
-#    "067" = "067 (La Baie de Kitasu)" ,
-#    "072" = "072 (Lower Spiller)",
-#    "073" = "073",
-#    "074" = "074 (Thompson/Styker)",
-#    "075"  = "075",
-#    "076"  = "076",
-#    "077"  = "077",
-#    "078"  = "078 (Upper Spiller)",
-#    "086"  = "086"
-#  )
+  variable_names_en <- list(
+    "067" = "067 Kitasu" ,
+    "072" = "072 Lower Spiller",
+    "073" = "073",
+    "074" = "074 Thompson/Styker",
+    "075"  = "075",
+    "076"  = "076",
+    "077"  = "077",
+    "078"  = "078 Upper Spiller",
+    "086"  = "086"
+  )
 
-#  variable_labeller <- function(variable, value, translate){
-#    if(translate){
-#      return(variable_names_fr[value])
-#    }else{
-#      return(variable_names_en[value])
-#    }
-# }
+  variable_labeller <- function(variable, value){
+    if(translate){
+      return(variable_names_fr[value])
+    }else{
+      return(variable_names_en[value])
+    }
+ }
 
   g <- ggplot(data = dat, mapping = aes(x = Year, y = Index)) +
     geom_point(mapping = aes(shape = Survey), size = 1, na.rm = TRUE) +
@@ -1829,9 +1818,8 @@ plot_spawn_section <- function(model,
     scale_shape_manual(values = c(1, 2)) +
     scale_x_continuous(breaks = yrBreaks) +
     scale_y_continuous(labels = function(x) x / 1000) +
-    facet_wrap(Section ~ ., ncol = 2, scales = "free_y") + #, labeller= variable_labeller) + #
-    theme(legend.position = "top") # ,
-          #axis.text.x = element_text(angle = 45, hjust = 1))
+    facet_wrap(Section ~ ., ncol = 2, scales = "free_y", labeller= variable_labeller) + #
+    theme(legend.position = "top")
   if(!is.na(yr_range)){
     g <- g +
       expand_limits(x = yr_range)
