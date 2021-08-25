@@ -1756,6 +1756,7 @@ plot_bh <- function(models,
 #' @importFrom dplyr mutate left_join filter
 #' @importFrom ggplot2 ggplot geom_point geom_line labs scale_shape_manual
 #' scale_x_continuous scale_y_continuous facet_wrap theme
+#' @importFrom rosettafish en2fr
 plot_spawn_section <- function(model,
                                data_file,
                                sections = NA,
@@ -1786,6 +1787,7 @@ plot_spawn_section <- function(model,
       filter(Year %in% c(min(yr_range):max(yr_range)))
   }
 
+  # Custom Section names (i.e., local names)
   variable_names <- tribble(
     ~Section, ~Name,
     "067", "067 Kitasu Bay",
@@ -1793,10 +1795,8 @@ plot_spawn_section <- function(model,
     "074", "074 Thompson/Styker",
     "078", "078 Upper Spiller")
 
-  if (translate) {
-    variable_names <- variable_names %>%
-      mutate(Name  = en2fr(Name))
-  }
+  variable_names <- variable_names %>%
+    mutate(Name  = en2fr(Name, translate))
 
   dat <- dat %>%
     left_join(variable_names, by = "Section") %>%
