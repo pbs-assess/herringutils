@@ -707,8 +707,7 @@ plot_natural_mortality <- function(model,
                          ~ ., name = NULL,
                          breaks = seq(from = 1900, to = 2100, by = 10),
                          labels = seq(from = 1900, to = 2100, by = 10)),
-    ) +
-    expand_limits(y = 0)
+    )
   if (!is.na(xlim[1])) {
     g <- g +
       coord_cartesian(xlim = xlim, expand = TRUE)
