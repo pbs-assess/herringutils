@@ -679,6 +679,7 @@ plot_natural_mortality <- function(model,
                                    line_size = 0.75,
                                    ribbon_alpha = 0.5,
                                    xlim = NA,
+                                   y_max = NA,
                                    show_x_axis = TRUE,
                                    show_y_axis = TRUE,
                                    x_axis_label_size = 8,
@@ -707,7 +708,8 @@ plot_natural_mortality <- function(model,
                          ~ ., name = NULL,
                          breaks = seq(from = 1900, to = 2100, by = 10),
                          labels = seq(from = 1900, to = 2100, by = 10)),
-    )
+    ) +
+    expand_limits(y = c(0, y_max))
   if (!is.na(xlim[1])) {
     g <- g +
       coord_cartesian(xlim = xlim, expand = TRUE)
@@ -746,8 +748,7 @@ plot_natural_mortality <- function(model,
     x_axis_tick_label_size = x_axis_tick_label_size,
     y_axis_label_size = y_axis_label_size,
     y_axis_tick_label_size = y_axis_tick_label_size
-  ) +
-    coord_cartesian(ylim=c(0, 1.25))
+  )
   g
 }
 
