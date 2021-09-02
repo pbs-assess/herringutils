@@ -851,10 +851,10 @@ plot_recruitment <- function(model,
   }
 
   g <- modify_axes_labels(g,
-    x_label_text = newline_format(
-      en2fr("Year", translate),
-      x_axis_label_newline_length
-    ),
+    #x_label_text = newline_format(
+    #  en2fr("Year", translate),
+    #  x_axis_label_newline_length
+    #),
     y_label_text = newline_format(
       paste(en2fr("Recruitment", translate), " (1,000 millions)"),
       y_axis_label_newline_length
@@ -1763,6 +1763,7 @@ plot_spawn_section <- function(model,
                                sections = NA,
                                yr_range = NA,
                                scale = TRUE,
+                               ncol = 2,
                                translate = FALSE){
   yrBreaks <- seq(from = 1950, to = 2030, by = 10)
   if( !is.na(model) & scale ){
@@ -1815,7 +1816,7 @@ plot_spawn_section <- function(model,
     scale_shape_manual(values = c(1, 2)) +
     scale_x_continuous(breaks = yrBreaks) +
     scale_y_continuous(labels = function(x) x / 1000) +
-    facet_wrap(Name ~ ., ncol = 2, scales = "free_y") +
+    facet_wrap(Name ~ ., ncol = ncol, scales = "free_y") +
     theme(legend.position = "top")
   if(!is.na(yr_range)){
     g <- g +
