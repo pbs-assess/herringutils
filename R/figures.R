@@ -1008,7 +1008,7 @@ plot_biomass_catch <- function(model,
       data = proj_sbt,
       aes(ymin = lower, ymax = upper),
       size = errorbar_size,
-      alpha =.5,
+      alpha = ribbon_alpha,
       width = 0
     ) +
     scale_fill_viridis_d() +
@@ -1040,7 +1040,7 @@ plot_biomass_catch <- function(model,
       size    = 12,
       xlim = c(NA, assess_yr-3)
     )
-
+  g
   if (!is.na(xlim[1])) {
     g <- g +
       coord_cartesian(xlim = xlim, expand = TRUE)
