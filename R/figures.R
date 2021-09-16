@@ -1039,8 +1039,10 @@ plot_biomass_catch <- function(model,
       segment.angle = 90,
       size    = 12,
       xlim = c(NA, assess_yr-3)
-    )
-  g
+    )+
+    geom_point(data = proj_sbt, color = "red")
+
+
   if (!is.na(xlim[1])) {
     g <- g +
       coord_cartesian(xlim = xlim, expand = TRUE)
