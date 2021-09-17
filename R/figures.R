@@ -601,7 +601,7 @@ plot_scaled_abundance <- function(df,
     ) +
     scale_shape_manual(values = c(2, 1)) +
     scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10),
-                       labels = NULL, name = NULL, position = x_axis_position) +
+                       position = x_axis_position) +
     scale_y_continuous(position = y_axis_position) +
     geom_line(
       data = ssb,
@@ -623,7 +623,7 @@ plot_scaled_abundance <- function(df,
         label = paste0("(", annot, ")"),
         vjust = 1.3,
         hjust = -0.1,
-        size = 3
+        size = x_axis_label_size/2
       )
   }
   if (!show_legend) {
@@ -703,7 +703,9 @@ plot_natural_mortality <- function(model,
     ) +
     geom_ribbon(aes(ymin = lower, ymax = upper), alpha = ribbon_alpha) +
     scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10),
-                       labels = NULL, name = NULL, position = x_axis_position) +
+                       #labels = NULL,
+                       name = NULL,
+                       position = x_axis_position) +
     scale_y_continuous(position = y_axis_position) +
     expand_limits(y = c(0, y_max))
   if (!is.na(xlim[1])) {
@@ -719,7 +721,7 @@ plot_natural_mortality <- function(model,
         label = paste0("(", annot, ")"),
         vjust = 1.3,
         hjust = -0.1,
-        size = 3
+        size = x_axis_label_size/2
       )
   }
   g <- modify_axes_labels(g,
@@ -835,7 +837,7 @@ plot_recruitment <- function(model,
         label = paste0("(", annot, ")"),
         vjust = 1.3,
         hjust = -0.1,
-        size = 3
+        size = x_axis_label_size/2
       )
   }
 
@@ -920,6 +922,7 @@ plot_biomass_catch <- function(model,
                                x_axis_position = "bottom",
                                y_axis_position = "left",
                                annot = "d",
+                               label_points = FALSE,
                                translate = FALSE) {
   if (length(unique(catch_df$region)) > 1) {
     stop("There is more than one region in the catch_df data frame", call. = FALSE)
@@ -1017,32 +1020,36 @@ sbt <- as.data.frame(sbt) %>%
     guides(fill = FALSE) +
     scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10),
                        labels = seq(from = 1900, to = 2100, by = 10),
-                       name = NULL, position = x_axis_position) +
-  geom_text_repel(
-    aes(label = ifelse(year == assess_yr, label,'')),
-    nudge_x = -10,
-    box.padding = 0.5,
-    nudge_y = 20, #max(sbt$upper),
-    segment.curvature = -0.1,
-    segment.ncp = 5,
-    segment.angle = 20,
-    #xlim = c(NA, assess_yr-3)
-    size    = x_axis_label_size/2
-  ) +
-    geom_point(color = ifelse(sbt$year == assess_yr, "red", NA)) +
-    geom_text_repel(
-      data = proj_sbt,
-      aes(label = label),
-      nudge_x = -5,
-      box.padding = 0.5,
-      nudge_y = max(sbt$upper),
-      segment.curvature = -0.1,
-      segment.ncp = 5,
-      segment.angle = 90,
-      size    = x_axis_label_size/2,
-      xlim = c(NA, assess_yr-3)
-    )+
-    geom_point(data = proj_sbt, color = "red")
+                       name = NULL, position = x_axis_position)
+
+  if (label_points == TRUE){
+    g <- g +
+      geom_text_repel(
+        aes(label = ifelse(year == assess_yr, label,'')),
+        nudge_x = -10,
+        box.padding = 0.5,
+        nudge_y = 20, #max(sbt$upper),
+        segment.curvature = -0.1,
+        segment.ncp = 5,
+        segment.angle = 20,
+        #xlim = c(NA, assess_yr-3)
+        size    = x_axis_label_size/2
+      ) +
+      geom_point(color = ifelse(sbt$year == assess_yr, "red", NA)) +
+      geom_text_repel(
+        data = proj_sbt,
+        aes(label = label),
+        nudge_x = -5,
+        box.padding = 0.5,
+        nudge_y = max(sbt$upper),
+        segment.curvature = -0.1,
+        segment.ncp = 5,
+        segment.angle = 90,
+        size    = x_axis_label_size/2,
+        xlim = c(NA, assess_yr-3)
+      )+
+      geom_point(data = proj_sbt, color = "red")
+  }
 
   if (!is.na(xlim[1])) {
     g <- g +
@@ -1054,7 +1061,7 @@ sbt <- as.data.frame(sbt) %>%
         geom = "text",
         x = -Inf,
         y = Inf,
-        label = annot,
+        label = paste0("(", annot, ")"),
         vjust = 1.3,
         hjust = -0.1,
         size = x_axis_label_size/2
@@ -1175,7 +1182,7 @@ plot_recruitment_devs <- function(model,
         label = paste0("(", annot, ")"),
         vjust = 1.3,
         hjust = -0.1,
-        size = 3
+        size = x_axis_label_size/2
       )
   }
   g <- modify_axes_labels(g,
@@ -1371,7 +1378,7 @@ plot_biomass_phase <- function(model,
         label = paste0("(", annot, ")"),
         vjust = 1.3,
         hjust = -0.1,
-        size = 3
+        size = x_axis_label_size/2
       )
   }
   g <- modify_axes_labels(g,
