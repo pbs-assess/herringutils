@@ -928,7 +928,9 @@ plot_biomass_catch <- function(model,
   proj_yr <- as.numeric(gsub("B", "", colnames(proj)[2]))
   proj_sbt <- as.numeric(c(proj_yr, proj[, 2]))
   names(proj_sbt) <- c("year", "lower", "median", "upper")
-  proj_sbt <- as_tibble(t(proj_sbt))
+  #proj_sbt <- as_tibble(t(proj_sbt))
+  proj_sbt <- as.data.frame(t(proj_sbt)) %>%
+    mutate(label = paste0(year, ": ", round(median,1), " kt"))
 
   sbt <- model$mcmccalcs$sbt.quants %>%
     t() %>%
@@ -936,6 +938,8 @@ plot_biomass_catch <- function(model,
     mutate(year = as.numeric(year)) %>%
     filter(year != proj_yr)
   names(sbt) <- c("year", "lower", "median", "upper", "mpd")
+sbt <- as.data.frame(sbt) %>%
+  mutate(label = paste0(year, ": ", round(median,1), " kt"))
 
   ct <- catch_df %>%
     select(-c(area, group, sex, type, region)) %>%
@@ -950,8 +954,6 @@ plot_biomass_catch <- function(model,
   names(lrp) <- c("year", "lower", "median", "upper")
   lrp[1, 1] <- as.character(min(sbt$year) - 2)
   lrp[, 1] <- as.numeric(lrp[, 1])
-
-  stb$label <= paste0(year, ": ", median)
 
   g <- ggplot(sbt, aes(x = year, y = median)) +
     geom_hline(
@@ -1017,8 +1019,8 @@ plot_biomass_catch <- function(model,
                        labels = seq(from = 1900, to = 2100, by = 10),
                        name = NULL, position = x_axis_position) +
   geom_text_repel(
-    aes(label = ifelse(year == assess_yr, round(median, 1),'')),
-    nudge_x = -5,
+    aes(label = ifelse(year == assess_yr, label,'')),
+    nudge_x = -10,
     box.padding = 0.5,
     nudge_y = 20, #max(sbt$upper),
     segment.curvature = -0.1,
@@ -1030,7 +1032,7 @@ plot_biomass_catch <- function(model,
     geom_point(color = ifelse(sbt$year == assess_yr, "red", NA)) +
     geom_text_repel(
       data = proj_sbt,
-      aes(label = round(median, 1)),
+      aes(label = label),
       nudge_x = -5,
       box.padding = 0.5,
       nudge_y = max(sbt$upper),
@@ -1042,7 +1044,7 @@ plot_biomass_catch <- function(model,
     )+
     geom_point(data = proj_sbt, color = "red")
 
-
+g
   if (!is.na(xlim[1])) {
     g <- g +
       coord_cartesian(xlim = xlim, expand = TRUE)
@@ -1053,10 +1055,10 @@ plot_biomass_catch <- function(model,
         geom = "text",
         x = -Inf,
         y = Inf,
-        label = paste0("(", annot, ") ", ),
+        label = paste0(annot),
         vjust = 1.3,
         hjust = -0.1,
-        size = 3
+        size = x_axis_label_size/2
       )
   }
   g <- modify_axes_labels(g,
