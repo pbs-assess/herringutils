@@ -703,7 +703,7 @@ plot_natural_mortality <- function(model,
     ) +
     geom_ribbon(aes(ymin = lower, ymax = upper), alpha = ribbon_alpha) +
     scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10),
-                       labels = NULL, name = NULL,position = x_axis_position) +
+                       labels = NULL, name = NULL, position = x_axis_position) +
     scale_y_continuous(position = y_axis_position) +
     expand_limits(y = c(0, y_max))
   if (!is.na(xlim[1])) {
@@ -1027,7 +1027,7 @@ sbt <- as.data.frame(sbt) %>%
     segment.ncp = 5,
     segment.angle = 20,
     #xlim = c(NA, assess_yr-3)
-    size    = 12
+    size    = x_axis_label_size/2
   ) +
     geom_point(color = ifelse(sbt$year == assess_yr, "red", NA)) +
     geom_text_repel(
@@ -1039,12 +1039,11 @@ sbt <- as.data.frame(sbt) %>%
       segment.curvature = -0.1,
       segment.ncp = 5,
       segment.angle = 90,
-      size    = 12,
+      size    = x_axis_label_size/2,
       xlim = c(NA, assess_yr-3)
     )+
     geom_point(data = proj_sbt, color = "red")
 
-g
   if (!is.na(xlim[1])) {
     g <- g +
       coord_cartesian(xlim = xlim, expand = TRUE)
@@ -1055,7 +1054,7 @@ g
         geom = "text",
         x = -Inf,
         y = Inf,
-        label = paste0(annot),
+        label = annot,
         vjust = 1.3,
         hjust = -0.1,
         size = x_axis_label_size/2
