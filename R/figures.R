@@ -601,6 +601,7 @@ plot_scaled_abundance <- function(df,
     ) +
     scale_shape_manual(values = c(2, 1)) +
     scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10),
+                       name = NULL,
                        position = x_axis_position) +
     scale_y_continuous(position = y_axis_position) +
     geom_line(
