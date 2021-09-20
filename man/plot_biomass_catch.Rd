@@ -9,7 +9,7 @@ plot_biomass_catch(
   model,
   catch_df,
   point_size = 1,
-  errorbar_size = 0.5,
+  errorbar_size = 2,
   line_size = 0.75,
   ribbon_alpha = 0.5,
   lrp_ribbon_alpha = 0.35,
@@ -24,6 +24,8 @@ plot_biomass_catch(
   y_axis_tick_label_size = 8,
   x_axis_label_newline_length = 50,
   y_axis_label_newline_length = 40,
+  x_axis_position = "bottom",
+  y_axis_position = "left",
   annot = "d",
   translate = FALSE
 )
