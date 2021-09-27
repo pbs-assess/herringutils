@@ -27,6 +27,7 @@ plot_biomass_catch(
   x_axis_position = "bottom",
   y_axis_position = "left",
   annot = "d",
+  label_points = FALSE,
   translate = FALSE
 )
 }
