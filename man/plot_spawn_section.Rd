@@ -10,6 +10,7 @@ plot_spawn_section(
   sections = NA,
   yr_range = NA,
   scale = TRUE,
+  ncol = 2,
   translate = FALSE
 )
 }
