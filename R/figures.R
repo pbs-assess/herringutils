@@ -950,6 +950,11 @@ plot_biomass_catch <- function(model,
   lrp[1, 1] <- as.character(min(sbt$year) - 2)
   lrp[, 1] <- as.numeric(lrp[, 1])
 
+  # lrp2 <- tibble(year = lrp$year,
+  #                lower = lrp$lower/0.3*0.65,
+  #                median = lrp$median/0.3*0.65,
+  #                upper = lrp$upper/0.3*0.65)
+
   g <- ggplot(sbt, aes(x = year, y = median)) +
     geom_hline(
       yintercept = lrp$median,
@@ -961,6 +966,17 @@ plot_biomass_catch <- function(model,
       alpha = lrp_ribbon_alpha,
       fill = "red"
     ) +
+    # geom_hline(
+    #   yintercept = lrp2$median,
+    #   color = "blue",
+    #   size = line_size
+    # ) +
+    # geom_rect(
+    #   data = lrp2, aes(xmin = -Inf, xmax = Inf, ymin = lrp2$lower,
+    #                    ymax = lrp2$upper),
+    #   alpha = lrp_ribbon_alpha,
+    #   fill = "blue"
+    # ) +
     geom_bar(
       data = ct,
       stat = "identity",
