@@ -925,6 +925,8 @@ plot_biomass_catch <- function(model,
                                annot = "d",
                                label_points = FALSE,
                                translate = FALSE) {
+
+
   if (length(unique(catch_df$region)) > 1) {
     stop("There is more than one region in the catch_df data frame", call. = FALSE)
   }
@@ -960,13 +962,17 @@ sbt <- as.data.frame(sbt) %>%
   lrp[, 1] <- as.numeric(lrp[, 1])
 
   g <- ggplot(sbt, aes(x = year, y = median)) +
-    geom_hline(
-      yintercept = lrp$median,
-      color = "red",
-      size = line_size
+    #geom_hline(
+    #  yintercept = lrp$median,
+    #  color = "red",
+    #  size = line_size
+    #) +
+    geom_rect( #lrp line size may appear different depending on the y axis range
+      data = lrp, aes(xmin = 2018, xmax = Inf, ymin = lrp$median-line_size/2, ymax = lrp$median + line_size/2),
+      fill = "red"
     ) +
     geom_rect(
-      data = lrp, aes(xmin = -Inf, xmax = Inf, ymin = lrp$lower, ymax = lrp$upper),
+      data = lrp, aes(xmin = 2018, xmax = Inf, ymin = lrp$lower, ymax = lrp$upper),
       alpha = lrp_ribbon_alpha,
       fill = "red"
     ) +
