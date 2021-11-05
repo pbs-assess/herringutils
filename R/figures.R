@@ -22,7 +22,8 @@ plot_catch <- function(df,
     theme(legend.position = "top") +
     labs(
       x = en2fr("Year", translate),
-      y = paste(en2fr("Catch", translate), " (1,000 t)"),
+      y = paste(en2fr("Catch", translate),
+                ifelse(translate, " (1 000 t)", " (1,000 t)")),
       fill = en2fr("Gear", translate)
     ) +
     facet_wrap(vars(region), ncol = 1, scales = "free_y")
@@ -60,7 +61,7 @@ plot_ic <- function(df,
     geom_col(position = "dodge") +
     labs(x = en2fr("Year", translate, case = "sentence"),
          y = paste0(en2fr("Number of fish", translate, case = "sentence"),
-                    " (x 1,000)"),
+                    ifelse(translate, " (x 1 000)", " (x 1,000)")),
          fill = en2fr("Type", translate, case = "sentence")) +
     scale_fill_viridis_d() +
     scale_y_continuous(labels = comma) +
@@ -319,7 +320,8 @@ plot_spawn_ind <- function(df,
     labs(
       shape = en2fr("Survey period", translate),
       x = en2fr("Year", translate),
-      y = paste0(en2fr("Spawn index", translate), " (1,000 t)")
+      y = paste0(en2fr("Spawn index", translate),
+                 ifelse(translate, " (1 000 t)", " (1,000 t)"))
     ) +
     facet_wrap(vars(Region), ncol = 1, scales = "free_y") +
     theme(legend.position = "top")
@@ -505,7 +507,7 @@ plot_proj_biomass_density <- function(models,
     labs(
       x = paste0(
         en2fr("Projected spawning biomass in", translate), " ", yr,
-        " (1,000 t)"
+        ifelse(translate, " (1 000 t)", " (1,000 t)")
       ),
       y = en2fr("Density", translate)
     ) +
@@ -638,7 +640,8 @@ plot_scaled_abundance <- function(df,
     #   x_axis_label_newline_length
     # ),
     y_label_text = newline_format(
-      paste0(en2fr("Scaled abundance", translate), " (1,000 t)"),
+      paste0(en2fr("Scaled abundance", translate),
+             ifelse(translate, " (1 000 t)", " (1,000 t)")),
       y_axis_label_newline_length
     ),
     show_x_axis = show_x_axis,
@@ -856,7 +859,8 @@ plot_recruitment <- function(model,
     #  x_axis_label_newline_length
     #),
     y_label_text = newline_format(
-      paste(en2fr("Recruitment", translate), " (1,000 millions)"),
+      paste(en2fr("Recruitment", translate),
+            ifelse(translate, " (1 000 millions)", " (1,000 million)")),
       y_axis_label_newline_length
     ),
     show_x_axis = show_x_axis,
@@ -1050,7 +1054,8 @@ plot_biomass_catch <- function(model,
     #   x_axis_label_newline_length
     # ),
     y_label_text = newline_format(
-      paste0(en2fr("Spawning biomass", translate), " (1,000 t)"),
+      paste0(en2fr("Spawning biomass", translate),
+             ifelse(translate, " (1 000 t)", " (1,000 t)")),
       y_axis_label_newline_length
     ),
     show_x_axis = show_x_axis,
@@ -1355,11 +1360,13 @@ plot_biomass_phase <- function(model,
   }
   g <- modify_axes_labels(g,
     x_label_text = newline_format(
-      paste0(en2fr("Spawning biomass", translate), " (1,000 t)"),
+      paste0(en2fr("Spawning biomass", translate),
+             ifelse(translate, " (1 000 t)", " (1,000 t)")),
       x_axis_label_newline_length
     ),
     y_label_text = newline_format(
-      paste0(en2fr("Spawning biomass production", translate), " (1,000 t)"),
+      paste0(en2fr("Spawning biomass production", translate),
+             ifelse(translate, " (1 000 t)", " (1,000 t)")),
       y_axis_label_newline_length
     ),
     show_x_axis = show_x_axis,
@@ -1738,8 +1745,10 @@ plot_bh <- function(models,
 
   g <- ggplot(d, aes(x = sbt, y = rt)) +
     labs(
-      x = paste(en2fr("Spawning biomass", translate), "(1,000 t)"),
-      y = paste(en2fr("Recruitment", translate), "(1,000 millions)")
+      x = paste(en2fr("Spawning biomass", translate),
+                ifelse(translate, " (1 000 t)", " (1,000 t)")),
+      y = paste(en2fr("Recruitment", translate),
+                ifelse(translate, " (1 000 millions)", " (1,000 millions)"))
     ) +
     geom_line(data = p) +
     geom_point(
@@ -1840,10 +1849,12 @@ plot_spawn_section <- function(model,
   }
   if(scale){
     g <- g +
-      labs(y = paste0(en2fr("Scaled abundance", translate), " (1,000 t)"))
+      labs(y = paste0(en2fr("Scaled abundance", translate),
+                      ifelse(translate, " (1 000 t)", " (1,000 t)")))
   } else {
     g <- g +
-      labs(y = paste0(en2fr("Spawn index", translate), " (1,000 t)"))
+      labs(y = paste0(en2fr("Spawn index", translate),
+                      ifelse(translate, " (1 000 t)", " (1,000 t)")))
   }
   g
 }
