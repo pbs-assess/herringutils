@@ -885,11 +885,14 @@ plot_recruitment <- function(model,
 #' @param lrp_ribbon_alpha transparency value for the LRP credibility interval ribbon
 #' @param between_bars amount of space between catch bars
 #' @param refpt_show which reference point to show. See `model$mcmccalcs$r.quants`` for choices
-#' @param show_usr Show the upper stock reference. Default TRUE.
-#' @param prod_yrs (Productive) period to calculate the USR. Default 1990:1999.
-#' @param prop_prod Proportion of productive period for USR. Default 1.0.
-#' @param show_prod_yrs Show vertical band for productive period. Default TRUE.
-#' @param show_sb0 Show SB_0. Default TRUE.
+#' @param show_usr Logical. Show the upper stock reference. Default TRUE.
+#' @param prod_yrs Numeric vector. Productive period to calculate the USR.
+#'   Default 1990:1999.
+#' @param prop_prod Numeric. Proportion of productive period for USR. Default
+#'   1.0.
+#' @param show_prod_yrs Logical. Show vertical band for productive period.
+#'   Default TRUE.
+#' @param show_sbo Logical. Show SB_0. Default TRUE.
 #' @param xlim x-limits for the plot. Implemented with [ggplot2::coord_cartesian()]
 #' @param show_x_axis see [modify_axes_labels()]
 #' @param show_y_axis see [modify_axes_labels()]
@@ -922,7 +925,7 @@ plot_biomass_catch <- function(model,
                                prod_yrs = 1990:1999,
                                prop_prod = 1.0,
                                show_prod_yrs = TRUE,
-                               show_sb0 = TRUE,
+                               show_sbo = TRUE,
                                xlim = NA,
                                show_x_axis = TRUE,
                                show_y_axis = TRUE,
@@ -959,7 +962,7 @@ plot_biomass_catch <- function(model,
       upper = mean(upper)* prop_prod
     )
 
-  sbo <- model$mcmccalcs$r.quants["sbo", 2:4]
+  sbo <- as.numeric(model$mcmccalcs$r.quants["sbo", 2:4])
 
   ct <- catch_df %>%
     select(-c(area, group, sex, type, region)) %>%
@@ -1015,7 +1018,7 @@ plot_biomass_catch <- function(model,
                        labels = seq(from = 1900, to = 2100, by = 10),
                        name = NULL)
 
-  if (show_sb0) {
+  if (show_sbo) {
     g <- g +
       geom_hline(yintercept = sbo[2]) +
       annotate(geom = "rect", fill="black", alpha = lrp_ribbon_alpha,
