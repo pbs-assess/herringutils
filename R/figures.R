@@ -885,6 +885,11 @@ plot_recruitment <- function(model,
 #' @param lrp_ribbon_alpha transparency value for the LRP credibility interval ribbon
 #' @param between_bars amount of space between catch bars
 #' @param refpt_show which reference point to show. See `model$mcmccalcs$r.quants`` for choices
+#' @param show_usr Show the upper stock reference. Default TRUE.
+#' @param prod_yrs (Productive) period to calculate the USR. Default 1990:1999.
+#' @param prop_prod Proportion of productive period for USR. Default 1.0.
+#' @param show_prod_yrs Show vertical band for productive period. Default TRUE.
+#' @param show_sb0 Show SB_0. Default TRUE.
 #' @param xlim x-limits for the plot. Implemented with [ggplot2::coord_cartesian()]
 #' @param show_x_axis see [modify_axes_labels()]
 #' @param show_y_axis see [modify_axes_labels()]
@@ -913,6 +918,11 @@ plot_biomass_catch <- function(model,
                                lrp_ribbon_alpha = 0.35,
                                between_bars = 0.75,
                                refpt_show = "0.3sbo",
+                               show_usr = TRUE,
+                               prod_yrs = 1990:1999,
+                               prop_prod = 1.0,
+                               show_prod_yrs = TRUE,
+                               show_sb0 = TRUE,
                                xlim = NA,
                                show_x_axis = TRUE,
                                show_y_axis = TRUE,
@@ -940,6 +950,10 @@ plot_biomass_catch <- function(model,
     filter(year != proj_yr)
   names(sbt) <- c("year", "lower", "median", "upper", "mpd")
 
+  prod_period <- sbt %>%
+    filter(year %in% prod_yrs) %>%
+
+
   ct <- catch_df %>%
     select(-c(area, group, sex, type, region)) %>%
     group_by(year, gear) %>%
@@ -954,11 +968,6 @@ plot_biomass_catch <- function(model,
   lrp[1, 1] <- as.character(min(sbt$year) - 2)
   lrp[, 1] <- as.numeric(lrp[, 1])
 
-  # lrp2 <- tibble(year = lrp$year,
-  #                lower = lrp$lower/0.3*0.65,
-  #                median = lrp$median/0.3*0.65,
-  #                upper = lrp$upper/0.3*0.65)
-
   g <- ggplot(sbt, aes(x = year, y = median)) +
     geom_hline(
       yintercept = lrp$median,
@@ -970,17 +979,6 @@ plot_biomass_catch <- function(model,
       alpha = lrp_ribbon_alpha,
       fill = "red"
     ) +
-    # geom_hline(
-    #   yintercept = lrp2$median,
-    #   color = "blue",
-    #   size = line_size
-    # ) +
-    # geom_rect(
-    #   data = lrp2, aes(xmin = -Inf, xmax = Inf, ymin = lrp2$lower,
-    #                    ymax = lrp2$upper),
-    #   alpha = lrp_ribbon_alpha,
-    #   fill = "blue"
-    # ) +
     geom_bar(
       data = ct,
       stat = "identity",
@@ -988,25 +986,14 @@ plot_biomass_catch <- function(model,
       position = "stack",
       aes(fill = gear)
     ) +
-    # geom_hline(yintercept = lrp$median/0.3*0.5, linetype = "dashed",
-    #            colour = "orange") +
-    # annotate(geom = "rect", fill="orange", alpha = 0.35,
-    #          xmin = -Inf, xmax = Inf,
-    #          ymin = lrp$lower/0.3*0.5, ymax = lrp$upper/0.3*0.5) +
     # geom_hline(yintercept = lrp$median/0.3*1) +
     # annotate(geom = "rect", fill="black", alpha = 0.35,
     #          xmin = -Inf, xmax = Inf,
     #          ymin = lrp$lower/0.3*1, ymax = lrp$upper/0.3*1) +
-    # geom_hline(yintercept = lrp$median/0.3*1.125, linetype = "dashed",
-    #            colour = "darkgreen") +
     # geom_hline(yintercept = lrp$median/0.3*1.5, colour = "green") +
     # annotate(geom = "rect", fill="green", alpha = 0.35,
     #          xmin = -Inf, xmax = Inf,
     #          ymin = lrp$lower/0.3*1.5, ymax = lrp$upper/0.3*1.5) +
-    # annotate(geom = "rect", fill="red", alpha = 0.35,
-    #          xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = lrp$median) +
-    # annotate(geom = "rect", fill="yellow", alpha = 0.35,
-    #          xmin = -Inf, xmax = Inf, ymin = lrp$median, ymax = lrp$median/0.3) +
     # annotate(geom = "rect", fill="green", alpha = 0.35,
     #          xmin = -Inf, xmax = Inf, ymin = lrp$median/0.3, ymax = Inf) +
     # annotate(geom = "rect", fill = "purple", alpha = 0.35,
