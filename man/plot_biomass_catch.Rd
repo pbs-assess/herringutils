@@ -15,6 +15,11 @@ plot_biomass_catch(
   lrp_ribbon_alpha = 0.35,
   between_bars = 0.75,
   refpt_show = "0.3sbo",
+  show_usr = TRUE,
+  prod_yrs = 1990:1999,
+  prop_prod = 1,
+  show_prod_yrs = TRUE,
+  show_sb0 = TRUE,
   xlim = NA,
   show_x_axis = TRUE,
   show_y_axis = TRUE,
@@ -46,6 +51,16 @@ plot_biomass_catch(
 \item{between_bars}{amount of space between catch bars}
 
 \item{refpt_show}{which reference point to show. See `model$mcmccalcs$r.quants`` for choices}
+
+\item{show_usr}{Show the upper stock reference. Default TRUE.}
+
+\item{prod_yrs}{(Productive) period to calculate the USR. Default 1990:1999.}
+
+\item{prop_prod}{Proportion of productive period for USR. Default 1.0.}
+
+\item{show_prod_yrs}{Show vertical band for productive period. Default TRUE.}
+
+\item{show_sb0}{Show SB_0. Default TRUE.}
 
 \item{xlim}{x-limits for the plot. Implemented with [ggplot2::coord_cartesian()]}
 

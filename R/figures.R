@@ -952,7 +952,12 @@ plot_biomass_catch <- function(model,
 
   prod_period <- sbt %>%
     filter(year %in% prod_yrs) %>%
-
+    select(-year) %>%
+    summarise(
+      lower = mean(lower)*prop_prod,
+      median = mean(median)*prop_prod,
+      upper = mean(upper)* prop_prod
+    )
 
   ct <- catch_df %>%
     select(-c(area, group, sex, type, region)) %>%
@@ -986,18 +991,6 @@ plot_biomass_catch <- function(model,
       position = "stack",
       aes(fill = gear)
     ) +
-    # geom_hline(yintercept = lrp$median/0.3*1) +
-    # annotate(geom = "rect", fill="black", alpha = 0.35,
-    #          xmin = -Inf, xmax = Inf,
-    #          ymin = lrp$lower/0.3*1, ymax = lrp$upper/0.3*1) +
-    # geom_hline(yintercept = lrp$median/0.3*1.5, colour = "green") +
-    # annotate(geom = "rect", fill="green", alpha = 0.35,
-    #          xmin = -Inf, xmax = Inf,
-    #          ymin = lrp$lower/0.3*1.5, ymax = lrp$upper/0.3*1.5) +
-    # annotate(geom = "rect", fill="green", alpha = 0.35,
-    #          xmin = -Inf, xmax = Inf, ymin = lrp$median/0.3, ymax = Inf) +
-    # annotate(geom = "rect", fill = "purple", alpha = 0.35,
-    #          xmin = 1975, xmax = 1985, ymin = -Inf, ymax = Inf) +
     geom_line(
       size = line_size,
       na.rm = TRUE
@@ -1019,6 +1012,30 @@ plot_biomass_catch <- function(model,
     scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10),
                        labels = seq(from = 1900, to = 2100, by = 10),
                        name = NULL)
+
+  if (show_sb0) {
+    g <- g +
+      geom_hline(yintercept = lrp$median/0.3) +
+      annotate(geom = "rect", fill="black", alpha = lrp_ribbon_alpha,
+               xmin = -Inf, xmax = Inf,
+               ymin = lrp$lower/0.3, ymax = lrp$upper/0.3)
+  }
+
+  if (show_usr) {
+    g <- g +
+      geom_hline(yintercept = prod_period$median, colour = "green") +
+      annotate(geom = "rect", fill="green", alpha = lrp_ribbon_alpha,
+               xmin = -Inf, xmax = Inf,
+               ymin = prod_period$lower, ymax = prod_period$upper)
+  }
+
+  if (show_prod_yrs){
+    g <- g +
+      annotate(geom = "rect", fill = "purple", alpha = lrp_ribbon_alpha,
+               xmin = min(prod_yrs) - 1, xmax = max(prod_yrs) + 1,
+               ymin = -Inf, ymax = Inf)
+  }
+
   if (!is.na(xlim[1])) {
     g <- g +
       coord_cartesian(xlim = xlim, expand = TRUE)
