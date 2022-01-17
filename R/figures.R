@@ -959,7 +959,7 @@ plot_biomass_catch <- function(model,
       upper = mean(upper)* prop_prod
     )
 
-  sbo <- models$mcmccalcs$r.quants["sbo", 2:4]
+  sbo <- model$mcmccalcs$r.quants["sbo", 2:4]
 
   ct <- catch_df %>%
     select(-c(area, group, sex, type, region)) %>%
