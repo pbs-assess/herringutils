@@ -959,6 +959,8 @@ plot_biomass_catch <- function(model,
       upper = mean(upper)* prop_prod
     )
 
+  sbo <- models$mcmccalcs$r.quants["sbo", 2:4]
+
   ct <- catch_df %>%
     select(-c(area, group, sex, type, region)) %>%
     group_by(year, gear) %>%
@@ -1015,10 +1017,9 @@ plot_biomass_catch <- function(model,
 
   if (show_sb0) {
     g <- g +
-      geom_hline(yintercept = lrp$median/0.3) +
+      geom_hline(yintercept = sbo[2]) +
       annotate(geom = "rect", fill="black", alpha = lrp_ribbon_alpha,
-               xmin = -Inf, xmax = Inf,
-               ymin = lrp$lower/0.3, ymax = lrp$upper/0.3)
+               xmin = -Inf, xmax = Inf, ymin = sbo[1], ymax = sbo[3])
   }
 
   if (show_usr) {
@@ -1032,7 +1033,7 @@ plot_biomass_catch <- function(model,
   if (show_prod_yrs){
     g <- g +
       annotate(geom = "rect", fill = "purple", alpha = lrp_ribbon_alpha,
-               xmin = min(prod_yrs) - 1, xmax = max(prod_yrs) + 1,
+               xmin = min(prod_yrs) - 0.5, xmax = max(prod_yrs) + 0.5,
                ymin = -Inf, ymax = Inf)
   }
 
