@@ -988,7 +988,33 @@ plot_biomass_catch <- function(model,
       data = lrp, aes(xmin = -Inf, xmax = Inf, ymin = lrp$lower, ymax = lrp$upper),
       alpha = lrp_ribbon_alpha,
       fill = "red"
-    ) +
+    )
+
+  if (show_sbo) {
+    g <- g +
+      geom_hline(yintercept = sbo[2]) +
+      annotate(geom = "rect", fill="black", alpha = lrp_ribbon_alpha,
+               xmin = -Inf, xmax = Inf, ymin = sbo[1], ymax = sbo[3])
+  }
+
+  if (show_usr) {
+    g <- g +
+      geom_hline(yintercept = prod_period$median, colour = "green") +
+      annotate(geom = "rect", fill="green", alpha = lrp_ribbon_alpha,
+               xmin = -Inf, xmax = Inf,
+               ymin = prod_period$lower, ymax = prod_period$upper)
+  }
+
+  if (show_prod_yrs){
+    g <- g +
+      # annotate(geom = "rect", fill = "blue", alpha = lrp_ribbon_alpha,
+      #          xmin = min(prod_yrs) - 0.5, xmax = max(prod_yrs) + 0.5,
+      #          ymin = -Inf, ymax = Inf)
+      geom_segment(colour = "blue", size = 3,
+                   x = min(prod_yrs), xend = max(prod_yrs), y = -Inf, yend = -Inf)
+  }
+
+  g <- g +
     geom_bar(
       data = ct,
       stat = "identity",
@@ -1017,28 +1043,6 @@ plot_biomass_catch <- function(model,
     scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10),
                        labels = seq(from = 1900, to = 2100, by = 10),
                        name = NULL)
-
-  if (show_sbo) {
-    g <- g +
-      geom_hline(yintercept = sbo[2]) +
-      annotate(geom = "rect", fill="black", alpha = lrp_ribbon_alpha,
-               xmin = -Inf, xmax = Inf, ymin = sbo[1], ymax = sbo[3])
-  }
-
-  if (show_usr) {
-    g <- g +
-      geom_hline(yintercept = prod_period$median, colour = "green") +
-      annotate(geom = "rect", fill="green", alpha = lrp_ribbon_alpha,
-               xmin = -Inf, xmax = Inf,
-               ymin = prod_period$lower, ymax = prod_period$upper)
-  }
-
-  if (show_prod_yrs){
-    g <- g +
-      annotate(geom = "rect", fill = "purple", alpha = lrp_ribbon_alpha,
-               xmin = min(prod_yrs) - 0.5, xmax = max(prod_yrs) + 0.5,
-               ymin = -Inf, ymax = Inf)
-  }
 
   if (!is.na(xlim[1])) {
     g <- g +
@@ -1204,6 +1208,14 @@ plot_recruitment_devs <- function(model,
 #' @param zeroline_type type of the line across zero
 #' @param lrp_ribbon_alpha transparency of the reference point credible interval ribbon
 #' @param refpt_show which reference point to show. See `model$mcmccalcs$r.quants`` for choices
+#' @param show_usr Logical. Show the upper stock reference. Default TRUE.
+#' @param prod_yrs Numeric vector. Productive period to calculate the USR.
+#'   Default 1990:1999.
+#' @param prop_prod Numeric. Proportion of productive period for USR. Default
+#'   1.0.
+#' @param show_prod_yrs Logical. Show vertical band for productive period.
+#'   Default TRUE.
+#' @param show_sbo Logical. Show SB_0. Default TRUE.
 #' @param show_x_axis see [modify_axes_labels()]
 #' @param show_y_axis see [modify_axes_labels()]
 #' @param x_axis_label_size see [modify_axes_labels()]
@@ -1234,6 +1246,11 @@ plot_biomass_phase <- function(model,
                                zeroline_type = "dashed",
                                lrp_ribbon_alpha = 0.35,
                                refpt_show = "0.3sbo",
+                               show_usr = TRUE,
+                               prod_yrs = 1990:1999,
+                               prop_prod = 1.0,
+                               show_prod_yrs = TRUE,
+                               show_sbo = TRUE,
                                show_x_axis = TRUE,
                                show_y_axis = TRUE,
                                x_axis_label_size = 8,
@@ -1257,6 +1274,17 @@ plot_biomass_phase <- function(model,
     as_tibble(rownames = "year") %>%
     mutate(year = as.numeric(year))
   names(sbt) <- c("year", "lower", "median", "upper", "mpd")
+
+  prod_period <- sbt %>%
+    filter(year %in% prod_yrs) %>%
+    select(-year) %>%
+    summarise(
+      lower = mean(lower)*prop_prod,
+      median = mean(median)*prop_prod,
+      upper = mean(upper)* prop_prod
+    )
+
+  sbo <- as.numeric(model$mcmccalcs$r.quants["sbo", 2:4])
 
   ct <- catch_df %>%
     select(-c(area, group, sex, type, region)) %>%
@@ -1285,11 +1313,6 @@ plot_biomass_phase <- function(model,
   names(lrp) <- c("year", "lower", "median", "upper")
   lrp[1, 1] <- as.character(min(sbt$year) - 2)
   lrp[, 1] <- as.numeric(lrp[, 1])
-  # # Add 0.38SB_0 (for HG)
-  # lrp2 <- lrp %>%
-  #   mutate( lower=lower/0.3*0.38,
-  #           median=median/0.3*0.38,
-  #           upper=upper/0.3*0.38 )
 
   g <- ggplot(dd, aes(
     x = median,
@@ -1315,17 +1338,34 @@ plot_biomass_phase <- function(model,
       alpha = lrp_ribbon_alpha,
       fill = "red",
       inherit.aes = FALSE
-    ) +
-    # geom_vline(xintercept = lrp2$median,
-    #            color = "blue",
-    #            size = line_size) +
-    # geom_rect(data = lrp2, aes(xmin = lrp2$lower,
-    #                           xmax = lrp2$upper,
-    #                           ymin = -Inf,
-    #                           ymax = Inf),
-    #           alpha = lrp_ribbon_alpha,
-    #           fill = "blue",
-    #           inherit.aes = FALSE) +
+    )
+
+  if (show_sbo) {
+    g <- g +
+      geom_vline(xintercept = sbo[2]) +
+      annotate(geom = "rect", fill="black", alpha = lrp_ribbon_alpha,
+               xmin = sbo[1], xmax = sbo[3], ymin =-Inf , ymax = Inf)
+  }
+
+  if (show_usr) {
+    g <- g +
+      geom_vline(xintercept = prod_period$median, colour = "green") +
+      annotate(
+        geom = "rect", fill="green", alpha = lrp_ribbon_alpha,
+        xmin = prod_period$lower, xmax = prod_period$upper,
+        ymin = -Inf, ymax = Inf
+      )
+  }
+
+  if (show_prod_yrs){
+    g <- g +
+      geom_point(
+        data = filter(dd, year %in% prod_yrs), colour = "blue", shape = 1,
+        size = point_size, na.rm = TRUE
+      )
+  }
+
+  g <- g +
     geom_point(
       data = filter(dd, year != max(year)),
       aes(
@@ -1366,6 +1406,7 @@ plot_biomass_phase <- function(model,
         size = 3
       )
   }
+
   g <- modify_axes_labels(g,
     x_label_text = newline_format(
       paste0(en2fr("Spawning biomass", translate),

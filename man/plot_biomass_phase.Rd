@@ -16,6 +16,11 @@ plot_biomass_phase(
   zeroline_type = "dashed",
   lrp_ribbon_alpha = 0.35,
   refpt_show = "0.3sbo",
+  show_usr = TRUE,
+  prod_yrs = 1990:1999,
+  prop_prod = 1,
+  show_prod_yrs = TRUE,
+  show_sbo = TRUE,
   show_x_axis = TRUE,
   show_y_axis = TRUE,
   x_axis_label_size = 8,
@@ -50,6 +55,19 @@ plot_biomass_phase(
 \item{lrp_ribbon_alpha}{transparency of the reference point credible interval ribbon}
 
 \item{refpt_show}{which reference point to show. See `model$mcmccalcs$r.quants`` for choices}
+
+\item{show_usr}{Logical. Show the upper stock reference. Default TRUE.}
+
+\item{prod_yrs}{Numeric vector. Productive period to calculate the USR.
+Default 1990:1999.}
+
+\item{prop_prod}{Numeric. Proportion of productive period for USR. Default
+1.0.}
+
+\item{show_prod_yrs}{Logical. Show vertical band for productive period.
+Default TRUE.}
+
+\item{show_sbo}{Logical. Show SB_0. Default TRUE.}
 
 \item{show_x_axis}{see [modify_axes_labels()]}
 
