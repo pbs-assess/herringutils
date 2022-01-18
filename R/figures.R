@@ -978,7 +978,19 @@ plot_biomass_catch <- function(model,
   lrp[1, 1] <- as.character(min(sbt$year) - 2)
   lrp[, 1] <- as.numeric(lrp[, 1])
 
-  g <- ggplot(sbt, aes(x = year, y = median)) +
+  g <- ggplot(sbt, aes(x = year, y = median))
+
+  if (show_prod_yrs){
+    g <- g +
+      annotate(geom = "rect", fill = "blue", alpha = lrp_ribbon_alpha / 2,
+               xmin = min(prod_yrs) - 0.5, xmax = max(prod_yrs) + 0.5,
+               ymin = -Inf, ymax = Inf)
+    # geom_segment(colour = "blue", size = 3,
+    #              x = min(prod_yrs), xend = max(prod_yrs),
+    #              y = -Inf, yend = -Inf)
+  }
+
+  g <- g +
     geom_hline(
       yintercept = lrp$median,
       color = "red",
@@ -1003,15 +1015,6 @@ plot_biomass_catch <- function(model,
       annotate(geom = "rect", fill="green", alpha = lrp_ribbon_alpha,
                xmin = -Inf, xmax = Inf,
                ymin = prod_period$lower, ymax = prod_period$upper)
-  }
-
-  if (show_prod_yrs){
-    g <- g +
-      # annotate(geom = "rect", fill = "blue", alpha = lrp_ribbon_alpha,
-      #          xmin = min(prod_yrs) - 0.5, xmax = max(prod_yrs) + 0.5,
-      #          ymin = -Inf, ymax = Inf)
-      geom_segment(colour = "blue", size = 3,
-                   x = min(prod_yrs), xend = max(prod_yrs), y = -Inf, yend = -Inf)
   }
 
   g <- g +
@@ -1360,8 +1363,8 @@ plot_biomass_phase <- function(model,
   if (show_prod_yrs){
     g <- g +
       geom_point(
-        data = filter(dd, year %in% prod_yrs), colour = "blue", shape = 1,
-        size = point_size, na.rm = TRUE
+        data = filter(dd, year %in% prod_yrs), colour = "blue",
+        size = point_size + 1, na.rm = TRUE
       )
   }
 
