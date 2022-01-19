@@ -525,6 +525,10 @@ plot_proj_biomass_density <- function(models,
 #' @param new_surv_yr the year when the survey changed from surface to dive
 #' @param point_size size for points
 #' @param line_size thickness of line
+#' @param prod_yrs Numeric vector. Productive period to calculate the USR.
+#'   Default 1990:1999.
+#' @param show_prod_yrs Logical. Show vertical band for productive period.
+#'   Default TRUE.
 #' @param xlim x-limits for the plot. Implemented with [ggplot2::coord_cartesian()]
 #' @param show_x_axis see [modify_axes_labels()]
 #' @param show_y_axis see [modify_axes_labels()]
@@ -551,6 +555,8 @@ plot_scaled_abundance <- function(df,
                                   new_surv_yr = NA,
                                   point_size = 1,
                                   line_size = 0.75,
+                                  prod_yrs = 1990:1999,
+                                  show_prod_yrs = TRUE,
                                   xlim = NA,
                                   show_x_axis = TRUE,
                                   show_y_axis = TRUE,
@@ -594,7 +600,16 @@ plot_scaled_abundance <- function(df,
     ) %>%
     filter(year != proj_yr)
 
-  g <- ggplot(dfm, aes(x = year, y = abundance)) +
+  g <- ggplot(dfm, aes(x = year, y = abundance))
+
+  if (show_prod_yrs){
+    g <- g +
+      annotate(geom = "rect", fill = "blue", alpha = 0.2,
+               xmin = min(prod_yrs) - 0.5, xmax = max(prod_yrs) + 0.5,
+               ymin = -Inf, ymax = Inf)
+  }
+
+  g <- g +
     geom_point(aes(shape = gear),
       size = point_size,
       na.rm = TRUE
@@ -659,6 +674,10 @@ plot_scaled_abundance <- function(df,
 #' @param model an iscam model
 #' @param line_size thickness of the median line
 #' @param ribbon_alpha transparency of the credibility interval ribbon
+#' @param prod_yrs Numeric vector. Productive period to calculate the USR.
+#'   Default 1990:1999.
+#' @param show_prod_yrs Logical. Show vertical band for productive period.
+#'   Default TRUE.
 #' @param xlim x-limits for the plot. Implemented with [ggplot2::coord_cartesian()]
 #' @param show_x_axis see [modify_axes_labels()]
 #' @param show_y_axis see [modify_axes_labels()]
@@ -681,6 +700,8 @@ plot_scaled_abundance <- function(df,
 plot_natural_mortality <- function(model,
                                    line_size = 0.75,
                                    ribbon_alpha = 0.5,
+                                   prod_yrs = 1990:1999,
+                                   show_prod_yrs = TRUE,
                                    xlim = NA,
                                    y_max = NA,
                                    show_x_axis = TRUE,
@@ -699,7 +720,16 @@ plot_natural_mortality <- function(model,
     mutate(year = as.numeric(year))
   names(m) <- c("year", "lower", "median", "upper")
 
-  g <- ggplot(m, aes(x = year, y = median)) +
+  g <- ggplot(m, aes(x = year, y = median))
+
+  if (show_prod_yrs){
+    g <- g +
+      annotate(geom = "rect", fill = "blue", alpha = 0.2,
+               xmin = min(prod_yrs) - 0.5, xmax = max(prod_yrs) + 0.5,
+               ymin = -Inf, ymax = Inf)
+  }
+
+  g <- g +
     geom_line(
       size = line_size,
       na.rm = TRUE
@@ -760,6 +790,10 @@ plot_natural_mortality <- function(model,
 #' @param model an iscam model object
 #' @param point_size Size of points for median recruitment
 #' @param line_size thickness of errorbars
+#' @param prod_yrs Numeric vector. Productive period to calculate the USR.
+#'   Default 1990:1999.
+#' @param show_prod_yrs Logical. Show vertical band for productive period.
+#'   Default TRUE.
 #' @param xlim x-limits for the plot. Implemented with
 #'   [ggplot2::coord_cartesian()]
 #' @param show_x_axis see [modify_axes_labels()]
@@ -787,6 +821,8 @@ plot_natural_mortality <- function(model,
 plot_recruitment <- function(model,
                              point_size = 1,
                              line_size = 1,
+                             prod_yrs = 1990:1999,
+                             show_prod_yrs = TRUE,
                              xlim = NA,
                              show_x_axis = FALSE,
                              show_y_axis = TRUE,
@@ -817,7 +853,16 @@ plot_recruitment <- function(model,
   r0 <- model$mcmccalcs$p.quants[, "ro"] / 1000
   names(r0) <- c("lower", "median", "upper")
 
-  g <- ggplot(rec, aes(x = year, y = median)) +
+  g <- ggplot(rec, aes(x = year, y = median))
+
+  if (show_prod_yrs){
+    g <- g +
+      annotate(geom = "rect", fill = "blue", alpha = 0.2,
+               xmin = min(prod_yrs) - 0.5, xmax = max(prod_yrs) + 0.5,
+               ymin = -Inf, ymax = Inf)
+  }
+
+  g <- g +
     geom_point(size = point_size, na.rm = TRUE) +
     geom_line(size = 0.5, colour = "darkgrey") +
     geom_errorbar(aes(ymin = lower, ymax = upper),
@@ -982,12 +1027,9 @@ plot_biomass_catch <- function(model,
 
   if (show_prod_yrs){
     g <- g +
-      annotate(geom = "rect", fill = "blue", alpha = lrp_ribbon_alpha / 2,
+      annotate(geom = "rect", fill = "blue", alpha = 0.2,
                xmin = min(prod_yrs) - 0.5, xmax = max(prod_yrs) + 0.5,
                ymin = -Inf, ymax = Inf)
-    # geom_segment(colour = "blue", size = 3,
-    #              x = min(prod_yrs), xend = max(prod_yrs),
-    #              y = -Inf, yend = -Inf)
   }
 
   g <- g +
@@ -1093,6 +1135,10 @@ plot_biomass_catch <- function(model,
 #' @param errorbar_size thickness of errorbars for recruitment deviations
 #' @param zeroline_size thickness of guide line at zero deviation
 #' @param zeroline_type type of  of guide line at zero deviation
+#' @param prod_yrs Numeric vector. Productive period to calculate the USR.
+#'   Default 1990:1999.
+#' @param show_prod_yrs Logical. Show vertical band for productive period.
+#'   Default TRUE.
 #' @param xlim x-limits for the plot. Implemented with [ggplot2::coord_cartesian()]
 #' @param show_x_axis see [modify_axes_labels()]
 #' @param show_y_axis see [modify_axes_labels()]
@@ -1119,6 +1165,8 @@ plot_recruitment_devs <- function(model,
                                   errorbar_size = 0.5,
                                   zeroline_size = 0.5,
                                   zeroline_type = "dashed",
+                                  prod_yrs = 1990:1999,
+                                  show_prod_yrs = TRUE,
                                   xlim = NA,
                                   show_x_axis = TRUE,
                                   show_y_axis = TRUE,
@@ -1144,7 +1192,16 @@ plot_recruitment_devs <- function(model,
       na.pad = TRUE
     ))
 
-  g <- ggplot(recdev, aes(x = year, y = median)) +
+  g <- ggplot(recdev, aes(x = year, y = median))
+
+  if (show_prod_yrs){
+    g <- g +
+      annotate(geom = "rect", fill = "blue", alpha = 0.2,
+               xmin = min(prod_yrs) - 0.5, xmax = max(prod_yrs) + 0.5,
+               ymin = -Inf, ymax = Inf)
+  }
+
+  g <- g +
     geom_hline(
       yintercept = 0,
       size = zeroline_size,
@@ -1210,15 +1267,15 @@ plot_recruitment_devs <- function(model,
 #' @param zeroline_size thickness of the line across zero
 #' @param zeroline_type type of the line across zero
 #' @param lrp_ribbon_alpha transparency of the reference point credible interval ribbon
-#' @param refpt_show which reference point to show. See `model$mcmccalcs$r.quants`` for choices
-#' @param show_usr Logical. Show the upper stock reference. Default TRUE.
+#' @param refpt_show which reference point to show. See `model$mcmccalcs$r.quants` for choices
+#' @param show_usr Logical. Show the upper stock reference. Default FALSE.
 #' @param prod_yrs Numeric vector. Productive period to calculate the USR.
 #'   Default 1990:1999.
 #' @param prop_prod Numeric. Proportion of productive period for USR. Default
 #'   1.0.
 #' @param show_prod_yrs Logical. Show vertical band for productive period.
 #'   Default TRUE.
-#' @param show_sbo Logical. Show SB_0. Default TRUE.
+#' @param show_sbo Logical. Show SB_0. Default FALSE.
 #' @param show_x_axis see [modify_axes_labels()]
 #' @param show_y_axis see [modify_axes_labels()]
 #' @param x_axis_label_size see [modify_axes_labels()]
@@ -1249,11 +1306,11 @@ plot_biomass_phase <- function(model,
                                zeroline_type = "dashed",
                                lrp_ribbon_alpha = 0.35,
                                refpt_show = "0.3sbo",
-                               show_usr = TRUE,
+                               show_usr = FALSE,
                                prod_yrs = 1990:1999,
                                prop_prod = 1.0,
                                show_prod_yrs = TRUE,
-                               show_sbo = TRUE,
+                               show_sbo = FALSE,
                                show_x_axis = TRUE,
                                show_y_axis = TRUE,
                                x_axis_label_size = 8,

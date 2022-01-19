@@ -8,6 +8,8 @@ plot_natural_mortality(
   model,
   line_size = 0.75,
   ribbon_alpha = 0.5,
+  prod_yrs = 1990:1999,
+  show_prod_yrs = TRUE,
   xlim = NA,
   y_max = NA,
   show_x_axis = TRUE,
@@ -28,6 +30,12 @@ plot_natural_mortality(
 \item{line_size}{thickness of the median line}
 
 \item{ribbon_alpha}{transparency of the credibility interval ribbon}
+
+\item{prod_yrs}{Numeric vector. Productive period to calculate the USR.
+Default 1990:1999.}
+
+\item{show_prod_yrs}{Logical. Show vertical band for productive period.
+Default TRUE.}
 
 \item{xlim}{x-limits for the plot. Implemented with [ggplot2::coord_cartesian()]}
 

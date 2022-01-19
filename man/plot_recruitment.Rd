@@ -8,6 +8,8 @@ plot_recruitment(
   model,
   point_size = 1,
   line_size = 1,
+  prod_yrs = 1990:1999,
+  show_prod_yrs = TRUE,
   xlim = NA,
   show_x_axis = FALSE,
   show_y_axis = TRUE,
@@ -30,6 +32,12 @@ plot_recruitment(
 \item{point_size}{Size of points for median recruitment}
 
 \item{line_size}{thickness of errorbars}
+
+\item{prod_yrs}{Numeric vector. Productive period to calculate the USR.
+Default 1990:1999.}
+
+\item{show_prod_yrs}{Logical. Show vertical band for productive period.
+Default TRUE.}
 
 \item{xlim}{x-limits for the plot. Implemented with
 [ggplot2::coord_cartesian()]}

@@ -13,6 +13,8 @@ plot_recruitment_devs(
   errorbar_size = 0.5,
   zeroline_size = 0.5,
   zeroline_type = "dashed",
+  prod_yrs = 1990:1999,
+  show_prod_yrs = TRUE,
   xlim = NA,
   show_x_axis = TRUE,
   show_y_axis = TRUE,
@@ -40,6 +42,12 @@ plot_recruitment_devs(
 \item{zeroline_size}{thickness of guide line at zero deviation}
 
 \item{zeroline_type}{type of  of guide line at zero deviation}
+
+\item{prod_yrs}{Numeric vector. Productive period to calculate the USR.
+Default 1990:1999.}
+
+\item{show_prod_yrs}{Logical. Show vertical band for productive period.
+Default TRUE.}
 
 \item{xlim}{x-limits for the plot. Implemented with [ggplot2::coord_cartesian()]}
 
