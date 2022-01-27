@@ -930,14 +930,17 @@ plot_recruitment <- function(model,
 #' @param lrp_ribbon_alpha transparency value for the LRP credibility interval ribbon
 #' @param between_bars amount of space between catch bars
 #' @param refpt_show which reference point to show. See `model$mcmccalcs$r.quants`` for choices
-#' @param show_usr Logical. Show the upper stock reference. Default TRUE.
+#' @param show_prod_usr Logical. Show the productive period USR. Default TRUE.
 #' @param prod_yrs Numeric vector. Productive period to calculate the USR.
 #'   Default 1990:1999.
 #' @param prop_prod Numeric. Proportion of productive period for USR. Default
 #'   1.0.
 #' @param show_prod_yrs Logical. Show vertical band for productive period.
 #'   Default TRUE.
-#' @param show_sbo Logical. Show SB_0. Default TRUE.
+#' @param show_sbo_usr Logical. Show SB_0. Default TRUE.
+#' @param prop_sbo Numeric. Proportion of SB_0 for USR. Default 0.6.
+#' @param show_blt_usr Logical. Show average long-term biomass USR. Default TRUE.
+#' @param prop_blt Numeric. Proportion of average long-term biomass for USR. Default 1.0.
 #' @param xlim x-limits for the plot. Implemented with [ggplot2::coord_cartesian()]
 #' @param show_x_axis see [modify_axes_labels()]
 #' @param show_y_axis see [modify_axes_labels()]
@@ -966,11 +969,14 @@ plot_biomass_catch <- function(model,
                                lrp_ribbon_alpha = 0.35,
                                between_bars = 0.75,
                                refpt_show = "0.3sbo",
-                               show_usr = TRUE,
+                               show_prod_usr = TRUE,
                                prod_yrs = 1990:1999,
                                prop_prod = 1.0,
                                show_prod_yrs = TRUE,
-                               show_sbo = TRUE,
+                               show_sbo_usr = TRUE,
+                               prop_sbo = 0.6,
+                               show_blt_usr = TRUE,
+                               prop_blt = 1.0,
                                xlim = NA,
                                show_x_axis = TRUE,
                                show_y_axis = TRUE,
@@ -1007,7 +1013,15 @@ plot_biomass_catch <- function(model,
       upper = mean(upper)* prop_prod
     )
 
-  sbo <- as.numeric(model$mcmccalcs$r.quants["sbo", 2:4])
+  sbo <- as.numeric(model$mcmccalcs$r.quants["sbo", 2:4]) * prop_sbo
+
+  blt <- sbt %>%
+    select(-year) %>%
+    summarise(
+      lower = mean(lower)*prop_blt,
+      median = mean(median)*prop_blt,
+      upper = mean(upper)* prop_blt
+    )
 
   ct <- catch_df %>%
     select(-c(area, group, sex, type, region)) %>%
@@ -1044,19 +1058,26 @@ plot_biomass_catch <- function(model,
       fill = "red"
     )
 
-  if (show_sbo) {
+  if (show_sbo_usr) {
     g <- g +
       geom_hline(yintercept = sbo[2]) +
       annotate(geom = "rect", fill="black", alpha = lrp_ribbon_alpha,
                xmin = -Inf, xmax = Inf, ymin = sbo[1], ymax = sbo[3])
   }
 
-  if (show_usr) {
+  if (show_prod_usr) {
     g <- g +
       geom_hline(yintercept = prod_period$median, colour = "green") +
       annotate(geom = "rect", fill="green", alpha = lrp_ribbon_alpha,
                xmin = -Inf, xmax = Inf,
                ymin = prod_period$lower, ymax = prod_period$upper)
+  }
+
+  if (show_blt_usr) {
+    g <- g +
+      geom_hline(yintercept = blt$median, colour = "purple") +
+      annotate(geom = "rect", fill="purple", alpha = lrp_ribbon_alpha,
+               xmin = -Inf, xmax = Inf, ymin = blt$lower, ymax = blt$upper)
   }
 
   g <- g +
@@ -1268,14 +1289,17 @@ plot_recruitment_devs <- function(model,
 #' @param zeroline_type type of the line across zero
 #' @param lrp_ribbon_alpha transparency of the reference point credible interval ribbon
 #' @param refpt_show which reference point to show. See `model$mcmccalcs$r.quants` for choices
-#' @param show_usr Logical. Show the upper stock reference. Default FALSE.
+#' @param show_prod_usr Logical. Show the productive period USR. Default TRUE.
 #' @param prod_yrs Numeric vector. Productive period to calculate the USR.
 #'   Default 1990:1999.
 #' @param prop_prod Numeric. Proportion of productive period for USR. Default
 #'   1.0.
 #' @param show_prod_yrs Logical. Show vertical band for productive period.
 #'   Default TRUE.
-#' @param show_sbo Logical. Show SB_0. Default FALSE.
+#' @param show_sbo_usr Logical. Show SB_0 USR. Default FALSE.
+#' @param prop_sbo Numeric. Proportion of SB_0 for USR. Default 0.6.
+#' @param show_blt_usr Logical. Show average long-term biomass USR. Default FALSE.
+#' @param prop_blt Numeric. Proportion of average long-term biomass for USR. Default 1.0.
 #' @param show_x_axis see [modify_axes_labels()]
 #' @param show_y_axis see [modify_axes_labels()]
 #' @param x_axis_label_size see [modify_axes_labels()]
@@ -1306,11 +1330,14 @@ plot_biomass_phase <- function(model,
                                zeroline_type = "dashed",
                                lrp_ribbon_alpha = 0.35,
                                refpt_show = "0.3sbo",
-                               show_usr = FALSE,
+                               show_prod_usr = FALSE,
                                prod_yrs = 1990:1999,
                                prop_prod = 1.0,
                                show_prod_yrs = TRUE,
-                               show_sbo = FALSE,
+                               show_sbo_usr = FALSE,
+                               prop_sbo = 0.6,
+                               show_blt_usr = FALSE,
+                               prop_blt = 1.0,
                                show_x_axis = TRUE,
                                show_y_axis = TRUE,
                                x_axis_label_size = 8,
@@ -1344,7 +1371,15 @@ plot_biomass_phase <- function(model,
       upper = mean(upper)* prop_prod
     )
 
-  sbo <- as.numeric(model$mcmccalcs$r.quants["sbo", 2:4])
+  sbo <- as.numeric(model$mcmccalcs$r.quants["sbo", 2:4]) * prop_sbo
+
+  blt <- sbt %>%
+    select(-year) %>%
+    summarise(
+      lower = mean(lower)*prop_blt,
+      median = mean(median)*prop_blt,
+      upper = mean(upper)* prop_blt
+    )
 
   ct <- catch_df %>%
     select(-c(area, group, sex, type, region)) %>%
@@ -1400,14 +1435,14 @@ plot_biomass_phase <- function(model,
       inherit.aes = FALSE
     )
 
-  if (show_sbo) {
+  if (show_sbo_usr) {
     g <- g +
       geom_vline(xintercept = sbo[2]) +
       annotate(geom = "rect", fill="black", alpha = lrp_ribbon_alpha,
                xmin = sbo[1], xmax = sbo[3], ymin =-Inf , ymax = Inf)
   }
 
-  if (show_usr) {
+  if (show_prod_usr) {
     g <- g +
       geom_vline(xintercept = prod_period$median, colour = "green") +
       annotate(
@@ -1415,6 +1450,13 @@ plot_biomass_phase <- function(model,
         xmin = prod_period$lower, xmax = prod_period$upper,
         ymin = -Inf, ymax = Inf
       )
+  }
+
+  if (show_blt_usr) {
+    g <- g +
+      geom_vline(xintercept = blt$median, colour = "purple") +
+      annotate(geom = "rect", fill="purple", alpha = lrp_ribbon_alpha,
+               xmin = blt$lower, xmax = blt$upper, ymin = -Inf, ymax = Inf)
   }
 
   if (show_prod_yrs){

@@ -16,11 +16,14 @@ plot_biomass_phase(
   zeroline_type = "dashed",
   lrp_ribbon_alpha = 0.35,
   refpt_show = "0.3sbo",
-  show_usr = FALSE,
+  show_prod_usr = FALSE,
   prod_yrs = 1990:1999,
   prop_prod = 1,
   show_prod_yrs = TRUE,
-  show_sbo = FALSE,
+  show_sbo_usr = FALSE,
+  prop_sbo = 0.6,
+  show_blt_usr = FALSE,
+  prop_blt = 1,
   show_x_axis = TRUE,
   show_y_axis = TRUE,
   x_axis_label_size = 8,
@@ -56,7 +59,7 @@ plot_biomass_phase(
 
 \item{refpt_show}{which reference point to show. See `model$mcmccalcs$r.quants` for choices}
 
-\item{show_usr}{Logical. Show the upper stock reference. Default FALSE.}
+\item{show_prod_usr}{Logical. Show the productive period USR. Default TRUE.}
 
 \item{prod_yrs}{Numeric vector. Productive period to calculate the USR.
 Default 1990:1999.}
@@ -67,7 +70,13 @@ Default 1990:1999.}
 \item{show_prod_yrs}{Logical. Show vertical band for productive period.
 Default TRUE.}
 
-\item{show_sbo}{Logical. Show SB_0. Default FALSE.}
+\item{show_sbo_usr}{Logical. Show SB_0 USR. Default FALSE.}
+
+\item{prop_sbo}{Numeric. Proportion of SB_0 for USR. Default 0.6.}
+
+\item{show_blt_usr}{Logical. Show average long-term biomass USR. Default FALSE.}
+
+\item{prop_blt}{Numeric. Proportion of average long-term biomass for USR. Default 1.0.}
 
 \item{show_x_axis}{see [modify_axes_labels()]}
 
