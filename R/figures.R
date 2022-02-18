@@ -941,6 +941,7 @@ plot_recruitment <- function(model,
 #' @param prop_sbo Numeric. Proportion of SB_0 for USR. Default 0.6.
 #' @param show_blt_usr Logical. Show average long-term biomass USR. Default TRUE.
 #' @param prop_blt Numeric. Proportion of average long-term biomass for USR. Default 1.0.
+#' @param col_catch Logical. Colour catch bars, or just grey. Default TRUE.
 #' @param xlim x-limits for the plot. Implemented with [ggplot2::coord_cartesian()]
 #' @param show_x_axis see [modify_axes_labels()]
 #' @param show_y_axis see [modify_axes_labels()]
@@ -977,6 +978,7 @@ plot_biomass_catch <- function(model,
                                prop_sbo = 0.6,
                                show_blt_usr = TRUE,
                                prop_blt = 1.0,
+                               col_catch = TRUE,
                                xlim = NA,
                                show_x_axis = TRUE,
                                show_y_axis = TRUE,
@@ -1103,8 +1105,15 @@ plot_biomass_catch <- function(model,
       aes(ymin = lower, ymax = upper),
       size = errorbar_size,
       width = 0
-    ) +
-    scale_fill_viridis_d() +
+    )
+
+  if (col_catch) {
+    g <- g + scale_fill_viridis_d()
+  } else {
+    g <- g + scale_fill_grey(start = 0.5, end = 0.5)
+  }
+
+  g <- g +
     guides(fill = FALSE) +
     scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10),
                        labels = seq(from = 1900, to = 2100, by = 10),

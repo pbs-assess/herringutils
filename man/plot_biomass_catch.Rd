@@ -23,6 +23,7 @@ plot_biomass_catch(
   prop_sbo = 0.6,
   show_blt_usr = TRUE,
   prop_blt = 1,
+  col_catch = TRUE,
   xlim = NA,
   show_x_axis = TRUE,
   show_y_axis = TRUE,
@@ -73,6 +74,8 @@ Default TRUE.}
 \item{show_blt_usr}{Logical. Show average long-term biomass USR. Default TRUE.}
 
 \item{prop_blt}{Numeric. Proportion of average long-term biomass for USR. Default 1.0.}
+
+\item{col_catch}{Logical. Colour catch bars, or just grey. Default TRUE.}
 
 \item{xlim}{x-limits for the plot. Implemented with [ggplot2::coord_cartesian()]}
 
