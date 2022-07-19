@@ -1,6 +1,7 @@
 #' Table showing input data to the herring assessment.
 #'
 #' @param tab data.frame as read in by [readr::read_csv()]
+#' @param last-year Last year of data
 #' @param cap caption for table
 #' @param translate Logical. Translate to french if TRUE
 #' @param ... arguments passed to [csas_table()]
@@ -13,48 +14,38 @@
 #' @export
 #' @return a [csasdown::csas_table()]
 input_data_table <- function(tab,
+                             last_year = NA,
                              cap = "",
                              translate = FALSE,
                              ...){
   # Source column
-  tab$Source <- en2fr(tab$Source, translate, allow_missing = TRUE)
-  tmp <- tab$Source
-  nonbracs <- str_extract(tmp, "[(\\w+ ) ]+(?= +\\()")
-  bracs <- str_extract(tmp, "(?<=\\()\\w+(?=\\))")
-  if(!all(is.na(bracs) == is.na(nonbracs))){
-    warning("The match of bracketed items in the Source column of the Input data table was incorrect.")
-  }
-  tmp[!is.na(bracs)] <- paste0(en2fr(firstup(nonbracs[!is.na(nonbracs)]), translate),
-                               " (",  firstlower(en2fr(firstup(bracs[!is.na(bracs)]), translate)), ")")
-  tab$Source <- tmp
+  tab$Source <- en2fr(
+    tab$Source, translate, case = "sentence", allow_missing = TRUE
+  )
+  tab$Gear <- en2fr(tab$Gear, translate, case = "lower", allow_missing = TRUE)
+  tab$Gear <- ifelse(is.na(tab$Gear), "", paste0(" (", tab$Gear, ")"))
+  tab$Source <- paste0(tab$Source, tab$Gear)
   # Data column
-  tmp <- strsplit(tab$Data, ": *")
-  tmp <- lapply(tmp, function(x){
-    j <- firstup(x)
-    j <- en2fr(j, translate = translate, allow_missing = TRUE)
-    if(length(j) > 1){
-      j <- c(j[1], tolower(j[-1]))
-      j <- paste(j, collapse = ": ")
-    }
-    j
-  })
-  tab$Data <- unlist(tmp)
+  tab$Data <- en2fr(
+    tab$Data, translate, case = "sentence", allow_missing = TRUE
+  )
+  tab$DataType <- en2fr(
+    tab$DataType, translate, case = "lower", allow_missing = TRUE
+  )
+  tab$DataType <- ifelse(is.na(tab$DataType), "", paste0(": ", tab$DataType))
+  tab$Data <- paste0(tab$Data, tab$DataType)
   # Years column
-  if(translate){
-    tmp <- tab$Years
-    tmp <- strsplit(tab$Years, " *to *")
-    tmp <- lapply(tmp, function(x){
-      paste0("De ", x[1], " \U00E0 ", x[2])
-    })
-    tab$Years <- unlist(tmp)
-  }
+  tab$YearEnd <- ifelse(is.na(tab$YearEnd), last_year, tab$YearEnd)
+  tab$Years <- ifelse(french,
+                      paste0(tab$YearStart, " to ", tab$YearEnd),
+                      paste0("De ", tab$YearStart, " \U00E0 ", tab$YearEnd))
+  tab <- tab[, c("Source", "Data", "Years")]
 
   names(tab) <- en2fr(names(tab), translate)
   csas_table(tab,
              format = "latex",
              caption = cap,
              ...)
-
 }
 
 #' Table showing the total landed catch by area for herring

@@ -4,7 +4,7 @@
 \alias{input_data_table}
 \title{Table showing input data to the herring assessment.}
 \usage{
-input_data_table(tab, cap = "", translate = FALSE, ...)
+input_data_table(tab, last_year = NA, cap = "", translate = FALSE, ...)
 }
 \arguments{
 \item{tab}{data.frame as read in by [readr::read_csv()]}
@@ -14,6 +14,8 @@ input_data_table(tab, cap = "", translate = FALSE, ...)
 \item{translate}{Logical. Translate to french if TRUE}
 
 \item{...}{arguments passed to [csas_table()]}
+
+\item{last-year}{Last year of data}
 }
 \value{
 a [csasdown::csas_table()]
