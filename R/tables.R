@@ -36,9 +36,8 @@ input_data_table <- function(tab,
   tab$Data <- paste0(tab$Data, tab$DataType)
   # Years column
   tab$YearEnd <- ifelse(is.na(tab$YearEnd), last_year, tab$YearEnd)
-  tab$Years <- ifelse(french,
-                      paste0(tab$YearStart, " to ", tab$YearEnd),
-                      paste0("De ", tab$YearStart, " \U00E0 ", tab$YearEnd))
+  yr_sep <- ifelse(translate, " \U00E0 ", " to ")
+  tab$Years <- paste0(tab$YearStart, yr_sep, tab$YearEnd)
   tab <- tab[, c("Source", "Data", "Years")]
 
   names(tab) <- en2fr(names(tab), translate)
