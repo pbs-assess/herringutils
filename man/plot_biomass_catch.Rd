@@ -9,7 +9,7 @@ plot_biomass_catch(
   model,
   catch_df,
   point_size = 1,
-  errorbar_size = 0.5,
+  errorbar_size = 1,
   line_size = 0.75,
   ribbon_alpha = 0.5,
   lrp_ribbon_alpha = 0.35,

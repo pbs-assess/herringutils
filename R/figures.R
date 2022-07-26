@@ -964,7 +964,7 @@ plot_recruitment <- function(model,
 plot_biomass_catch <- function(model,
                                catch_df,
                                point_size = 1,
-                               errorbar_size = 0.5,
+                               errorbar_size = 1,
                                line_size = 0.75,
                                ribbon_alpha = 0.5,
                                lrp_ribbon_alpha = 0.35,
@@ -1104,6 +1104,7 @@ plot_biomass_catch <- function(model,
       data = proj_sbt,
       aes(ymin = lower, ymax = upper),
       size = errorbar_size,
+      alpha = ribbon_alpha,
       width = 0
     )
 
