@@ -332,6 +332,88 @@ plot_spawn_ind <- function(df,
   g
 }
 
+#' Plot coastwide spawning biomass and catch
+#'
+#' @param models a list of iscam model objects
+#' @param catch_df a data frame as constructed by [get_catch()]
+#' @param reg_names region names (must correspond to models and catch_df)
+#' @param translate Logical. If TRUE, translate to french
+#' @importFrom dplyr mutate filter select rename group_by summarise ungroup
+#' full_join
+#' @importFrom tidyr pivot_longer replace_na
+#' @importFrom tibble as_tibble
+#' @importFrom ggplot2 ggplot aes geom_area facet_wrap scale_x_continuous
+#' scale_fill_viridis_d labs theme
+#' @importFrom rosettafish en2fr
+#' @export
+#' @return A ggplot object
+plot_coastwide_biomass_catch <- function(
+    models,
+    catch_df,
+    reg_names,
+    translate = FALSE) {
+
+  proj <- models[[1]]$mcmccalcs$proj.quants
+  proj_yr <- as.numeric(gsub("B", "", colnames(proj)[2]))
+
+
+  sbt <- data.frame()
+
+  for(i in seq(models)) {
+    model <- models[[i]]
+    dat <- model$mcmccalcs$sbt.quants %>%
+      t() %>%
+      as_tibble(rownames = "year") %>%
+      mutate(year = as.numeric(year)) %>%
+      filter(year != proj_yr)
+    names(dat) <- c("Year", "Lower", "Median", "Upper", "MPD")
+    dat$SAR = reg_names[i]
+    ifelse(i == 1,
+           sbt <- dat,
+           sbt <- rbind(sbt, dat)
+    )
+  }
+
+  sbt <- sbt %>%
+    select(Year, Median, SAR) %>%
+    rename(`Spawning biomass` = Median)
+
+  ct <- catch_df %>%
+    rename(Year = year, SAR = region) %>%
+    group_by(Year, SAR) %>%
+    summarise(Catch = sum(value, na.rm = TRUE)) %>%
+    ungroup()
+
+  df <- sbt %>%
+    full_join(y = ct, by = c("Year", "SAR")) %>%
+    replace_na(replace = list(`Spawning biomass` = 0, Catch = 0)) %>%
+    pivot_longer(
+      cols = c(`Spawning biomass`, Catch),
+      names_to = "Name",
+      values_to = "Value"
+    ) %>%
+    mutate(
+      Name = en2fr(Name, translate),
+      Name = factor(
+        Name,
+        levels = c(en2fr("Spawning biomass"), en2fr("Catch"))
+      ),
+      SAR = factor(SAR, levels = reg_names)
+    )
+
+  p <- ggplot(data = df, mapping = aes(x = Year, y = Value)) +
+    geom_area(mapping = aes(fill = SAR)) +
+    facet_wrap(vars(Name), ncol = 1, scales = "free_y") +
+    scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10)) +
+    scale_fill_viridis_d() +
+    guides(fill = guide_legend(nrow = 2, byrow = TRUE)) +
+    labs(x = en2fr("Year", translate),
+         y = ifelse(translate, "1 000 t", "1,000 t"),
+         fill = en2fr("SAR", translate)) +
+    theme(legend.position = "top", legend.text.align = 0)
+  p
+}
+
 #' Title
 #'
 #' @param df a data frame as constructed by [get_catch()]
