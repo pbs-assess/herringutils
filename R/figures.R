@@ -414,6 +414,101 @@ plot_coastwide_biomass_catch <- function(
   p
 }
 
+#' Plot total and spawning biomass
+#'
+#' @param models a list of iscam model objects
+#' @param reg_names region names (must correspond to models)
+#' @param reg_names_short region names short (must correspond to models)
+#' @param translate Logical. If TRUE, translate to french
+#' @importFrom dplyr mutate filter select rename group_by summarise ungroup
+#' full_join
+#' @importFrom tidyr pivot_longer replace_na
+#' @importFrom tibble as_tibble
+#' @importFrom ggplot2 ggplot aes geom_line facet_wrap scale_x_continuous
+#' scale_colour_viridis_d labs theme
+#' @importFrom rosettafish en2fr fr2en
+#' @export
+#' @return A ggplot object
+plot_biomass_total_biomass <- function(
+    models,
+    reg_names,
+    reg_names_short,
+    translate = FALSE) {
+
+  proj <- models[[1]]$mcmccalcs$proj.quants
+  proj_yr <- as.numeric(gsub("B", "", colnames(proj)[2]))
+
+  sbt <- data.frame()
+
+  for(i in seq(models)) {
+    model <- models[[i]]
+    dat <- model$mcmccalcs$sbt.quants %>%
+      t() %>%
+      as_tibble(rownames = "year") %>%
+      mutate(year = as.numeric(year)) %>%
+      filter(year != proj_yr)
+    names(dat) <- c("Year", "Lower", "Median", "Upper", "MPD")
+    dat$SAR = reg_names[i]
+    ifelse(i == 1,
+           sbt <- dat,
+           sbt <- rbind(sbt, dat)
+    )
+  }
+
+  sbt <- sbt %>%
+    select(Year, Median, SAR) %>%
+    rename(`Spawning biomass` = Median)
+
+  tbt <- data.frame()
+
+  for(i in seq(models)) {
+    sar <- fr2en(reg_names_short[i], translate = translate)
+    rep_file = here(models_dir, sar, "iscam.rep")
+    dat <- readLines(con = rep_file)
+    yr_line <- grep(pattern = "\\byrs\\b", x = dat)
+    yrs <- read_lines(file = rep_file, skip = yr_line, n_max = 1)
+    yrs <- scan(file = rep_file, skip = yr_line, nlines = 1, quiet = TRUE)
+    bt_line <- grep(pattern = "\\bbt\\b", x = dat)
+    bt <- scan(file = rep_file, skip = bt_line, nlines = 1, quiet = TRUE)
+    dat <- tibble(Year = yrs, `Total biomass` = bt) %>%
+      filter(Year != proj_yr)
+    dat$SAR = reg_names[i]
+    ifelse(i == 1,
+           tbt <- dat,
+           tbt <- rbind(tbt, dat)
+    )
+  }
+
+  df <- sbt %>%
+    full_join(y = tbt, by = c("Year", "SAR")) %>%
+    replace_na(replace = list(`Spawning biomass` = 0, `Total biomass` = 0)) %>%
+    pivot_longer(
+      cols = c(`Spawning biomass`, `Total biomass`),
+      names_to = "Name",
+      values_to = "Value"
+    ) %>%
+    mutate(
+      Name = en2fr(Name, translate),
+      Name = factor(
+        Name,
+        levels = c(en2fr("Total biomass"), en2fr("Spawning biomass"))
+      ),
+      SAR = factor(SAR, levels = reg_names)
+    )
+
+  p <- ggplot(data = df, mapping = aes(x = Year, y = Value, group = Name)) +
+    geom_line(mapping = aes(colour = Name)) +
+    facet_wrap(vars(SAR), ncol = 1, scales = "free_y") +
+    scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10)) +
+    scale_colour_viridis_d() +
+    guides(fill = guide_legend(nrow = 2, byrow = TRUE)) +
+    labs(x = en2fr("Year", translate),
+         y = ifelse(translate, "Biomasse (1 000 t)", "Biomass (1,000 t)"),
+         colour = en2fr("Biomass", translate)) +
+    theme(legend.position = "top", legend.text.align = 0)
+  p
+}
+
 #' Title
 #'
 #' @param df a data frame as constructed by [get_catch()]
