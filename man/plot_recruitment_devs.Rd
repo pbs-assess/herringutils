@@ -14,7 +14,7 @@ plot_recruitment_devs(
   zeroline_size = 0.5,
   zeroline_type = "dashed",
   prod_yrs = 1990:1999,
-  show_prod_yrs = TRUE,
+  show_prod_yrs = FALSE,
   xlim = NA,
   show_x_axis = TRUE,
   show_y_axis = TRUE,

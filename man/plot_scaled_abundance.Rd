@@ -14,7 +14,7 @@ plot_scaled_abundance(
   point_size = 1,
   line_size = 0.75,
   prod_yrs = 1990:1999,
-  show_prod_yrs = TRUE,
+  show_prod_yrs = FALSE,
   xlim = NA,
   show_x_axis = TRUE,
   show_y_axis = TRUE,

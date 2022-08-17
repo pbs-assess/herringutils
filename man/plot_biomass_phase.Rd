@@ -19,7 +19,7 @@ plot_biomass_phase(
   show_prod_usr = FALSE,
   prod_yrs = 1990:1999,
   prop_prod = 1,
-  show_prod_yrs = TRUE,
+  show_prod_yrs = FALSE,
   show_sbo_usr = FALSE,
   prop_sbo = 0.6,
   show_blt_usr = FALSE,
