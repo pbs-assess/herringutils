@@ -285,7 +285,7 @@ plot_spawn_ind <- function(df,
     is.numeric(new_surv_yr),
     length(new_surv_yr) == 1
   )
-  if(!is.na(yr_range)) {
+  if(!any(is.na(yr_range))) {
     df <- df %>%
       filter(year %in% (min(yr_range):max(yr_range))) %>%
       complete(year = min(yr_range):max(yr_range), region)
@@ -325,7 +325,7 @@ plot_spawn_ind <- function(df,
     ) +
     facet_wrap(vars(Region), ncol = 1, scales = "free_y") +
     theme(legend.position = "top")
-  if(!is.na(yr_range)){
+  if(!any(is.na(yr_range))){
     g <- g +
       expand_limits(x = yr_range)
   }
@@ -2129,7 +2129,7 @@ plot_spawn_section <- function(model,
                                ncol = 2,
                                translate = FALSE){
   yrBreaks <- seq(from = 1950, to = 2030, by = 10)
-  if( !is.na(model) & scale ){
+  if( scale ){
     qVals <- tibble(Survey = c("Surface", "Dive"),
                     q = model$mcmccalcs$q.quants[2,])
   }
@@ -2139,7 +2139,7 @@ plot_spawn_section <- function(model,
       left_join( y=qVals, by="Survey") %>%
       mutate(Index = Index / q)
   }
-  if( !is.na(sections) ) {
+  if( !any(is.na(sections)) ) {
     dat <- dat %>%
       mutate(Section = as.numeric(Section)) %>%
       filter(Section %in% sections)
@@ -2147,7 +2147,7 @@ plot_spawn_section <- function(model,
   dat <- dat %>%
     mutate(Survey = factor(Survey, levels = c("Surface", "Dive")),
            Section = formatC(Section, width = 3, format = "d", flag = "0"))
-  if(!is.na(yr_range)) {
+  if(!any(is.na(yr_range))) {
     dat <- dat %>%
       filter(Year %in% c(min(yr_range):max(yr_range)))
   }
@@ -2181,7 +2181,7 @@ plot_spawn_section <- function(model,
     scale_y_continuous(labels = function(x) x / 1000) +
     facet_wrap(Name ~ ., ncol = ncol, scales = "free_y") +
     theme(legend.position = "top")
-  if(!is.na(yr_range)){
+  if(!any(is.na(yr_range))){
     g <- g +
       expand_limits(x = yr_range)
   }
