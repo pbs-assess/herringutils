@@ -147,6 +147,7 @@ get_surv_ind <- function(models,
 #'   `major_regions_short` vector`.
 #' @param majors Logical. If TRUE use major models list (`major_models`), if
 #'   FALSE use minor models list (`minor_models`). Default is TRUE.
+#' @param n_hr_yrs Integer. Number of years to calculate mean HR.
 #' @param french Logical. If TRUE, use French (default is FALSE).
 #'
 #' @importFrom tibble as_tibble
@@ -156,7 +157,7 @@ get_surv_ind <- function(models,
 #'
 #' @examples
 #' hg_vars <- get_vars("HG")
-get_vars <- function(region, majors = TRUE, french = FALSE, hr_yrs = 10) {
+get_vars <- function(region, majors = TRUE, n_hr_yrs = 10, french = FALSE) {
   if (majors) {
     model_ind <- match(en2fr(region, french), major_regions_short)
     model <- major_models[[model_ind]]
@@ -204,11 +205,14 @@ get_vars <- function(region, majors = TRUE, french = FALSE, hr_yrs = 10) {
   # Harvest rate
   hr <- sbt_df %>%
     full_join(y = ct, by = "year") %>%
-    mutate(median = catch / (catch + `50%`))
+    mutate(median = catch / (catch + `50%`)) %>%
+    na.omit() %>%
+    tail(n = n_hr_yrs)
+  # Years with HR data
+  hr_yrs = hr %>%
+    pull(year)
   # Mean harvest rate
   hr_mean <- hr %>%
-    na.omit() %>%
-    tail(n = hr_yrs) %>%
     pull(median) %>%
     mean()
   # List to return
@@ -220,6 +224,7 @@ get_vars <- function(region, majors = TRUE, french = FALSE, hr_yrs = 10) {
     proj_sbt = proj_sbt,
     prob_proj_less_03sbo = prob_proj_less_03sbo,
     final_yr_dt = final_yr_dt,
+    n_hr_yrs = n_hr_yrs,
     hr_yrs = hr_yrs,
     hr_mean = hr_mean
   )

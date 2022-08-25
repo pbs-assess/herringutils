@@ -162,11 +162,23 @@ mean_harvest_text <- function(SAR,
       "Le taux de récolte effectif $U_t$ moyen pour les ",
       "The mean effective harvest $U_t$ rate for the past "
     ),
-    vars$hr_yrs,
+    vars$n_hr_yrs,
     ifelse(
       translate,
-      " dernières années avec des captures non nulles est de ",
-      " years with non-zero catches is "
+      " dernières années avec des captures non nulles (de ",
+      " years with non-zero catches (from "
+    ),
+    min(vars$hr_yrs),
+    ifelse(
+      translate,
+      " à ",
+      " to "
+    ),
+    max(vars$hr_yrs),
+    ifelse(
+      translate,
+      ") est de ",
+      ") is "
     ),
     f(vars$hr_mean * 100),
     "%",

@@ -4,7 +4,7 @@
 \alias{get_vars}
 \title{Get model output values for a given region.}
 \usage{
-get_vars(region, majors = TRUE, french = FALSE, hr_yrs = 10)
+get_vars(region, majors = TRUE, n_hr_yrs = 10, french = FALSE)
 }
 \arguments{
 \item{region}{Character. The short form for the region as defined in the
@@ -12,6 +12,8 @@ get_vars(region, majors = TRUE, french = FALSE, hr_yrs = 10)
 
 \item{majors}{Logical. If TRUE use major models list (`major_models`), if
 FALSE use minor models list (`minor_models`). Default is TRUE.}
+
+\item{n_hr_yrs}{Integer. Number of years to calculate mean HR.}
 
 \item{french}{Logical. If TRUE, use French (default is FALSE).}
 }
