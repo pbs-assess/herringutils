@@ -159,8 +159,8 @@ mean_harvest_text <- function(SAR,
   res <- paste0(
     ifelse(
       translate,
-      "Le taux de récolte effectif moyen pour les ",
-      "The mean effective harvest rate for the past "
+      "Le taux de récolte effectif $U_t$ moyen pour les ",
+      "The mean effective harvest $U_t$ rate for the past "
     ),
     vars$hr_yrs,
     ifelse(
