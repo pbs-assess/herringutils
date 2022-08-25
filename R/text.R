@@ -142,3 +142,39 @@ proj_biomass_text <- function(SAR,
   # Encoding(res) <- "UTF-8"
   res
 }
+
+#' Text for "Application of MPs.." section.
+#'
+#' @param SAR Character. SAR name (e.g., "HG").
+#' @param translate Logical. Translate to french if TRUE.
+#'
+#' @note Requires variables from the `get_vars()` function named for the SAR
+#'   (i.e., `hg_vars <- get_vars("HG", french = french)`).
+#'
+#' @export
+#' @return Text.
+mean_harvest_text <- function(SAR,
+                              translate){
+  vars <- get(paste0(tolower(SAR), "_vars"))
+  res <- paste0(
+    ifelse(
+      translate,
+      "Le taux de récolte effectif moyen pour les ",
+      "The mean effective harvest rate for the past "
+    ),
+    vars$hr_yrs,
+    ifelse(
+      translate,
+      " dernières années avec des captures non nulles est de ",
+      " years with non-zero catches is "
+    ),
+    f(vars$hr_mean * 100),
+    "%",
+    ifelse(
+      translate,
+      " (figure",
+      " (Figure "),
+    "\\@ref(fig:harvest-rate))."
+  )
+  res
+}

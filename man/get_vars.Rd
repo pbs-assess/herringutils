@@ -4,7 +4,7 @@
 \alias{get_vars}
 \title{Get model output values for a given region.}
 \usage{
-get_vars(region, majors = TRUE, french = FALSE)
+get_vars(region, majors = TRUE, french = FALSE, hr_yrs = 10)
 }
 \arguments{
 \item{region}{Character. The short form for the region as defined in the

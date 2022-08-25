@@ -156,15 +156,15 @@ get_surv_ind <- function(models,
 #'
 #' @examples
 #' hg_vars <- get_vars("HG")
-get_vars <- function(region, majors = TRUE, french = FALSE) {
+get_vars <- function(region, majors = TRUE, french = FALSE, hr_yrs = 10) {
   if (majors) {
     model_ind <- match(en2fr(region, french), major_regions_short)
-    models <- major_models
+    model <- major_models[[model_ind]]
   } else {
     model_ind <- match(en2fr(region, french), minor_regions_short)
-    models <- minor_models
+    model <- minor_models[[model_ind]]
   }
-  sbt <- models[[model_ind]]$mcmccalcs$sbt.quants
+  sbt <- model$mcmccalcs$sbt.quants
   sbt_yrs <- as.numeric(colnames(sbt))
   # Previous year spawning biomass - vector length 4:
   # 1 = lower, 2 = median, 3 = upper, 4 = mpd
@@ -172,13 +172,13 @@ get_vars <- function(region, majors = TRUE, french = FALSE) {
   # Final year spawning biomass - vector length 4:
   # 1 = lower, 2 = median, 3 = upper, 4 = mpd
   final_yr_sbt <- sbt[, sbt_yrs == assess_yr] * 1000
-  refs <- models[[model_ind]]$mcmccalcs$r.quants
+  refs <- model$mcmccalcs$r.quants
   sbo <- refs[rownames(refs) == "sbo", ][2:4] * 1000
   # Probability that final year biomass is less than 0.3B0 - vector length 3:
   # 1 = lower, 2 = median, 3 = upper
   prob_less_03sbo <-
     refs[rownames(refs) == paste0("psb", assess_yr, "/0.3sbo"), ][2]
-  proj <- as_tibble(models[[model_ind]]$mcmccalcs$r.quants, rownames = "value")
+  proj <- as_tibble(model$mcmccalcs$r.quants, rownames = "value")
   # Projected biomass for next year - vector length 3:
   # 1 = lower, 2 = median, 3 = upper
   proj_sbt <-
@@ -188,10 +188,29 @@ get_vars <- function(region, majors = TRUE, french = FALSE) {
   prob_proj_less_03sbo <-
     refs[rownames(refs) == paste0("psb", assess_yr + 1, "/0.3sbo"), ][2]
   # Depletion
-  dt <- models[[model_ind]]$mcmccalcs$depl.quants
+  dt <- model$mcmccalcs$depl.quants
   dt_yrs <- as.numeric(colnames(dt))
   # Depletion in final year
   final_yr_dt <- dt[, dt_yrs == assess_yr]
+  # Catch
+  ct <- model$dat$catch %>%
+    as_tibble() %>%
+    group_by(year) %>%
+    summarise(catch = sum(value))
+  # Rearrange sbt
+  sbt_df <- t(sbt) %>%
+    as_tibble(rownames = "year") %>%
+    mutate(year = as.integer(year))
+  # Harvest rate
+  hr <- sbt_df %>%
+    full_join(y = ct, by = "year") %>%
+    mutate(median = catch / (catch + `50%`))
+  # Mean harvest rate
+  hr_mean <- hr %>%
+    na.omit() %>%
+    tail(n = hr_yrs) %>%
+    pull(median) %>%
+    mean()
   # List to return
   list(
     prev_yr_sbt = prev_yr_sbt,
@@ -200,6 +219,8 @@ get_vars <- function(region, majors = TRUE, french = FALSE) {
     prob_less_03sbo = prob_less_03sbo,
     proj_sbt = proj_sbt,
     prob_proj_less_03sbo = prob_proj_less_03sbo,
-    final_yr_dt = final_yr_dt
+    final_yr_dt = final_yr_dt,
+    hr_yrs = hr_yrs,
+    hr_mean = hr_mean
   )
 }
