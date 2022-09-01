@@ -8,8 +8,9 @@ decision_tables_mp(
   df,
   xcaption = "Default",
   xlabel = "tab:default",
+  p_sb_ave_prod = "",
   font.size = 11,
-  space.size = 14,
+  space.size = 15,
   placement = "ht",
   perc_dec_pts = 0,
   dec_pts = 2,
@@ -23,6 +24,8 @@ decision_tables_mp(
 \item{xcaption}{caption to use for the table}
 
 \item{xlabel}{latex label to use for the table}
+
+\item{p_sb_ave_prod}{Proportion of average SB during the productive period}
 
 \item{font.size}{size of font for table data}
 
