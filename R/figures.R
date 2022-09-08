@@ -924,6 +924,7 @@ plot_biomass_catch <- function(model,
                                y_axis_position = "left",
                                annot = "d",
                                label_points = FALSE,
+                               label_round = 1,
                                translate = FALSE) {
 
 
@@ -936,7 +937,7 @@ plot_biomass_catch <- function(model,
   names(proj_sbt) <- c("year", "lower", "median", "upper")
   #proj_sbt <- as_tibble(t(proj_sbt))
   proj_sbt <- as.data.frame(t(proj_sbt)) %>%
-    mutate(label = paste0(year, ": ", round(median,1), " kt"))
+    mutate(label = paste0(year, ": ", round(median, label_round), " kt"))
 
   sbt <- model$mcmccalcs$sbt.quants %>%
     t() %>%
@@ -945,7 +946,7 @@ plot_biomass_catch <- function(model,
     filter(year != proj_yr)
   names(sbt) <- c("year", "lower", "median", "upper", "mpd")
 sbt <- as.data.frame(sbt) %>%
-  mutate(label = paste0(year, ": ", round(median,1), " kt"))
+  mutate(label = paste0(year, ": ", round(median, label_round), " kt"))
 
   ct <- catch_df %>%
     select(-c(area, group, sex, type, region)) %>%
