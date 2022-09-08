@@ -1,6 +1,7 @@
 #' Table showing input data to the herring assessment.
 #'
 #' @param tab data.frame as read in by [readr::read_csv()]
+#' @param last-year Last year of data
 #' @param cap caption for table
 #' @param translate Logical. Translate to french if TRUE
 #' @param ... arguments passed to [csas_table()]
@@ -13,48 +14,37 @@
 #' @export
 #' @return a [csasdown::csas_table()]
 input_data_table <- function(tab,
+                             last_year = NA,
                              cap = "",
                              translate = FALSE,
                              ...){
   # Source column
-  tab$Source <- en2fr(tab$Source, translate, allow_missing = TRUE)
-  tmp <- tab$Source
-  nonbracs <- str_extract(tmp, "[(\\w+ ) ]+(?= +\\()")
-  bracs <- str_extract(tmp, "(?<=\\()\\w+(?=\\))")
-  if(!all(is.na(bracs) == is.na(nonbracs))){
-    warning("The match of bracketed items in the Source column of the Input data table was incorrect.")
-  }
-  tmp[!is.na(bracs)] <- paste0(en2fr(firstup(nonbracs[!is.na(nonbracs)]), translate),
-                               " (",  firstlower(en2fr(firstup(bracs[!is.na(bracs)]), translate)), ")")
-  tab$Source <- tmp
+  tab$Source <- en2fr(
+    tab$Source, translate, case = "sentence", allow_missing = TRUE
+  )
+  tab$Gear <- en2fr(tab$Gear, translate, case = "lower", allow_missing = TRUE)
+  tab$Gear <- ifelse(is.na(tab$Gear), "", paste0(" (", tab$Gear, ")"))
+  tab$Source <- paste0(tab$Source, tab$Gear)
   # Data column
-  tmp <- strsplit(tab$Data, ": *")
-  tmp <- lapply(tmp, function(x){
-    j <- firstup(x)
-    j <- en2fr(j, translate = translate, allow_missing = TRUE)
-    if(length(j) > 1){
-      j <- c(j[1], tolower(j[-1]))
-      j <- paste(j, collapse = ": ")
-    }
-    j
-  })
-  tab$Data <- unlist(tmp)
+  tab$Data <- en2fr(
+    tab$Data, translate, case = "sentence", allow_missing = TRUE
+  )
+  tab$DataType <- en2fr(
+    tab$DataType, translate, case = "lower", allow_missing = TRUE
+  )
+  tab$DataType <- ifelse(is.na(tab$DataType), "", paste0(": ", tab$DataType))
+  tab$Data <- paste0(tab$Data, tab$DataType)
   # Years column
-  if(translate){
-    tmp <- tab$Years
-    tmp <- strsplit(tab$Years, " *to *")
-    tmp <- lapply(tmp, function(x){
-      paste0("De ", x[1], " \U00E0 ", x[2])
-    })
-    tab$Years <- unlist(tmp)
-  }
+  tab$YearEnd <- ifelse(is.na(tab$YearEnd), last_year, tab$YearEnd)
+  yr_sep <- ifelse(translate, " \U00E0 ", " to ")
+  tab$Years <- paste0(tab$YearStart, yr_sep, tab$YearEnd)
+  tab <- tab[, c("Source", "Data", "Years")]
 
   names(tab) <- en2fr(names(tab), translate)
   csas_table(tab,
              format = "latex",
              caption = cap,
              ...)
-
 }
 
 #' Table showing the total landed catch by area for herring
@@ -132,7 +122,7 @@ sok_harvest_table <- function(tab,
     summarize(catch = sum(Harvest) * 2.20462262185) %>%
     ungroup() %>%
     dcast(Year ~ Region, value.var = "catch") #%>%
-    #select(-by_vec)
+  #select(-by_vec)
   tab <- add_cols_and_reorder(tab, by = by_vec)
   if(translate){
     tab$DPR[tab$Year %in% c(2016, 2019)] <- "DT"
@@ -233,6 +223,7 @@ spawn_index_table <- function(tab,
 #' @param df data brought in from CSV files found in the herringsr project's data directory
 #' @param xcaption caption to use for the table
 #' @param xlabel latex label to use for the table
+#' @param p_sb_ave_prod Proportion of average SB during the productive period
 #' @param font.size size of font for table data
 #' @param space.size space between rows of data in the table
 #' @param placement latex placement for the table
@@ -247,170 +238,9 @@ spawn_index_table <- function(tab,
 #' @importFrom xtable xtable
 #' @importFrom dplyr as_tibble mutate
 decision_tables_mp <- function(df,
-                               xcaption = "Default",
-                               xlabel = "tab:default",
-                               font.size = 11,
-                               space.size = 14,
-                               placement = "ht",
-                               perc_dec_pts = 0,
-                               dec_pts = 2,
-                               inc_mps = NA,
-                               translate = FALSE){
-
-  df$label <- gsub("_", "\\\\_", df$label)
-
-  # If the conservation target is less than 75%, show -- for TAC and hr
-  df <- df %>%
-    mutate(tac = ifelse(obj1 < 0.75, NA, tac),
-           targ.hr = ifelse(obj1 < 0.75, NA, targ.hr))
-
-  df <- df %>%
-    mutate(om,
-           obj1 = paste0(f(obj1 * 100, dec.points = perc_dec_pts), "\\%"),
-           hiab = paste0(f(hiab * 100, dec.points = perc_dec_pts), "\\%"),
-           obj2 = paste0(f(obj2 * 100, dec.points = perc_dec_pts), "\\%"),
-           obj3 = f(obj3, dec.points = dec_pts),
-           obj4 = f(obj4, dec.points = dec_pts),
-           tac = ifelse(tac == "--", "--", f(tac, dec.points = dec_pts)),
-           targ.hr = ifelse(targ.hr == "--", "--", f(targ.hr, dec.points = dec_pts)))
-  df[is.na(df)] <- "--"
-
-  col_align = paste0("ll", paste(rep("|c", times = ncol(df) - 2), collapse = ""))
-
-  if(!is.na(inc_mps[1])){
-    df <- df %>%
-      filter(mp %in% inc_mps)
-  }
-
-  new_rows <- list()
-  new_rows$pos <- list()
-  new_rows$pos[[1]] <- -1
-  new_rows$pos[[2]] <- -1
-  new_rows$pos[[3]] <- -1
-  new_rows$pos[[4]] <- -1
-  new_rows$command <- c(paste0(latex.cline(paste0("1-",ncol(df))),
-                               latex.amp(2),
-                               latex.bold(en2fr("Conservation", translate = translate)),
-                               latex.amp(),
-                               latex.mcol(2,
-                                          "c|",
-                                          latex.bold(en2fr("Biomass", translate = translate))),
-                               latex.amp(),
-                               latex.mcol(2,
-                                          "c|",
-                                          latex.bold(en2fr("Yield", translate = translate))),
-                               latex.amp(),
-                               latex.bold(""),
-                               latex.nline),
-                        paste0(latex.mcol(2,
-                                          "c|",
-                                          latex.bold(en2fr("Scenario", translate = translate))),
-                               latex.amp(),
-                               latex.bold(paste0(en2fr("Obj", translate = translate),
-                                                 " 1 (",
-                                                 en2fr("LRP", translate = translate),
-                                                 ")")),
-                               latex.amp(),
-                               latex.bold("HIAB"),
-                               latex.amp(),
-                               latex.bold(paste0(en2fr("Obj", translate = translate),
-                                                 " 2")),
-                               latex.amp(),
-                               latex.bold(paste0(en2fr("Obj", translate = translate),
-                                                 " 3")),
-                               latex.amp(),
-                               latex.bold(paste0(en2fr("Obj", translate = translate),
-                                                 " 4")),
-                               latex.amp(),
-                               latex.bold(""),
-                               latex.amp(),
-                               latex.bold(""),
-                               latex.nline),
-                        paste0(latex.amp(2),
-                               "$P \\geq 75\\%$",
-                               latex.amp(),
-                               "$P \\geq 50\\%$",
-                               latex.amp(),
-                               "$P \\geq 50\\%$",
-                               latex.amp(),
-                               "$< 25\\%$",
-                               latex.amp(),
-                               "max",
-                               latex.amp(),
-                               latex.bold(assess_yr + 1),
-                               latex.nline),
-                        paste0(latex.cline("3-7"),
-                               latex.bold(en2fr("OM", translate = translate)),
-                               latex.amp(),
-                               latex.bold(en2fr("MP", translate = translate)),
-                               latex.amp(),
-                               "$\\SB_t > 0.3\\SB_0$",
-                               latex.amp(),
-                               "$\\geq 0.4\\SB_0$",
-                               latex.amp(),
-                               "$\\geq 0.6\\SB_0$",
-                               latex.amp(),
-                               en2fr("AAV", translate = translate),
-                               latex.amp(),
-                               "$\\overline{C}$",
-                               latex.amp(),
-                               latex.bold(en2fr("TAC", translate = translate)),
-                               latex.amp(),
-                               latex.bold(en2fr("HR", translate = translate)),
-                               latex.nline,
-                               latex.cline(paste0("1-",ncol(df)))))
-  # Horizontal line locations for separating groups of OMs
-  last_ddm <- which(df$om == "DDM")
-  last_dim <- which(df$om == "DIM")
-  last_conm <- which(df$om == "conM")
-  last_ddm <- tail(last_ddm, 1)
-  last_dim <- tail(last_dim, 1)
-  last_conm <- tail(last_conm, 1)
-  new_rows$pos[[5]] <- last_ddm
-  new_rows$pos[[6]] <- last_dim
-  new_rows$pos[[7]] <- last_conm
-  new_rows$command <- c(new_rows$command,
-                        latex.cline(paste0("1-",ncol(df))),
-                        latex.cline(paste0("1-",ncol(df))),
-                        latex.cline(paste0("1-",ncol(df))))
-  size.string <- latex.size.str(font.size, space.size)
-  df$om <- en2fr(df$om, translate, allow_missing = TRUE)
-  print(xtable(df,
-               caption = xcaption,
-               label = xlabel,
-               align = paste0("l", col_align)),
-        caption.placement = "top",
-        include.rownames = FALSE,
-        include.colnames = FALSE,
-        sanitize.text.function = function(x){x},
-        size = size.string,
-        add.to.row = new_rows,
-        table.placement = placement,
-        tabular.environment = "tabular",
-        hline.after = NULL)
-}
-
-#' Make decision table based on MP data with 3 extra Biomass columns
-#'
-#' @param df data brought in from CSV files found in the herringsr project's data directory
-#' @param xcaption caption to use for the table
-#' @param xlabel latex label to use for the table
-#' @param font.size size of font for table data
-#' @param space.size space between rows of data in the table
-#' @param placement latex placement for the table
-#' @param translate logical. Translate to French if TRUE
-#' @param perc_dec_pts number of decimal points to show for percentage columns
-#' @param dec_pts number of decimal points to show for numerical non-percentage columns
-#' @param col_align string for alignment of columns. c=center, r=right, l=left, |=place vertical bar between column
-#' @param inc_mps include these MP numbers in the table. If NA, all will be included
-#'
-#' @return an [xtable::xtable()]
-#' @export
-#' @importFrom xtable xtable
-#' @importFrom dplyr as_tibble mutate
-decision_tables_mp_add <- function(df,
                                    xcaption = "Default",
                                    xlabel = "tab:default",
+                                   p_sb_ave_prod = "",
                                    font.size = 11,
                                    space.size = 15,
                                    placement = "ht",
@@ -428,12 +258,18 @@ decision_tables_mp_add <- function(df,
 
   df <- df %>%
     mutate(om,
-           obj1 = paste0(f(obj1 * 100, dec.points = perc_dec_pts), "\\%"),
-           hiab = paste0(f(hiab * 100, dec.points = perc_dec_pts), "\\%"),
-           obj2 = paste0(f(obj2 * 100, dec.points = perc_dec_pts), "\\%"),
-           ncn1 = paste0(f(ncn1 * 100, dec.points = perc_dec_pts), "\\%"),
-           ncn2 = paste0(f(ncn2 * 100, dec.points = perc_dec_pts), "\\%"),
-           ncn3 = paste0(f(ncn3 * 100, dec.points = perc_dec_pts), "\\%"),
+           obj1 = paste0(f(obj1 * 100, dec.points = perc_dec_pts),
+                         ifelse(translate, " \\%", "\\%")),
+           hiab = paste0(f(hiab * 100, dec.points = perc_dec_pts),
+                         ifelse(translate, " \\%", "\\%")),
+           obj2 = paste0(f(obj2 * 100, dec.points = perc_dec_pts),
+                         ifelse(translate, " \\%", "\\%")),
+           ncn1 = paste0(f(ncn1 * 100, dec.points = perc_dec_pts),
+                         ifelse(translate, " \\%", "\\%")),
+           ncn2 = paste0(f(ncn2 * 100, dec.points = perc_dec_pts),
+                         ifelse(translate, " \\%", "\\%")),
+           ncn3 = paste0(f(ncn3 * 100, dec.points = perc_dec_pts),
+                         ifelse(translate, " \\%", "\\%")),
            obj3 = f(obj3, dec.points = dec_pts),
            obj4 = f(obj4, dec.points = dec_pts),
            tac = ifelse(tac == "--", "--", f(tac, dec.points = dec_pts)),
@@ -459,7 +295,7 @@ decision_tables_mp_add <- function(df,
                                latex.amp(),
                                latex.mcol(5,
                                           "c|",
-                                          latex.bold(en2fr("Biomass", translate = translate))),
+                                          latex.bold(en2fr("USR options", translate = translate))),
                                latex.amp(),
                                latex.mcol(2,
                                           "c|",
@@ -476,14 +312,7 @@ decision_tables_mp_add <- function(df,
                                                  en2fr("LRP", translate = translate),
                                                  ")")),
                                latex.amp(),
-                               latex.bold("HIAB"),
-                               latex.amp(),
-                               latex.bold(paste0(en2fr("Obj", translate = translate),
-                                                 " 2")),
-                               latex.amp(),
-                               latex.mcol(3,
-                                          "c|",
-                                          latex.bold(paste0("NCN"))),
+                               latex.mcol(5, "c|", ""),
                                latex.amp(),
                                latex.bold(paste0(en2fr("Obj", translate = translate),
                                                  " 3")),
@@ -496,40 +325,40 @@ decision_tables_mp_add <- function(df,
                                latex.bold(""),
                                latex.nline),
                         paste0(latex.amp(2),
-                               "$P \\geq 75\\%$",
+                               ifelse(translate, "$P \\geq 75~\\%$", "$P \\geq 75\\%$"),
                                latex.amp(),
-                               "$P \\geq 50\\%$",
+                               # ifelse(translate, "$P \\geq 50~\\%$", "$P \\geq 50\\%$"),
+                               # latex.amp(),
+                               # ifelse(translate, "$P \\geq 50~\\%$", "$P \\geq 50\\%$"),
+                               # latex.amp(),
+                               # ifelse(translate, "$P \\geq 50~\\%$", "$P \\geq 50\\%$"),
+                               # latex.amp(),
+                               # ifelse(translate, "$P \\geq 50~\\%$", "$P \\geq 50\\%$"),
+                               # latex.amp(),
+                               # ifelse(translate, "$P \\geq 75~\\%$", "$P \\geq 75\\%$"),
+                               latex.mcol(5, "c|", ""),
                                latex.amp(),
-                               "$P \\geq 50\\%$",
-                               latex.amp(),
-                               "$P \\geq 50\\%$",
-                               latex.amp(),
-                               "$P \\geq 50\\%$",
-                               latex.amp(),
-                               "$P \\geq 75\\%$",
-                               latex.amp(),
-                               "$< 25\\%$",
+                               ifelse(translate, "$< 25~\\%$", "$< 25\\%$"),
                                latex.amp(),
                                "max",
                                latex.amp(),
                                latex.bold(assess_yr + 1),
                                latex.nline),
-                        paste0(latex.cline("3-10"),
-                               latex.bold(en2fr("OM", translate = translate)),
+                        paste0(latex.bold(en2fr("OM", translate = translate)),
                                latex.amp(),
                                latex.bold(en2fr("MP", translate = translate)),
                                latex.amp(),
                                "$\\SB_t > 0.3\\SB_0$",
                                latex.amp(),
+                               paste0("$\\geq", p_sb_ave_prod, "\\overline{\\SB}_\\mli{Prod}$"),
+                               latex.amp(),
                                "$\\geq 0.4\\SB_0$",
+                               latex.amp(),
+                               "$\\geq 0.5\\SB_0$",
                                latex.amp(),
                                "$\\geq 0.6\\SB_0$",
                                latex.amp(),
-                               "$\\geq 0.65\\SB_0$",
-                               latex.amp(),
-                               "$\\geq 0.75\\SB_0$",
-                               latex.amp(),
-                               "$\\geq \\SB_\\AVE$",
+                               "$\\geq \\overline{\\SB}$",
                                latex.amp(),
                                en2fr("AAV", translate = translate),
                                latex.amp(),
@@ -543,15 +372,11 @@ decision_tables_mp_add <- function(df,
   # Horizontal line locations for separating groups of OMs
   last_ddm <- which(df$om == "DDM")
   last_dim <- which(df$om == "DIM")
-  last_conm <- which(df$om == "conM")
   last_ddm <- tail(last_ddm, 1)
   last_dim <- tail(last_dim, 1)
-  last_conm <- tail(last_conm, 1)
   new_rows$pos[[5]] <- last_ddm
   new_rows$pos[[6]] <- last_dim
-  new_rows$pos[[7]] <- last_conm
   new_rows$command <- c(new_rows$command,
-                        latex.cline(paste0("1-",ncol(df))),
                         latex.cline(paste0("1-",ncol(df))),
                         latex.cline(paste0("1-",ncol(df))))
   size.string <- latex.size.str(font.size, space.size)

@@ -13,6 +13,8 @@ plot_scaled_abundance(
   new_surv_yr = NA,
   point_size = 1,
   line_size = 0.75,
+  prod_yrs = 1990:1999,
+  show_prod_yrs = FALSE,
   xlim = NA,
   show_x_axis = TRUE,
   show_y_axis = TRUE,
@@ -41,6 +43,12 @@ plot_scaled_abundance(
 \item{point_size}{size for points}
 
 \item{line_size}{thickness of line}
+
+\item{prod_yrs}{Numeric vector. Productive period to calculate the USR.
+Default 1990:1999.}
+
+\item{show_prod_yrs}{Logical. Show vertical band for productive period.
+Default TRUE.}
 
 \item{xlim}{x-limits for the plot. Implemented with [ggplot2::coord_cartesian()]}
 

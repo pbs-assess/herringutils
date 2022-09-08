@@ -22,7 +22,8 @@ plot_catch <- function(df,
     theme(legend.position = "top") +
     labs(
       x = en2fr("Year", translate),
-      y = paste(en2fr("Catch", translate), " (1,000 t)"),
+      y = paste(en2fr("Catch", translate),
+                ifelse(translate, " (1 000 t)", " (1,000 t)")),
       fill = en2fr("Gear", translate)
     ) +
     facet_wrap(vars(region), ncol = 1, scales = "free_y")
@@ -60,7 +61,7 @@ plot_ic <- function(df,
     geom_col(position = "dodge") +
     labs(x = en2fr("Year", translate, case = "sentence"),
          y = paste0(en2fr("Number of fish", translate, case = "sentence"),
-                    " (x 1,000)"),
+                    ifelse(translate, " (x 1 000)", " (x 1,000)")),
          fill = en2fr("Type", translate, case = "sentence")) +
     scale_fill_viridis_d() +
     scale_y_continuous(labels = comma) +
@@ -284,7 +285,7 @@ plot_spawn_ind <- function(df,
     is.numeric(new_surv_yr),
     length(new_surv_yr) == 1
   )
-  if(!is.na(yr_range)) {
+  if(!any(is.na(yr_range))) {
     df <- df %>%
       filter(year %in% (min(yr_range):max(yr_range))) %>%
       complete(year = min(yr_range):max(yr_range), region)
@@ -319,15 +320,193 @@ plot_spawn_ind <- function(df,
     labs(
       shape = en2fr("Survey period", translate),
       x = en2fr("Year", translate),
-      y = paste0(en2fr("Spawn index", translate), " (1,000 t)")
+      y = paste0(en2fr("Spawn index", translate),
+                 ifelse(translate, " (1 000 t)", " (1,000 t)"))
     ) +
     facet_wrap(vars(Region), ncol = 1, scales = "free_y") +
     theme(legend.position = "top")
-  if(!is.na(yr_range)){
+  if(!any(is.na(yr_range))){
     g <- g +
       expand_limits(x = yr_range)
   }
   g
+}
+
+#' Plot coastwide spawning biomass and catch
+#'
+#' @param models a list of iscam model objects
+#' @param catch_df a data frame as constructed by [get_catch()]
+#' @param reg_names region names (must correspond to models and catch_df)
+#' @param translate Logical. If TRUE, translate to french
+#' @importFrom dplyr mutate filter select rename group_by summarise ungroup
+#' full_join
+#' @importFrom tidyr pivot_longer replace_na
+#' @importFrom tibble as_tibble
+#' @importFrom ggplot2 ggplot aes geom_area facet_wrap scale_x_continuous
+#' scale_fill_viridis_d labs theme
+#' @importFrom rosettafish en2fr
+#' @export
+#' @return A ggplot object
+plot_coastwide_biomass_catch <- function(
+    models,
+    catch_df,
+    reg_names,
+    translate = FALSE) {
+
+  proj <- models[[1]]$mcmccalcs$proj.quants
+  proj_yr <- as.numeric(gsub("B", "", colnames(proj)[2]))
+
+
+  sbt <- data.frame()
+
+  for(i in seq(models)) {
+    model <- models[[i]]
+    dat <- model$mcmccalcs$sbt.quants %>%
+      t() %>%
+      as_tibble(rownames = "year") %>%
+      mutate(year = as.numeric(year)) %>%
+      filter(year != proj_yr)
+    names(dat) <- c("Year", "Lower", "Median", "Upper", "MPD")
+    dat$SAR = reg_names[i]
+    ifelse(i == 1,
+           sbt <- dat,
+           sbt <- rbind(sbt, dat)
+    )
+  }
+
+  sbt <- sbt %>%
+    select(Year, Median, SAR) %>%
+    rename(`Spawning biomass` = Median)
+
+  ct <- catch_df %>%
+    rename(Year = year, SAR = region) %>%
+    group_by(Year, SAR) %>%
+    summarise(Catch = sum(value, na.rm = TRUE)) %>%
+    ungroup()
+
+  df <- sbt %>%
+    full_join(y = ct, by = c("Year", "SAR")) %>%
+    replace_na(replace = list(`Spawning biomass` = 0, Catch = 0)) %>%
+    pivot_longer(
+      cols = c(`Spawning biomass`, Catch),
+      names_to = "Name",
+      values_to = "Value"
+    ) %>%
+    mutate(
+      Name = en2fr(Name, translate),
+      Name = factor(
+        Name,
+        levels = c(en2fr("Spawning biomass"), en2fr("Catch"))
+      ),
+      SAR = factor(SAR, levels = reg_names)
+    )
+
+  p <- ggplot(data = df, mapping = aes(x = Year, y = Value)) +
+    geom_area(mapping = aes(fill = SAR)) +
+    facet_wrap(vars(Name), ncol = 1, scales = "free_y") +
+    scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10)) +
+    scale_fill_viridis_d() +
+    guides(fill = guide_legend(nrow = 2, byrow = TRUE)) +
+    labs(x = en2fr("Year", translate),
+         y = ifelse(translate, "1 000 t", "1,000 t"),
+         fill = en2fr("SAR", translate)) +
+    theme(legend.position = "top", legend.text.align = 0)
+  p
+}
+
+#' Plot total and spawning biomass
+#'
+#' @param models a list of iscam model objects
+#' @param reg_names region names (must correspond to models)
+#' @param reg_names_short region names short (must correspond to models)
+#' @param translate Logical. If TRUE, translate to french
+#' @importFrom dplyr mutate filter select rename group_by summarise ungroup
+#' full_join
+#' @importFrom tidyr pivot_longer replace_na
+#' @importFrom tibble as_tibble
+#' @importFrom ggplot2 ggplot aes geom_line facet_wrap scale_x_continuous
+#' scale_colour_viridis_d labs theme
+#' @importFrom rosettafish en2fr fr2en
+#' @export
+#' @return A ggplot object
+plot_biomass_total_biomass <- function(
+    models,
+    reg_names,
+    reg_names_short,
+    translate = FALSE) {
+
+  proj <- models[[1]]$mcmccalcs$proj.quants
+  proj_yr <- as.numeric(gsub("B", "", colnames(proj)[2]))
+
+  sbt <- data.frame()
+
+  for(i in seq(models)) {
+    model <- models[[i]]
+    dat <- model$mcmccalcs$sbt.quants %>%
+      t() %>%
+      as_tibble(rownames = "year") %>%
+      mutate(year = as.numeric(year)) %>%
+      filter(year != proj_yr)
+    names(dat) <- c("Year", "Lower", "Median", "Upper", "MPD")
+    dat$SAR = reg_names[i]
+    ifelse(i == 1,
+           sbt <- dat,
+           sbt <- rbind(sbt, dat)
+    )
+  }
+
+  sbt <- sbt %>%
+    select(Year, Median, SAR) %>%
+    rename(`Spawning biomass` = Median)
+
+  tbt <- data.frame()
+
+  for(i in seq(models)) {
+    sar <- fr2en(reg_names_short[i], translate = translate)
+    rep_file = here(models_dir, sar, "iscam.rep")
+    dat <- readLines(con = rep_file)
+    yr_line <- grep(pattern = "\\byrs\\b", x = dat)
+    yrs <- read_lines(file = rep_file, skip = yr_line, n_max = 1)
+    yrs <- scan(file = rep_file, skip = yr_line, nlines = 1, quiet = TRUE)
+    bt_line <- grep(pattern = "\\bbt\\b", x = dat)
+    bt <- scan(file = rep_file, skip = bt_line, nlines = 1, quiet = TRUE)
+    dat <- tibble(Year = yrs, `Total biomass` = bt) %>%
+      filter(Year != proj_yr)
+    dat$SAR = reg_names[i]
+    ifelse(i == 1,
+           tbt <- dat,
+           tbt <- rbind(tbt, dat)
+    )
+  }
+
+  df <- sbt %>%
+    full_join(y = tbt, by = c("Year", "SAR")) %>%
+    replace_na(replace = list(`Spawning biomass` = 0, `Total biomass` = 0)) %>%
+    pivot_longer(
+      cols = c(`Spawning biomass`, `Total biomass`),
+      names_to = "Name",
+      values_to = "Value"
+    ) %>%
+    mutate(
+      Name = en2fr(Name, translate),
+      Name = factor(
+        Name,
+        levels = c(en2fr("Total biomass"), en2fr("Spawning biomass"))
+      ),
+      SAR = factor(SAR, levels = reg_names)
+    )
+
+  p <- ggplot(data = df, mapping = aes(x = Year, y = Value, group = Name)) +
+    geom_line(mapping = aes(colour = Name)) +
+    facet_wrap(vars(SAR), ncol = 1, scales = "free_y") +
+    scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10)) +
+    scale_colour_viridis_d() +
+    guides(fill = guide_legend(nrow = 2, byrow = TRUE)) +
+    labs(x = en2fr("Year", translate),
+         y = ifelse(translate, "Biomasse (1 000 t)", "Biomass (1,000 t)"),
+         colour = en2fr("Biomass", translate)) +
+    theme(legend.position = "top", legend.text.align = 0)
+  p
 }
 
 #' Title
@@ -505,7 +684,7 @@ plot_proj_biomass_density <- function(models,
     labs(
       x = paste0(
         en2fr("Projected spawning biomass in", translate), " ", yr,
-        " (1,000 t)"
+        ifelse(translate, " (1 000 t)", " (1,000 t)")
       ),
       y = en2fr("Density", translate)
     ) +
@@ -523,6 +702,10 @@ plot_proj_biomass_density <- function(models,
 #' @param new_surv_yr the year when the survey changed from surface to dive
 #' @param point_size size for points
 #' @param line_size thickness of line
+#' @param prod_yrs Numeric vector. Productive period to calculate the USR.
+#'   Default 1990:1999.
+#' @param show_prod_yrs Logical. Show vertical band for productive period.
+#'   Default TRUE.
 #' @param xlim x-limits for the plot. Implemented with [ggplot2::coord_cartesian()]
 #' @param show_x_axis see [modify_axes_labels()]
 #' @param show_y_axis see [modify_axes_labels()]
@@ -549,6 +732,8 @@ plot_scaled_abundance <- function(df,
                                   new_surv_yr = NA,
                                   point_size = 1,
                                   line_size = 0.75,
+                                  prod_yrs = 1990:1999,
+                                  show_prod_yrs = FALSE,
                                   xlim = NA,
                                   show_x_axis = TRUE,
                                   show_y_axis = TRUE,
@@ -594,7 +779,16 @@ plot_scaled_abundance <- function(df,
     ) %>%
     filter(year != proj_yr)
 
-  g <- ggplot(dfm, aes(x = year, y = abundance)) +
+  g <- ggplot(dfm, aes(x = year, y = abundance))
+
+  if (show_prod_yrs){
+    g <- g +
+      annotate(geom = "rect", fill = "blue", alpha = 0.2,
+               xmin = min(prod_yrs) - 0.5, xmax = max(prod_yrs) + 0.5,
+               ymin = -Inf, ymax = Inf)
+  }
+
+  g <- g +
     geom_point(aes(shape = gear),
       size = point_size,
       na.rm = TRUE
@@ -637,7 +831,8 @@ plot_scaled_abundance <- function(df,
     #   x_axis_label_newline_length
     # ),
     y_label_text = newline_format(
-      paste0(en2fr("Scaled abundance", translate), " (1,000 t)"),
+      paste0(en2fr("Scaled abundance", translate),
+             ifelse(translate, " (1 000 t)", " (1,000 t)")),
       y_axis_label_newline_length
     ),
     show_x_axis = show_x_axis,
@@ -655,6 +850,10 @@ plot_scaled_abundance <- function(df,
 #' @param model an iscam model
 #' @param line_size thickness of the median line
 #' @param ribbon_alpha transparency of the credibility interval ribbon
+#' @param prod_yrs Numeric vector. Productive period to calculate the USR.
+#'   Default 1990:1999.
+#' @param show_prod_yrs Logical. Show vertical band for productive period.
+#'   Default TRUE.
 #' @param xlim x-limits for the plot. Implemented with [ggplot2::coord_cartesian()]
 #' @param show_x_axis see [modify_axes_labels()]
 #' @param show_y_axis see [modify_axes_labels()]
@@ -677,6 +876,8 @@ plot_scaled_abundance <- function(df,
 plot_natural_mortality <- function(model,
                                    line_size = 0.75,
                                    ribbon_alpha = 0.5,
+                                   prod_yrs = 1990:1999,
+                                   show_prod_yrs = FALSE,
                                    xlim = NA,
                                    y_max = NA,
                                    show_x_axis = TRUE,
@@ -697,7 +898,16 @@ plot_natural_mortality <- function(model,
     mutate(year = as.numeric(year))
   names(m) <- c("year", "lower", "median", "upper")
 
-  g <- ggplot(m, aes(x = year, y = median)) +
+  g <- ggplot(m, aes(x = year, y = median))
+
+  if (show_prod_yrs){
+    g <- g +
+      annotate(geom = "rect", fill = "blue", alpha = 0.2,
+               xmin = min(prod_yrs) - 0.5, xmax = max(prod_yrs) + 0.5,
+               ymin = -Inf, ymax = Inf)
+  }
+
+  g <- g +
     geom_line(
       size = line_size,
       na.rm = TRUE
@@ -756,6 +966,10 @@ plot_natural_mortality <- function(model,
 #' @param model an iscam model object
 #' @param point_size Size of points for median recruitment
 #' @param line_size thickness of errorbars
+#' @param prod_yrs Numeric vector. Productive period to calculate the USR.
+#'   Default 1990:1999.
+#' @param show_prod_yrs Logical. Show vertical band for productive period.
+#'   Default TRUE.
 #' @param xlim x-limits for the plot. Implemented with
 #'   [ggplot2::coord_cartesian()]
 #' @param show_x_axis see [modify_axes_labels()]
@@ -783,6 +997,8 @@ plot_natural_mortality <- function(model,
 plot_recruitment <- function(model,
                              point_size = 1,
                              line_size = 1,
+                             prod_yrs = 1990:1999,
+                             show_prod_yrs = FALSE,
                              xlim = NA,
                              show_x_axis = FALSE,
                              show_y_axis = TRUE,
@@ -815,7 +1031,16 @@ plot_recruitment <- function(model,
   r0 <- model$mcmccalcs$p.quants[, "ro"] / 1000
   names(r0) <- c("lower", "median", "upper")
 
-  g <- ggplot(rec, aes(x = year, y = median)) +
+  g <- ggplot(rec, aes(x = year, y = median))
+
+  if (show_prod_yrs){
+    g <- g +
+      annotate(geom = "rect", fill = "blue", alpha = 0.2,
+               xmin = min(prod_yrs) - 0.5, xmax = max(prod_yrs) + 0.5,
+               ymin = -Inf, ymax = Inf)
+  }
+
+  g <- g +
     geom_point(size = point_size, na.rm = TRUE) +
     geom_line(size = 0.5, colour = "darkgrey") +
     geom_errorbar(aes(ymin = lower, ymax = upper),
@@ -858,7 +1083,8 @@ plot_recruitment <- function(model,
     #  x_axis_label_newline_length
     #),
     y_label_text = newline_format(
-      paste(en2fr("Recruitment", translate), " (1,000 millions)"),
+      paste(en2fr("Recruitment", translate),
+            ifelse(translate, " (1 000 millions)", " (1,000 million)")),
       y_axis_label_newline_length
     ),
     show_x_axis = show_x_axis,
@@ -883,6 +1109,18 @@ plot_recruitment <- function(model,
 #' @param lrp_ribbon_alpha transparency value for the LRP credibility interval ribbon
 #' @param between_bars amount of space between catch bars
 #' @param refpt_show which reference point to show. See `model$mcmccalcs$r.quants`` for choices
+#' @param show_prod_usr Logical. Show the productive period USR. Default TRUE.
+#' @param prod_yrs Numeric vector. Productive period to calculate the USR.
+#'   Default 1990:1999.
+#' @param prop_prod Numeric. Proportion of productive period for USR. Default
+#'   1.0.
+#' @param show_prod_yrs Logical. Show vertical band for productive period.
+#'   Default TRUE.
+#' @param show_sbo_usr Logical. Show SB_0. Default TRUE.
+#' @param prop_sbo Numeric. Proportion of SB_0 for USR. Default 0.6.
+#' @param show_blt_usr Logical. Show average long-term biomass USR. Default TRUE.
+#' @param prop_blt Numeric. Proportion of average long-term biomass for USR. Default 1.0.
+#' @param col_catch Logical. Colour catch bars, or just grey. Default TRUE.
 #' @param xlim x-limits for the plot. Implemented with [ggplot2::coord_cartesian()]
 #' @param show_x_axis see [modify_axes_labels()]
 #' @param show_y_axis see [modify_axes_labels()]
@@ -905,12 +1143,21 @@ plot_recruitment <- function(model,
 plot_biomass_catch <- function(model,
                                catch_df,
                                point_size = 1,
-                               errorbar_size = 2,
+                               errorbar_size = 1,
                                line_size = 0.75,
                                ribbon_alpha = 0.5,
                                lrp_ribbon_alpha = 0.35,
                                between_bars = 0.75,
                                refpt_show = "0.3sbo",
+                               show_prod_usr = FALSE,
+                               prod_yrs = 1990:1999,
+                               prop_prod = 1.0,
+                               show_prod_yrs = FALSE,
+                               show_sbo_usr = FALSE,
+                               prop_sbo = 0.6,
+                               show_blt_usr = FALSE,
+                               prop_blt = 1.0,
+                               col_catch = TRUE,
                                xlim = NA,
                                show_x_axis = TRUE,
                                show_y_axis = TRUE,
@@ -948,6 +1195,25 @@ plot_biomass_catch <- function(model,
 sbt <- as.data.frame(sbt) %>%
   mutate(label = paste0(year, ": ", round(median, label_round), " kt"))
 
+  prod_period <- sbt %>%
+    filter(year %in% prod_yrs) %>%
+    select(-year) %>%
+    summarise(
+      lower = mean(lower)*prop_prod,
+      median = mean(median)*prop_prod,
+      upper = mean(upper)* prop_prod
+    )
+
+  sbo <- as.numeric(model$mcmccalcs$r.quants["sbo", 2:4]) * prop_sbo
+
+  blt <- sbt %>%
+    select(-year) %>%
+    summarise(
+      lower = mean(lower)*prop_blt,
+      median = mean(median)*prop_blt,
+      upper = mean(upper)* prop_blt
+    )
+
   ct <- catch_df %>%
     select(-c(area, group, sex, type, region)) %>%
     group_by(year, gear) %>%
@@ -962,21 +1228,54 @@ sbt <- as.data.frame(sbt) %>%
   lrp[1, 1] <- as.character(min(sbt$year) - 2)
   lrp[, 1] <- as.numeric(lrp[, 1])
 
-  g <- ggplot(sbt, aes(x = year, y = median)) +
-    #geom_hline(
-    #  yintercept = lrp$median,
-    #  color = "red",
-    #  size = line_size
-    #) +
-    geom_rect( #lrp line size may appear different depending on the y axis range
-      data = lrp, aes(xmin = 2018, xmax = Inf, ymin = lrp$median-line_size/2, ymax = lrp$median + line_size/2),
-      fill = "red"
+
+  g <- ggplot(sbt, aes(x = year, y = median))
+
+  if (show_prod_yrs){
+    g <- g +
+      annotate(geom = "rect", fill = "blue", alpha = 0.2,
+               xmin = min(prod_yrs) - 0.5, xmax = max(prod_yrs) + 0.5,
+               ymin = -Inf, ymax = Inf)
+  }
+
+  g <- g +
+    geom_hline(
+      yintercept = lrp$median,
+      color = "red",
+      size = line_size
+
     ) +
     geom_rect(
+      #lrp line size may appear different depending on the y axis range
+      #data = lrp, aes(xmin = 2018, xmax = Inf, ymin = lrp$median-line_size/2, ymax = lrp$median + line_size/2),
       data = lrp, aes(xmin = 2018, xmax = Inf, ymin = lrp$lower, ymax = lrp$upper),
       alpha = lrp_ribbon_alpha,
       fill = "red"
-    ) +
+    )
+
+  if (show_sbo_usr) {
+    g <- g +
+      geom_hline(yintercept = sbo[2]) +
+      annotate(geom = "rect", fill="black", alpha = lrp_ribbon_alpha,
+               xmin = -Inf, xmax = Inf, ymin = sbo[1], ymax = sbo[3])
+  }
+
+  if (show_prod_usr) {
+    g <- g +
+      geom_hline(yintercept = prod_period$median, colour = "green") +
+      annotate(geom = "rect", fill="green", alpha = lrp_ribbon_alpha,
+               xmin = -Inf, xmax = Inf,
+               ymin = prod_period$lower, ymax = prod_period$upper)
+  }
+
+  if (show_blt_usr) {
+    g <- g +
+      geom_hline(yintercept = blt$median, colour = "purple") +
+      annotate(geom = "rect", fill="purple", alpha = lrp_ribbon_alpha,
+               xmin = -Inf, xmax = Inf, ymin = blt$lower, ymax = blt$upper)
+  }
+
+  g <- g +
     geom_bar(
       data = ct,
       stat = "identity",
@@ -984,29 +1283,6 @@ sbt <- as.data.frame(sbt) %>%
       position = "stack",
       aes(fill = gear)
     ) +
-    # geom_hline(yintercept = lrp$median/0.3*0.5, linetype = "dashed",
-    #            colour = "orange") +
-    # annotate(geom = "rect", fill="orange", alpha = 0.35,
-    #          xmin = -Inf, xmax = Inf,
-    #          ymin = lrp$lower/0.3*0.5, ymax = lrp$upper/0.3*0.5) +
-    # geom_hline(yintercept = lrp$median/0.3*1) +
-    # annotate(geom = "rect", fill="black", alpha = 0.35,
-    #          xmin = -Inf, xmax = Inf,
-    #          ymin = lrp$lower/0.3*1, ymax = lrp$upper/0.3*1) +
-    # geom_hline(yintercept = lrp$median/0.3*1.125, linetype = "dashed",
-    #            colour = "darkgreen") +
-    # geom_hline(yintercept = lrp$median/0.3*1.5, colour = "green") +
-    # annotate(geom = "rect", fill="green", alpha = 0.35,
-    #          xmin = -Inf, xmax = Inf,
-    #          ymin = lrp$lower/0.3*1.5, ymax = lrp$upper/0.3*1.5) +
-    # annotate(geom = "rect", fill="red", alpha = 0.35,
-    #          xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = lrp$median) +
-    # annotate(geom = "rect", fill="yellow", alpha = 0.35,
-    #          xmin = -Inf, xmax = Inf, ymin = lrp$median, ymax = lrp$median/0.3) +
-    # annotate(geom = "rect", fill="green", alpha = 0.35,
-    #          xmin = -Inf, xmax = Inf, ymin = lrp$median/0.3, ymax = Inf) +
-    # annotate(geom = "rect", fill = "purple", alpha = 0.35,
-    #          xmin = 1975, xmax = 1985, ymin = -Inf, ymax = Inf) +
     geom_line(
       size = line_size,
       na.rm = TRUE
@@ -1023,8 +1299,15 @@ sbt <- as.data.frame(sbt) %>%
       size = errorbar_size,
       alpha = ribbon_alpha,
       width = 0
-    ) +
-    scale_fill_viridis_d() +
+    )
+
+  if (col_catch) {
+    g <- g + scale_fill_viridis_d()
+  } else {
+    g <- g + scale_fill_grey(start = 0.5, end = 0.5)
+  }
+
+  g <- g +
     guides(fill = FALSE) +
     scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10),
                        labels = seq(from = 1900, to = 2100, by = 10),
@@ -1059,6 +1342,7 @@ sbt <- as.data.frame(sbt) %>%
       geom_point(data = proj_sbt, color = "red")
   }
 
+
   if (!is.na(xlim[1])) {
     g <- g +
       coord_cartesian(xlim = xlim, expand = TRUE)
@@ -1081,7 +1365,8 @@ sbt <- as.data.frame(sbt) %>%
     #   x_axis_label_newline_length
     # ),
     y_label_text = newline_format(
-      paste0(en2fr("Spawning biomass", translate), " (1,000 t)"),
+      paste0(en2fr("Spawning biomass", translate),
+             ifelse(translate, " (1 000 t)", " (1,000 t)")),
       y_axis_label_newline_length
     ),
     show_x_axis = show_x_axis,
@@ -1104,6 +1389,10 @@ sbt <- as.data.frame(sbt) %>%
 #' @param errorbar_size thickness of errorbars for recruitment deviations
 #' @param zeroline_size thickness of guide line at zero deviation
 #' @param zeroline_type type of  of guide line at zero deviation
+#' @param prod_yrs Numeric vector. Productive period to calculate the USR.
+#'   Default 1990:1999.
+#' @param show_prod_yrs Logical. Show vertical band for productive period.
+#'   Default TRUE.
 #' @param xlim x-limits for the plot. Implemented with [ggplot2::coord_cartesian()]
 #' @param show_x_axis see [modify_axes_labels()]
 #' @param show_y_axis see [modify_axes_labels()]
@@ -1130,6 +1419,8 @@ plot_recruitment_devs <- function(model,
                                   errorbar_size = 0.5,
                                   zeroline_size = 0.5,
                                   zeroline_type = "dashed",
+                                  prod_yrs = 1990:1999,
+                                  show_prod_yrs = FALSE,
                                   xlim = NA,
                                   show_x_axis = TRUE,
                                   show_y_axis = TRUE,
@@ -1157,7 +1448,16 @@ plot_recruitment_devs <- function(model,
       na.pad = TRUE
     ))
 
-  g <- ggplot(recdev, aes(x = year, y = median)) +
+  g <- ggplot(recdev, aes(x = year, y = median))
+
+  if (show_prod_yrs){
+    g <- g +
+      annotate(geom = "rect", fill = "blue", alpha = 0.2,
+               xmin = min(prod_yrs) - 0.5, xmax = max(prod_yrs) + 0.5,
+               ymin = -Inf, ymax = Inf)
+  }
+
+  g <- g +
     geom_hline(
       yintercept = 0,
       size = zeroline_size,
@@ -1224,7 +1524,18 @@ plot_recruitment_devs <- function(model,
 #' @param zeroline_size thickness of the line across zero
 #' @param zeroline_type type of the line across zero
 #' @param lrp_ribbon_alpha transparency of the reference point credible interval ribbon
-#' @param refpt_show which reference point to show. See `model$mcmccalcs$r.quants`` for choices
+#' @param refpt_show which reference point to show. See `model$mcmccalcs$r.quants` for choices
+#' @param show_prod_usr Logical. Show the productive period USR. Default TRUE.
+#' @param prod_yrs Numeric vector. Productive period to calculate the USR.
+#'   Default 1990:1999.
+#' @param prop_prod Numeric. Proportion of productive period for USR. Default
+#'   1.0.
+#' @param show_prod_yrs Logical. Show vertical band for productive period.
+#'   Default TRUE.
+#' @param show_sbo_usr Logical. Show SB_0 USR. Default FALSE.
+#' @param prop_sbo Numeric. Proportion of SB_0 for USR. Default 0.6.
+#' @param show_blt_usr Logical. Show average long-term biomass USR. Default FALSE.
+#' @param prop_blt Numeric. Proportion of average long-term biomass for USR. Default 1.0.
 #' @param show_x_axis see [modify_axes_labels()]
 #' @param show_y_axis see [modify_axes_labels()]
 #' @param x_axis_label_size see [modify_axes_labels()]
@@ -1255,6 +1566,14 @@ plot_biomass_phase <- function(model,
                                zeroline_type = "dashed",
                                lrp_ribbon_alpha = 0.35,
                                refpt_show = "0.3sbo",
+                               show_prod_usr = FALSE,
+                               prod_yrs = 1990:1999,
+                               prop_prod = 1.0,
+                               show_prod_yrs = FALSE,
+                               show_sbo_usr = FALSE,
+                               prop_sbo = 0.6,
+                               show_blt_usr = FALSE,
+                               prop_blt = 1.0,
                                show_x_axis = TRUE,
                                show_y_axis = TRUE,
                                x_axis_label_size = 8,
@@ -1280,6 +1599,25 @@ plot_biomass_phase <- function(model,
     as_tibble(rownames = "year") %>%
     mutate(year = as.numeric(year))
   names(sbt) <- c("year", "lower", "median", "upper", "mpd")
+
+  prod_period <- sbt %>%
+    filter(year %in% prod_yrs) %>%
+    select(-year) %>%
+    summarise(
+      lower = mean(lower)*prop_prod,
+      median = mean(median)*prop_prod,
+      upper = mean(upper)* prop_prod
+    )
+
+  sbo <- as.numeric(model$mcmccalcs$r.quants["sbo", 2:4]) * prop_sbo
+
+  blt <- sbt %>%
+    select(-year) %>%
+    summarise(
+      lower = mean(lower)*prop_blt,
+      median = mean(median)*prop_blt,
+      upper = mean(upper)* prop_blt
+    )
 
   ct <- catch_df %>%
     select(-c(area, group, sex, type, region)) %>%
@@ -1308,11 +1646,6 @@ plot_biomass_phase <- function(model,
   names(lrp) <- c("year", "lower", "median", "upper")
   lrp[1, 1] <- as.character(min(sbt$year) - 2)
   lrp[, 1] <- as.numeric(lrp[, 1])
-  # # Add 0.38SB_0 (for HG)
-  # lrp2 <- lrp %>%
-  #   mutate( lower=lower/0.3*0.38,
-  #           median=median/0.3*0.38,
-  #           upper=upper/0.3*0.38 )
 
   g <- ggplot(dd, aes(
     x = median,
@@ -1338,17 +1671,41 @@ plot_biomass_phase <- function(model,
       alpha = lrp_ribbon_alpha,
       fill = "red",
       inherit.aes = FALSE
-    ) +
-    # geom_vline(xintercept = lrp2$median,
-    #            color = "blue",
-    #            size = line_size) +
-    # geom_rect(data = lrp2, aes(xmin = lrp2$lower,
-    #                           xmax = lrp2$upper,
-    #                           ymin = -Inf,
-    #                           ymax = Inf),
-    #           alpha = lrp_ribbon_alpha,
-    #           fill = "blue",
-    #           inherit.aes = FALSE) +
+    )
+
+  if (show_sbo_usr) {
+    g <- g +
+      geom_vline(xintercept = sbo[2]) +
+      annotate(geom = "rect", fill="black", alpha = lrp_ribbon_alpha,
+               xmin = sbo[1], xmax = sbo[3], ymin =-Inf , ymax = Inf)
+  }
+
+  if (show_prod_usr) {
+    g <- g +
+      geom_vline(xintercept = prod_period$median, colour = "green") +
+      annotate(
+        geom = "rect", fill="green", alpha = lrp_ribbon_alpha,
+        xmin = prod_period$lower, xmax = prod_period$upper,
+        ymin = -Inf, ymax = Inf
+      )
+  }
+
+  if (show_blt_usr) {
+    g <- g +
+      geom_vline(xintercept = blt$median, colour = "purple") +
+      annotate(geom = "rect", fill="purple", alpha = lrp_ribbon_alpha,
+               xmin = blt$lower, xmax = blt$upper, ymin = -Inf, ymax = Inf)
+  }
+
+  if (show_prod_yrs){
+    g <- g +
+      geom_point(
+        data = filter(dd, year %in% prod_yrs), colour = "blue",
+        size = point_size + 1, na.rm = TRUE
+      )
+  }
+
+  g <- g +
     geom_point(
       data = filter(dd, year != max(year)),
       aes(
@@ -1389,13 +1746,16 @@ plot_biomass_phase <- function(model,
         size = x_axis_label_size/2
       )
   }
+
   g <- modify_axes_labels(g,
     x_label_text = newline_format(
-      paste0(en2fr("Spawning biomass", translate), " (1,000 t)"),
+      paste0(en2fr("Spawning biomass", translate),
+             ifelse(translate, " (1 000 t)", " (1,000 t)")),
       x_axis_label_newline_length
     ),
     y_label_text = newline_format(
-      paste0(en2fr("Spawning biomass production", translate), " (1,000 t)"),
+      paste0(en2fr("Spawning biomass production", translate),
+             ifelse(translate, " (1 000 t)", " (1,000 t)")),
       y_axis_label_newline_length
     ),
     show_x_axis = show_x_axis,
@@ -1774,8 +2134,10 @@ plot_bh <- function(models,
 
   g <- ggplot(d, aes(x = sbt, y = rt)) +
     labs(
-      x = paste(en2fr("Spawning biomass", translate), "(1,000 t)"),
-      y = paste(en2fr("Recruitment", translate), "(1,000 millions)")
+      x = paste(en2fr("Spawning biomass", translate),
+                ifelse(translate, " (1 000 t)", " (1,000 t)")),
+      y = paste(en2fr("Recruitment", translate),
+                ifelse(translate, " (1 000 millions)", " (1,000 millions)"))
     ) +
     geom_line(data = p) +
     geom_point(
@@ -1818,7 +2180,7 @@ plot_spawn_section <- function(model,
                                ncol = 2,
                                translate = FALSE){
   yrBreaks <- seq(from = 1950, to = 2030, by = 10)
-  if( !is.na(model) & scale ){
+  if( scale ){
     qVals <- tibble(Survey = c("Surface", "Dive"),
                     q = model$mcmccalcs$q.quants[2,])
   }
@@ -1828,7 +2190,7 @@ plot_spawn_section <- function(model,
       left_join( y=qVals, by="Survey") %>%
       mutate(Index = Index / q)
   }
-  if( !is.na(sections) ) {
+  if( !any(is.na(sections)) ) {
     dat <- dat %>%
       mutate(Section = as.numeric(Section)) %>%
       filter(Section %in% sections)
@@ -1836,7 +2198,7 @@ plot_spawn_section <- function(model,
   dat <- dat %>%
     mutate(Survey = factor(Survey, levels = c("Surface", "Dive")),
            Section = formatC(Section, width = 3, format = "d", flag = "0"))
-  if(!is.na(yr_range)) {
+  if(!any(is.na(yr_range))) {
     dat <- dat %>%
       filter(Year %in% c(min(yr_range):max(yr_range)))
   }
@@ -1870,16 +2232,18 @@ plot_spawn_section <- function(model,
     scale_y_continuous(labels = function(x) x / 1000) +
     facet_wrap(Name ~ ., ncol = ncol, scales = "free_y") +
     theme(legend.position = "top")
-  if(!is.na(yr_range)){
+  if(!any(is.na(yr_range))){
     g <- g +
       expand_limits(x = yr_range)
   }
   if(scale){
     g <- g +
-      labs(y = paste0(en2fr("Scaled abundance", translate), " (1,000 t)"))
+      labs(y = paste0(en2fr("Scaled abundance", translate),
+                      ifelse(translate, " (1 000 t)", " (1,000 t)")))
   } else {
     g <- g +
-      labs(y = paste0(en2fr("Spawn index", translate), " (1,000 t)"))
+      labs(y = paste0(en2fr("Spawn index", translate),
+                      ifelse(translate, " (1 000 t)", " (1,000 t)")))
   }
   g
 }
