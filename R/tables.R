@@ -252,9 +252,9 @@ decision_tables_mp <- function(df,
   df$label <- gsub("_", "\\\\_", df$label)
 
   # If the conservation target is less than 75%, show -- for TAC and hr
-  df <- df %>%
-    mutate(tac = ifelse(obj1 < 0.75, NA, tac),
-           targ.hr = ifelse(obj1 < 0.75, NA, targ.hr))
+  # df <- df %>%
+  #   mutate(tac = ifelse(obj1 < 0.75, NA, tac),
+  #          targ.hr = ifelse(obj1 < 0.75, NA, targ.hr))
 
   df <- df %>%
     mutate(om,
@@ -272,9 +272,8 @@ decision_tables_mp <- function(df,
                          ifelse(translate, " \\%", "\\%")),
            obj3 = f(obj3, dec.points = dec_pts),
            obj4 = f(obj4, dec.points = dec_pts),
-           tac = ifelse(tac == "--", "--", f(tac, dec.points = dec_pts)),
-           targ.hr = ifelse(targ.hr == "--", "--", f(targ.hr, dec.points = dec_pts)))
-  df[is.na(df)] <- "--"
+           tac = f(tac, dec.points = dec_pts),
+           targ.hr = f(targ.hr, dec.points = dec_pts))
 
   col_align = paste0("ll", paste(rep("|c", times = ncol(df) - 2), collapse = ""))
 
