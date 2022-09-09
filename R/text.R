@@ -38,22 +38,24 @@ stock_status_text <- function(SAR,
     if (translate) {
       ifelse(
         vars$final_yr_sbt[2] > vars$prev_yr_sbt[2],
-        "a diminué à ",
-        "a augmenté à "
+        "a diminué de ",
+        "a augmenté de "
       )
     },
     if (!translate) {
       ifelse(
         vars$final_yr_sbt[2] > vars$prev_yr_sbt[2],
-        "increased to ",
-        "decreased to "
+        "increased from ",
+        "decreased from "
       )
     },
+    f(vars$prev_yr_sbt[2]),
+    ifelse(translate, " à ", " to "),
     f(vars$final_yr_sbt[2]), "$\\,\\text{t}$ ",
     ifelse(
       translate,
       "(médiane postérieure), ce qui correspond à ",
-      "(posterior median), which is equal to "
+      "(posterior median), and is equivalent to "
     ),
     f(vars$final_yr_dt[2] * 100, 1), "% ",
     ifelse(translate, "de ", "of "),
