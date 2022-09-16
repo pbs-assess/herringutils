@@ -394,3 +394,42 @@ decision_tables_mp <- function(df,
         tabular.environment = "tabular",
         hline.after = NULL)
 }
+
+#' Table showing productive period and related information
+#'
+#' @param dat list with SARs, years, and proportion
+#' @param cap caption for table
+#' @param translate Logical. Translate to french if TRUE
+#' @param ... arguments passed to [csas_table()]
+#'
+#' @importFrom tibble tibble
+#' @importFrom rosettafish en2fr
+#' @importFrom csasdown csas_table
+#'
+#' @export
+#' @return a [csasdown::csas_table()]
+prod_period_table <- function(dat,
+                              cap = "",
+                              translate = FALSE,
+                              ...) {
+  yrs_min <- sapply(X = dat, FUN = function(x) min(x$yrs))
+  yrs_max <- sapply(X = dat, FUN = function(x) max(x$yrs))
+  prop <- sapply(X = dat, FUN = function(x) x$prop)
+  tab <- tibble(
+    SAR = names(dat),
+    Years = paste(
+      yrs_min,
+      yrs_max,
+      sep = ifelse(translate, " \U00E0 ", " to ")
+    ),
+    Proportion = formatC(prop, digits = 2, format = "f")
+  )
+  names(tab) <- en2fr(names(tab), translate)
+  csas_table(tab,
+    format = "latex",
+    align = c("l", "l", "r"),
+    caption = cap,
+    bold_header = TRUE,
+    ...
+  )
+}
