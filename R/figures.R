@@ -8,6 +8,8 @@
 #' @importFrom rosettafish en2fr
 #' @export
 #' @return A ggplot object
+#'
+library(gcookbook)#added for stacked figures
 plot_catch <- function(df,
                        xlim = c(1000, 3000),
                        translate = FALSE) {
@@ -1149,12 +1151,12 @@ plot_biomass_catch <- function(model,
                                lrp_ribbon_alpha = 0.35,
                                between_bars = 0.75,
                                refpt_show = "0.3sbo",
-                               show_prod_usr = FALSE,
+                               show_prod_usr = TRUE,
                                prod_yrs = 1990:1999,
                                prop_prod = 1.0,
-                               show_prod_yrs = FALSE,
+                               show_prod_yrs = TRUE,
                                show_sbo_usr = FALSE,
-                               prop_sbo = 0.6,
+                               prop_sbo = 0.5,
                                show_blt_usr = FALSE,
                                prop_blt = 1.0,
                                col_catch = TRUE,
@@ -1205,6 +1207,9 @@ sbt <- as.data.frame(sbt) %>%
     )
 
   sbo <- as.numeric(model$mcmccalcs$r.quants["sbo", 2:4]) * prop_sbo
+  sbo60 <- as.numeric(model$mcmccalcs$r.quants["sbo", 2:4]) * .6
+  sbo50 <- as.numeric(model$mcmccalcs$r.quants["sbo", 2:4]) * .5
+  sbo40 <- as.numeric(model$mcmccalcs$r.quants["sbo", 2:4]) * .4
 
   blt <- sbt %>%
     select(-year) %>%
@@ -1262,10 +1267,10 @@ sbt <- as.data.frame(sbt) %>%
 
   if (show_prod_usr) {
     g <- g +
-      geom_hline(yintercept = prod_period$median, colour = "green") +
-      annotate(geom = "rect", fill="green", alpha = lrp_ribbon_alpha,
-               xmin = -Inf, xmax = Inf,
-               ymin = prod_period$lower, ymax = prod_period$upper)
+      geom_hline(yintercept = prod_period$median, colour = "blue")# + #blue at JC request
+      #annotate(geom = "rect", fill="green", alpha = lrp_ribbon_alpha,
+      #         xmin = -Inf, xmax = Inf,
+      #         ymin = prod_period$lower, ymax = prod_period$upper)
   }
 
   if (show_blt_usr) {
