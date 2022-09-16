@@ -41,6 +41,7 @@ input_data_table <- function(tab,
   tab <- tab[, c("Source", "Data", "Years")]
 
   names(tab) <- en2fr(names(tab), translate)
+  names(tab) <- latex.bold(names(tab))
   csas_table(tab,
              format = "latex",
              caption = cap,
@@ -83,6 +84,7 @@ total_landed_catch_table <- function(tab,
   sar <- en2fr("SAR", translate)
   ahead <- c(" "=1, sar=(ncol(tab)-1))
   names(ahead) <- c(" ", sar)
+  names(tab) <- latex.bold(names(tab))
   csas_table(tab,
              format = "latex",
              align = c("l", rep("r", 5)),
@@ -133,6 +135,7 @@ sok_harvest_table <- function(tab,
   sar <- en2fr("SAR", translate)
   ahead <- c(" "=1, sar=(ncol(tab)-1))
   names(ahead) <- c(" ", sar)
+  names(tab) <- latex.bold(names(tab))
   csas_table(tab,
              format = "latex",
              align = c("l", rep("r", 5)),
@@ -164,6 +167,7 @@ spawn_index_by_area_table <- function(tab,
   tab[-c(1, 2)] <- apply(tab[-c(1, 2)], c(1,2), f, 3)
   tab[2] <- apply(tab[2], c(1,2), f)
   names(tab) <- en2fr(names(tab), translate, allow_missing = TRUE)
+  names(tab) <- latex.bold(names(tab))
   csas_table(tab,
              format = "latex",
              align = c("l", rep("r", ncol(tab) - 1)),
@@ -425,11 +429,11 @@ prod_period_table <- function(dat,
     Proportion = formatC(prop, digits = 2, format = "f")
   )
   names(tab) <- en2fr(names(tab), translate)
+  names(tab) <- latex.bold(names(tab))
   csas_table(tab,
     format = "latex",
     align = c("l", "l", "r"),
     caption = cap,
-    bold_header = TRUE,
     ...
   )
 }
