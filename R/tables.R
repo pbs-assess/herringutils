@@ -416,24 +416,25 @@ prod_period_table <- function(dat,
                               cap = "",
                               translate = FALSE,
                               ...) {
+  regs <- sapply(X = dat, FUN = function(x) x$region)
   yrs_min <- sapply(X = dat, FUN = function(x) min(x$yrs))
   yrs_max <- sapply(X = dat, FUN = function(x) max(x$yrs))
   prop <- sapply(X = dat, FUN = function(x) x$prop)
   tab <- tibble(
-    SAR = names(dat),
+    SAR = regs,
     Years = paste(
       yrs_min,
       yrs_max,
       sep = ifelse(translate, " \U00E0 ", " to ")
     ),
     Proportion = formatC(prop, digits = 2, format = "f")
-  )
-  tab <- tab[, 1:2]
+  ) %>%
+    select(SAR, Years)
   names(tab) <- en2fr(names(tab), translate)
   names(tab) <- latex.bold(names(tab))
   csas_table(tab,
     format = "latex",
-    align = c("l", "c"),
+    align = c("l", "l"),
     caption = cap,
     ...
   )
