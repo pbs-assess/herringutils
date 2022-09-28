@@ -429,7 +429,8 @@ prod_period_table <- function(dat,
     ),
     Proportion = formatC(prop, digits = 2, format = "f")
   ) %>%
-    select(SAR, Years)
+    select(SAR, Years) %>%
+    mutate(SAR = en2fr(SAR, translate))
   names(tab) <- en2fr(names(tab), translate)
   names(tab) <- latex.bold(names(tab))
   csas_table(tab,
