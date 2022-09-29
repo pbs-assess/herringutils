@@ -140,9 +140,9 @@ hcr.ref.pts <- function(bt,
   if(is.na(catch.cap)){
     catch.cap <- 0
   }
-  if(catch.cap > 0 && tac > catch.cap){
+  if(catch.cap > 0 && tac >= catch.cap){
     tac <- catch.cap
-    hr <- catch.cap / bt
+    hr <- 1 - ((bt - catch.cap) / bt)
   }
   c(tac, hr)
 }
