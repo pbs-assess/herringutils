@@ -1151,10 +1151,10 @@ plot_biomass_catch <- function(model,
                                lrp_ribbon_alpha = 0.35,
                                between_bars = 0.75,
                                refpt_show = "0.3sbo",
-                               show_prod_usr = TRUE,
+                               show_prod_usr = FALSE,
                                prod_yrs = 1990:1999,
                                prop_prod = 1.0,
-                               show_prod_yrs = TRUE,
+                               show_prod_yrs = FALSE,
                                show_sbo_usr = FALSE,
                                prop_sbo = 0.5,
                                show_blt_usr = FALSE,
@@ -1267,7 +1267,7 @@ sbt <- as.data.frame(sbt) %>%
 
   if (show_prod_usr) {
     g <- g +
-      geom_hline(yintercept = prod_period$median, colour = "blue")# + #blue at JC request
+      geom_hline(yintercept = prod_period$median, colour = "blue", size = line_size)# + #blue at JC request
       #annotate(geom = "rect", fill="green", alpha = lrp_ribbon_alpha,
       #         xmin = -Inf, xmax = Inf,
       #         ymin = prod_period$lower, ymax = prod_period$upper)

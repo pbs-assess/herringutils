@@ -20,7 +20,7 @@ plot_biomass_catch(
   prop_prod = 1,
   show_prod_yrs = FALSE,
   show_sbo_usr = FALSE,
-  prop_sbo = 0.6,
+  prop_sbo = 0.5,
   show_blt_usr = FALSE,
   prop_blt = 1,
   col_catch = TRUE,
@@ -37,6 +37,7 @@ plot_biomass_catch(
   y_axis_position = "left",
   annot = "d",
   label_points = FALSE,
+  label_round = 1,
   translate = FALSE
 )
 }
