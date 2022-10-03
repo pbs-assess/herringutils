@@ -8,8 +8,6 @@
 #' @importFrom rosettafish en2fr
 #' @export
 #' @return A ggplot object
-#'
-library(gcookbook)#added for stacked figures
 plot_catch <- function(df,
                        xlim = c(1000, 3000),
                        translate = FALSE) {
