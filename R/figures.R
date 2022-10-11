@@ -396,8 +396,7 @@ plot_coastwide_biomass_catch <- function(
       Name = en2fr(Name, translate),
       Name = factor(
         Name,
-        levels = c(en2fr("Spawning biomass", translate),
-                   en2fr("Catch", translate))
+        levels = c(en2fr("Spawning biomass"), en2fr("Catch"))
       ),
       SAR = factor(SAR, levels = reg_names)
     )
@@ -458,7 +457,7 @@ plot_biomass_total_biomass <- function(
 
   sbt <- sbt %>%
     select(Year, Median, SAR) %>%
-    rename(Spawning = Median)
+    rename(`Spawning biomass` = Median)
 
   tbt <- data.frame()
 
@@ -471,7 +470,7 @@ plot_biomass_total_biomass <- function(
     yrs <- scan(file = rep_file, skip = yr_line, nlines = 1, quiet = TRUE)
     bt_line <- grep(pattern = "\\bbt\\b", x = dat)
     bt <- scan(file = rep_file, skip = bt_line, nlines = 1, quiet = TRUE)
-    dat <- tibble(Year = yrs, Total = bt) %>%
+    dat <- tibble(Year = yrs, `Total biomass` = bt) %>%
       filter(Year != proj_yr)
     dat$SAR = reg_names[i]
     ifelse(i == 1,
@@ -482,19 +481,17 @@ plot_biomass_total_biomass <- function(
 
   df <- sbt %>%
     full_join(y = tbt, by = c("Year", "SAR")) %>%
-    replace_na(replace = list(Spawning = 0, Total = 0)) %>%
+    replace_na(replace = list(`Spawning biomass` = 0, `Total biomass` = 0)) %>%
     pivot_longer(
-      cols = c(Spawning, Total),
+      cols = c(`Spawning biomass`, `Total biomass`),
       names_to = "Name",
       values_to = "Value"
     ) %>%
     mutate(
-      Name = ifelse(Name == "Spawning", "Spawning biomass", "Total biomass"),
       Name = en2fr(Name, translate),
       Name = factor(
         Name,
-        levels = c(en2fr("Total biomass", translate),
-                   en2fr("Spawning biomass", translate))
+        levels = c(en2fr("Total biomass"), en2fr("Spawning biomass"))
       ),
       SAR = factor(SAR, levels = reg_names)
     )
