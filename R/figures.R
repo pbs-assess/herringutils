@@ -396,7 +396,9 @@ plot_coastwide_biomass_catch <- function(
       Name = en2fr(Name, translate),
       Name = factor(
         Name,
-        levels = c(en2fr("Spawning biomass"), en2fr("Catch"))
+        levels = c(
+          en2fr("Spawning biomass", translate), en2fr("Catch", translate)
+          )
       ),
       SAR = factor(SAR, levels = reg_names)
     )
@@ -491,7 +493,10 @@ plot_biomass_total_biomass <- function(
       Name = en2fr(Name, translate),
       Name = factor(
         Name,
-        levels = c(en2fr("Total biomass"), en2fr("Spawning biomass"))
+        levels = c(
+          en2fr("Total biomass", translate),
+          en2fr("Spawning biomass", translate)
+          )
       ),
       SAR = factor(SAR, levels = reg_names)
     )
