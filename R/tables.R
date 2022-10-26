@@ -162,7 +162,7 @@ spawn_index_by_area_table <- function(tab,
                                       first_yr,
                                       translate = FALSE,
                                       ...){
-  tab <- filter( tab, Year>=first_yr )
+  tab <- filter(tab, Year >= first_yr)
   names(tab) <- gsub("&", "\\\\&", names(tab))
   tab[-c(1, 2)] <- apply(tab[-c(1, 2)], c(1,2), f, 3)
   tab[2] <- apply(tab[2], c(1,2), f)
