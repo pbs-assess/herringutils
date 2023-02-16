@@ -19,6 +19,8 @@ plot_recruitment(
   y_axis_tick_label_size = 8,
   x_axis_label_newline_length = 50,
   y_axis_label_newline_length = 40,
+  x_axis_position = "bottom",
+  y_axis_position = "left",
   annot = "c",
   show_r0 = TRUE,
   line_size_r0 = 0.5,

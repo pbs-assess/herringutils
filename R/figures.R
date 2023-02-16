@@ -748,6 +748,8 @@ plot_scaled_abundance <- function(df,
                                   y_axis_tick_label_size = 8,
                                   x_axis_label_newline_length = 50,
                                   y_axis_label_newline_length = 40,
+                                  x_axis_position = "bottom",
+                                  y_axis_position = "left",
                                   annot = "a",
                                   show_legend = FALSE,
                                   translate = FALSE) {
@@ -798,12 +800,9 @@ plot_scaled_abundance <- function(df,
     ) +
     scale_shape_manual(values = c(2, 1)) +
     scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10),
-                       labels = NULL, name = NULL,
-                       sec.axis = sec_axis(
-                         ~ ., name = NULL,
-                         breaks = seq(from = 1900, to = 2100, by = 10),
-                         labels = seq(from = 1900, to = 2100, by = 10)),
-                       ) +
+                       name = NULL,
+                       position = x_axis_position) +
+    scale_y_continuous(position = y_axis_position) +
     geom_line(
       data = ssb,
       aes(x = year, y = median, group = survey),
@@ -824,7 +823,7 @@ plot_scaled_abundance <- function(df,
         label = paste0("(", annot, ")"),
         vjust = 1.3,
         hjust = -0.1,
-        size = 3
+        size = x_axis_label_size/2
       )
   }
   if (!show_legend) {
@@ -894,6 +893,8 @@ plot_natural_mortality <- function(model,
                                    y_axis_tick_label_size = 8,
                                    x_axis_label_newline_length = 50,
                                    y_axis_label_newline_length = 40,
+                                   x_axis_position = "bottom",
+                                   y_axis_position = "left",
                                    annot = "b",
                                    translate = FALSE) {
   m <- model$mcmccalcs$nat.mort.quants %>%
@@ -918,12 +919,10 @@ plot_natural_mortality <- function(model,
     ) +
     geom_ribbon(aes(ymin = lower, ymax = upper), alpha = ribbon_alpha) +
     scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10),
-                       labels = NULL, name = NULL,
-                       sec.axis = sec_axis(
-                         ~ ., name = NULL,
-                         breaks = seq(from = 1900, to = 2100, by = 10),
-                         labels = seq(from = 1900, to = 2100, by = 10)),
-    ) +
+                       #labels = NULL,
+                       name = NULL,
+                       position = x_axis_position) +
+    scale_y_continuous(position = y_axis_position) +
     expand_limits(y = c(0, y_max))
   if (!is.na(xlim[1])) {
     g <- g +
@@ -938,7 +937,7 @@ plot_natural_mortality <- function(model,
         label = paste0("(", annot, ")"),
         vjust = 1.3,
         hjust = -0.1,
-        size = 3
+        size = x_axis_label_size/2
       )
   }
   g <- modify_axes_labels(g,
@@ -1014,6 +1013,8 @@ plot_recruitment <- function(model,
                              y_axis_tick_label_size = 8,
                              x_axis_label_newline_length = 50,
                              y_axis_label_newline_length = 40,
+                             x_axis_position = "bottom",
+                             y_axis_position = "left",
                              annot = "c",
                              show_r0 = TRUE,
                              line_size_r0 = 0.5,
@@ -1051,7 +1052,8 @@ plot_recruitment <- function(model,
       size = line_size / 2,
       width = 0
     ) +
-    scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10)) +
+    scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10), position = x_axis_position) +
+    scale_y_continuous(position = y_axis_position) +
     expand_limits(y = 0)
   if (!is.na(xlim[1])) {
     g <- g +
@@ -1066,7 +1068,7 @@ plot_recruitment <- function(model,
         label = paste0("(", annot, ")"),
         vjust = 1.3,
         hjust = -0.1,
-        size = 3
+        size = x_axis_label_size/2
       )
   }
 
@@ -1157,7 +1159,7 @@ plot_biomass_catch <- function(model,
                                prop_prod = 1.0,
                                show_prod_yrs = FALSE,
                                show_sbo_usr = FALSE,
-                               prop_sbo = 0.6,
+                               prop_sbo = 0.5,
                                show_blt_usr = FALSE,
                                prop_blt = 1.0,
                                col_catch = TRUE,
@@ -1170,8 +1172,14 @@ plot_biomass_catch <- function(model,
                                y_axis_tick_label_size = 8,
                                x_axis_label_newline_length = 50,
                                y_axis_label_newline_length = 40,
+                               x_axis_position = "bottom",
+                               y_axis_position = "left",
                                annot = "d",
+                               label_points = FALSE,
+                               label_round = 1,
                                translate = FALSE) {
+
+
   if (length(unique(catch_df$region)) > 1) {
     stop("There is more than one region in the catch_df data frame", call. = FALSE)
   }
@@ -1179,7 +1187,9 @@ plot_biomass_catch <- function(model,
   proj_yr <- as.numeric(gsub("B", "", colnames(proj)[2]))
   proj_sbt <- as.numeric(c(proj_yr, proj[, 2]))
   names(proj_sbt) <- c("year", "lower", "median", "upper")
-  proj_sbt <- as_tibble(t(proj_sbt))
+  #proj_sbt <- as_tibble(t(proj_sbt))
+  proj_sbt <- as.data.frame(t(proj_sbt)) %>%
+    mutate(label = paste0(year, ": ", round(median, label_round), " kt"))
 
   sbt <- model$mcmccalcs$sbt.quants %>%
     t() %>%
@@ -1187,6 +1197,8 @@ plot_biomass_catch <- function(model,
     mutate(year = as.numeric(year)) %>%
     filter(year != proj_yr)
   names(sbt) <- c("year", "lower", "median", "upper", "mpd")
+sbt <- as.data.frame(sbt) %>%
+  mutate(label = paste0(year, ": ", round(median, label_round), " kt"))
 
   prod_period <- sbt %>%
     filter(year %in% prod_yrs) %>%
@@ -1198,6 +1210,9 @@ plot_biomass_catch <- function(model,
     )
 
   sbo <- as.numeric(model$mcmccalcs$r.quants["sbo", 2:4]) * prop_sbo
+  sbo60 <- as.numeric(model$mcmccalcs$r.quants["sbo", 2:4]) * .6
+  sbo50 <- as.numeric(model$mcmccalcs$r.quants["sbo", 2:4]) * .5
+  sbo40 <- as.numeric(model$mcmccalcs$r.quants["sbo", 2:4]) * .4
 
   blt <- sbt %>%
     select(-year) %>%
@@ -1221,6 +1236,7 @@ plot_biomass_catch <- function(model,
   lrp[1, 1] <- as.character(min(sbt$year) - 2)
   lrp[, 1] <- as.numeric(lrp[, 1])
 
+
   g <- ggplot(sbt, aes(x = year, y = median))
 
   if (show_prod_yrs){
@@ -1235,9 +1251,12 @@ plot_biomass_catch <- function(model,
       yintercept = lrp$median,
       color = "red",
       size = line_size
+
     ) +
     geom_rect(
-      data = lrp, aes(xmin = -Inf, xmax = Inf, ymin = lrp$lower, ymax = lrp$upper),
+      #lrp line size may appear different depending on the y axis range
+      #data = lrp, aes(xmin = 2018, xmax = Inf, ymin = lrp$median-line_size/2, ymax = lrp$median + line_size/2),
+      data = lrp, aes(xmin = 2018, xmax = Inf, ymin = lrp$lower, ymax = lrp$upper),
       alpha = lrp_ribbon_alpha,
       fill = "red"
     )
@@ -1251,10 +1270,10 @@ plot_biomass_catch <- function(model,
 
   if (show_prod_usr) {
     g <- g +
-      geom_hline(yintercept = prod_period$median, colour = "green") +
-      annotate(geom = "rect", fill="green", alpha = lrp_ribbon_alpha,
-               xmin = -Inf, xmax = Inf,
-               ymin = prod_period$lower, ymax = prod_period$upper)
+      geom_hline(yintercept = prod_period$median, colour = "blue", size = line_size)# + #blue at JC request
+      #annotate(geom = "rect", fill="green", alpha = lrp_ribbon_alpha,
+      #         xmin = -Inf, xmax = Inf,
+      #         ymin = prod_period$lower, ymax = prod_period$upper)
   }
 
   if (show_blt_usr) {
@@ -1300,7 +1319,37 @@ plot_biomass_catch <- function(model,
     guides(fill = FALSE) +
     scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10),
                        labels = seq(from = 1900, to = 2100, by = 10),
-                       name = NULL)
+                       name = NULL, position = x_axis_position)
+
+  if (label_points == TRUE){
+    g <- g +
+      geom_text_repel(
+        aes(label = ifelse(year == assess_yr, label,'')),
+        nudge_x = -10,
+        box.padding = 0.5,
+        nudge_y = 20, #max(sbt$upper),
+        segment.curvature = -0.1,
+        segment.ncp = 5,
+        segment.angle = 20,
+        #xlim = c(NA, assess_yr-3)
+        size    = x_axis_label_size/2
+      ) +
+      geom_point(color = ifelse(sbt$year == assess_yr, "red", NA)) +
+      geom_text_repel(
+        data = proj_sbt,
+        aes(label = label),
+        nudge_x = -5,
+        box.padding = 0.5,
+        nudge_y = max(sbt$upper),
+        segment.curvature = -0.1,
+        segment.ncp = 5,
+        segment.angle = 90,
+        size    = x_axis_label_size/2,
+        xlim = c(NA, assess_yr-3)
+      )+
+      geom_point(data = proj_sbt, color = "red")
+  }
+
 
   if (!is.na(xlim[1])) {
     g <- g +
@@ -1315,7 +1364,7 @@ plot_biomass_catch <- function(model,
         label = paste0("(", annot, ")"),
         vjust = 1.3,
         hjust = -0.1,
-        size = 3
+        size = x_axis_label_size/2
       )
   }
   g <- modify_axes_labels(g,
@@ -1389,6 +1438,8 @@ plot_recruitment_devs <- function(model,
                                   y_axis_tick_label_size = 8,
                                   x_axis_label_newline_length = 50,
                                   y_axis_label_newline_length = 40,
+                                  x_axis_position = "bottom",
+                                  y_axis_position = "left",
                                   annot = "e",
                                   translate = FALSE) {
   recdev <- model$mcmccalcs$recr.devs.quants %>%
@@ -1432,7 +1483,8 @@ plot_recruitment_devs <- function(model,
     # geom_line(aes(y = runmean),
     #   color = "red",
     # size = line_size) +
-    scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10))
+    scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10), position = x_axis_position) +
+    scale_y_continuous(position = y_axis_position)
   if (!is.na(xlim[1])) {
     g <- g +
       coord_cartesian(xlim = xlim, expand = TRUE)
@@ -1446,7 +1498,7 @@ plot_recruitment_devs <- function(model,
         label = paste0("(", annot, ")"),
         vjust = 1.3,
         hjust = -0.1,
-        size = 3
+        size = x_axis_label_size/2
       )
   }
   g <- modify_axes_labels(g,
@@ -1538,6 +1590,8 @@ plot_biomass_phase <- function(model,
                                y_axis_tick_label_size = 8,
                                x_axis_label_newline_length = 50,
                                y_axis_label_newline_length = 40,
+                               x_axis_position = "bottom",
+                               y_axis_position = "left",
                                annot = "f",
                                translate = FALSE) {
   stopifnot(
@@ -1697,7 +1751,7 @@ plot_biomass_phase <- function(model,
         label = paste0("(", annot, ")"),
         vjust = 1.3,
         hjust = -0.1,
-        size = 3
+        size = x_axis_label_size/2
       )
   }
 
