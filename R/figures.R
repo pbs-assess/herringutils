@@ -160,6 +160,75 @@ plot_wa <- function(df,
   g
 }
 
+plot_wa2 <- function(df,
+                    circle_age = 3,
+                    xlim = c(1000, 3000),
+                    ylim = c(0, NA),
+                    n_roll = 5,
+                    major = TRUE,
+                    translate = FALSE) {
+  df <- df %>%
+    filter(year >= xlim[1])
+  dfm <- melt(df, id.vars = c("year", "area", "group", "sex", "region", "gear")) %>%
+    as_tibble() %>%
+    rename(
+      Year = year,
+      Age = variable,
+      Weight = value
+    ) %>%
+    select(-c(area, group, sex)) %>%
+    group_by(region, Age) %>%
+    mutate(muWeight = rollmean(x = Weight, k = n_roll, align = "right", na.pad = TRUE)) %>%
+    ungroup() %>%
+    mutate(Age = factor(Age),
+           gear = factor(gear))
+  #dfm_circle_age <- dfm %>%
+  #  filter(Age == circle_age)
+  #dfm <- dfm %>%
+  #  filter(Age != circle_age)
+
+  dshade <- data.frame(Age = c(2:10), Shade = c(.8, 1, .9, .8, .4, .3, .2 , .1, .1))
+  # need to add in colors dshade <- data.frame(Age = c(2:10), Shade = c(.8, 1, .9, .8, .4, .3, .2 , .1, .1))
+  dfm <- merge(dfm, dshade, by = "Age", all.x=TRUE)
+
+  g <- ggplot(dfm, aes(x = Year, y = muWeight, group = Age, alpha = Shade), na.remove = TRUE) +
+#    geom_point(
+    #      data = dfm_circle_age,
+    # aes(x = Year, y = Weight),
+    # shape = 1,
+    # size = 2,
+    # na.rm = TRUE
+    #) +
+
+
+    scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10)) +
+    coord_cartesian(xlim, ylim) +
+    expand_limits(x = xlim[1]:xlim[2]) +
+    labs(
+      x = en2fr("Year", translate),
+      y = paste0(en2fr("Weight-at-age", translate), " (kg)")
+    ) +
+    facet_wrap(vars(region), ncol = 1)
+  if(major) {
+    g <- g +
+      geom_line(aes(x = Year, y = muWeight, group = Age, alpha = Shade), na.rm = TRUE ) +
+      geom_line(
+        data = dfm, aes(x = Year, y = muWeight), linewidth = .8,
+        na.rm = TRUE
+      ) +
+      guides(alpha = "none")
+  } else {
+    g <- g +
+      geom_line(aes(x = Year, y = Weight, group = Age, alpha = Shade), na.rm = TRUE ) +
+      geom_line(
+        data = dfm, aes(x = Year, y = Weight), linewidth = .8,
+        na.rm = TRUE
+      ) +
+      guides(alpha = "none")
+  }
+  g
+}
+
 #' Plot proportions-at-age time series from a data frames as extracted from iscam data (dat) files
 #'
 #' @param df a data frame as constructed by [get_pa()]
