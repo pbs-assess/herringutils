@@ -161,7 +161,6 @@ plot_wa <- function(df,
 }
 
 plot_wa2 <- function(df,
-                    circle_age = 3,
                     xlim = c(1000, 3000),
                     ylim = c(0, NA),
                     n_roll = 5,
@@ -181,26 +180,13 @@ plot_wa2 <- function(df,
     mutate(muWeight = rollmean(x = Weight, k = n_roll, align = "right", na.pad = TRUE)) %>%
     ungroup() %>%
     mutate(Age = factor(Age),
-           gear = factor(gear))
-  #dfm_circle_age <- dfm %>%
-  #  filter(Age == circle_age)
-  #dfm <- dfm %>%
-  #  filter(Age != circle_age)
-
+           gear = factor(gear),
+           label = if_else(Year == max(Year), as.character(Age), NA_character_))
   dshade <- data.frame(Age = c(2:10), Shade = c(.8, 1, .9, .8, .4, .3, .2 , .1, .1))
-  # need to add in colors dshade <- data.frame(Age = c(2:10), Shade = c(.8, 1, .9, .8, .4, .3, .2 , .1, .1))
   dfm <- merge(dfm, dshade, by = "Age", all.x=TRUE)
 
-  g <- ggplot(dfm, aes(x = Year, y = muWeight, group = Age, alpha = Shade), na.remove = TRUE) +
-#    geom_point(
-    #      data = dfm_circle_age,
-    # aes(x = Year, y = Weight),
-    # shape = 1,
-    # size = 2,
-    # na.rm = TRUE
-    #) +
 
-
+  g <- ggplot(dfm, aes(x = Year, y = muWeight, group = Age, color = Age), na.remove = TRUE) +
     scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10)) +
     coord_cartesian(xlim, ylim) +
     expand_limits(x = xlim[1]:xlim[2]) +
@@ -211,20 +197,27 @@ plot_wa2 <- function(df,
     facet_wrap(vars(region), ncol = 1)
   if(major) {
     g <- g +
-      geom_line(aes(x = Year, y = muWeight, group = Age, alpha = Shade), na.rm = TRUE ) +
-      geom_line(
-        data = dfm, aes(x = Year, y = muWeight), linewidth = .8,
-        na.rm = TRUE
-      ) +
-      guides(alpha = "none")
+      geom_line(aes(x = Year, y = muWeight, group = Age, color = Age), na.rm = TRUE ) +
+      geom_line(data = dfm, aes(x = Year, y = muWeight), linewidth = .8, na.rm = TRUE) +
+      scale_color_manual(                         values = c("#2B8CBE", "#0868AC", "#084081", "#000099",
+                                    "#0080FF", "#99CCFF","#4EB3D3","#7BCCC4", "#A8DDB5")) +
+      geom_dl(aes(label = Age), method = list(dl.combine("first.points", "last.points")), cex = 0.1) +
+      theme(legend.position="none")
+
   } else {
     g <- g +
-      geom_line(aes(x = Year, y = Weight, group = Age, alpha = Shade), na.rm = TRUE ) +
+      geom_line(aes(x = Year, y = Weight, group = Age, color = Age), na.rm = TRUE ) +
       geom_line(
         data = dfm, aes(x = Year, y = Weight), linewidth = .8,
         na.rm = TRUE
       ) +
-      guides(alpha = "none")
+      scale_color_manual(name = "Age",
+                         labels = c(2:10),
+                         values = c("#2B8CBE", "#0868AC", "#084081", "#000099",
+                                  "#0080FF", "#99CCFF","#4EB3D3","#7BCCC4", "#A8DDB5")) +
+                                    geom_dl(aes(label = Age), method = list(dl.combine("first.points", "last.points")), cex = 0.5) +
+      geom_dl(aes(label = Age), method = list(dl.combine("first.points", "last.points")), cex = 0.1) +
+      theme(legend.position="none")
   }
   g
 }
