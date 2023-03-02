@@ -185,7 +185,7 @@ plot_wa2 <- function(df,
     mutate(Age = factor(Age),
            gear = factor(gear,
                          levels = c(1,2,3),
-                         labels = c("Food and Bait", "Seine", "Gillnet"))
+                         labels = c("Food and Bait", "Seine", "Gillnet")))
 
   g <- ggplot(df, aes(x = Year, y = muWeight, group = Age, color = Age), na.remove = TRUE) +
     scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10)) +
@@ -202,7 +202,7 @@ plot_wa2 <- function(df,
       geom_line(data = df, aes(x = Year, y = muWeight), linewidth = .8, na.rm = TRUE) +
       scale_color_manual(                         values = c("#2B8CBE", "#0868AC", "#084081", "#000099",
                                     "#0080FF", "#99CCFF","#4EB3D3","#7BCCC4", "#A8DDB5")) +
-      geom_dl(aes(label = Age), method = list(dl.combine("first.points", "last.points")), cex = 0.1) +
+      directlabels::geom_dl(aes(label = Age), method = list(dl.combine("first.points", "last.points")), cex = 0.1) +
       theme(legend.position="none")
 
   } else {
@@ -213,7 +213,6 @@ plot_wa2 <- function(df,
                          labels = c(2:10),
                          values = c("#2B8CBE", "#0868AC", "#084081", "#000099",
                                   "#0080FF", "#99CCFF","#4EB3D3","#7BCCC4", "#A8DDB5")) +
-                                    geom_dl(aes(label = Age), method = list(dl.combine("first.points", "last.points")), cex = 0.5) +
       directlabels::geom_dl(aes(label = Age), method = list(dl.combine("first.points", "last.points")), cex = 0.1) +
       theme(legend.position="none")
   }
