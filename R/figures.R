@@ -167,26 +167,27 @@ plot_wa2 <- function(df,
                     major = TRUE,
                     translate = FALSE) {
   df <- df %>%
-    filter(year >= xlim[1])
-  dfm <- melt(df, id.vars = c("year", "area", "group", "sex", "region", "gear")) %>%
-    as_tibble() %>%
+    filter(Year >= xlim[1]) %>%
+    pivot_longer(a2:a10,
+                 names_to = "Age",
+                 names_prefix = "a",
+                 names_transform = list(Age = as.integer),
+                 values_to = "Weight") %>%
     rename(
-      Year = year,
-      Age = variable,
-      Weight = value
+      #Year = year,
+      region = Stock,
+      gear = Gear
     ) %>%
-    select(-c(area, group, sex)) %>%
-    group_by(region, Age) %>%
+    select(-c(Area)) %>%
+    group_by(region, gear, Age) %>%
     mutate(muWeight = rollmean(x = Weight, k = n_roll, align = "right", na.pad = TRUE)) %>%
     ungroup() %>%
     mutate(Age = factor(Age),
-           gear = factor(gear),
-           label = if_else(Year == max(Year), as.character(Age), NA_character_))
-  dshade <- data.frame(Age = c(2:10), Shade = c(.8, 1, .9, .8, .4, .3, .2 , .1, .1))
-  dfm <- merge(dfm, dshade, by = "Age", all.x=TRUE)
+           gear = factor(gear,
+                         levels = c(1,2,3),
+                         labels = c("Food and Bait", "Seine", "Gillnet"))
 
-
-  g <- ggplot(dfm, aes(x = Year, y = muWeight, group = Age, color = Age), na.remove = TRUE) +
+  g <- ggplot(df, aes(x = Year, y = muWeight, group = Age, color = Age), na.remove = TRUE) +
     scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10)) +
     coord_cartesian(xlim, ylim) +
     expand_limits(x = xlim[1]:xlim[2]) +
@@ -194,11 +195,11 @@ plot_wa2 <- function(df,
       x = en2fr("Year", translate),
       y = paste0(en2fr("Weight-at-age", translate), " (kg)")
     ) +
-    facet_wrap(vars(region), ncol = 1)
+    facet_wrap(vars(gear), ncol = 1)
   if(major) {
     g <- g +
       geom_line(aes(x = Year, y = muWeight, group = Age, color = Age), na.rm = TRUE ) +
-      geom_line(data = dfm, aes(x = Year, y = muWeight), linewidth = .8, na.rm = TRUE) +
+      geom_line(data = df, aes(x = Year, y = muWeight), linewidth = .8, na.rm = TRUE) +
       scale_color_manual(                         values = c("#2B8CBE", "#0868AC", "#084081", "#000099",
                                     "#0080FF", "#99CCFF","#4EB3D3","#7BCCC4", "#A8DDB5")) +
       geom_dl(aes(label = Age), method = list(dl.combine("first.points", "last.points")), cex = 0.1) +
@@ -206,17 +207,14 @@ plot_wa2 <- function(df,
 
   } else {
     g <- g +
-      geom_line(aes(x = Year, y = Weight, group = Age, color = Age), na.rm = TRUE ) +
-      geom_line(
-        data = dfm, aes(x = Year, y = Weight), linewidth = .8,
-        na.rm = TRUE
-      ) +
+      geom_line(aes(x = Year, y = Weight, group = Age, color = Age), na.rm = TRUE) +
+      geom_line(data = df, aes(x = Year, y = Weight), linewidth = .8, na.rm = TRUE) +
       scale_color_manual(name = "Age",
                          labels = c(2:10),
                          values = c("#2B8CBE", "#0868AC", "#084081", "#000099",
                                   "#0080FF", "#99CCFF","#4EB3D3","#7BCCC4", "#A8DDB5")) +
                                     geom_dl(aes(label = Age), method = list(dl.combine("first.points", "last.points")), cex = 0.5) +
-      geom_dl(aes(label = Age), method = list(dl.combine("first.points", "last.points")), cex = 0.1) +
+      directlabels::geom_dl(aes(label = Age), method = list(dl.combine("first.points", "last.points")), cex = 0.1) +
       theme(legend.position="none")
   }
   g

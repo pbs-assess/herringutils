@@ -12,6 +12,7 @@ License: GPL-3
 Encoding: UTF-8
 Imports:
   dplyr,
+  directlabels,
   ggplot2,
   cowplot,
   rosettafish,
@@ -27,9 +28,9 @@ Imports:
   zoo,
   xtable,
   kableExtra,
+  readr,
   stats,
   grid
 Depends: R (>= 3.5.0)
 LazyData: true
-RoxygenNote: 7.2.1
-
+RoxygenNote: 7.2.3
