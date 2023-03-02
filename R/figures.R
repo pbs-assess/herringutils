@@ -160,7 +160,7 @@ plot_wa <- function(df,
   g
 }
 
-plot_wa2 <- function(df,
+plot_wa_by_gear <- function(df,
                     xlim = c(1000, 3000),
                     ylim = c(0, NA),
                     n_roll = 5,
@@ -174,7 +174,6 @@ plot_wa2 <- function(df,
                  names_transform = list(Age = as.integer),
                  values_to = "Weight") %>%
     rename(
-      #Year = year,
       region = Stock,
       gear = Gear
     ) %>%
@@ -236,6 +235,81 @@ plot_wa2 <- function(df,
 #' @importFrom rosettafish en2fr
 #' @export
 #' @return A ggplot object
+plot_pa_by_gear <- function(df,
+                    age_plus = 10,
+                    conf = 0.9,
+                    xlim = c(1000, 3000),
+                    ylim = c(0, NA),
+                    size_range = c(0.5, 2.5),
+                    translate = FALSE) {
+  # df <- pa_SOG
+  df <- df %>%
+    filter(Year >= xlim[1]) %>%
+    pivot_longer(a2:a10,
+               names_to = "Age",
+               names_prefix = "a",
+               names_transform = list(Age = as.integer),
+               values_to = "Number") %>%
+    select(-c(Area, Group, a1)) %>%
+    mutate(Age = ifelse(Age > age_plus, age_plus, Age),
+           Gear = factor(Gear,
+                         levels = c(1,2,3),
+                         labels = c("Food and Bait", "Seine", "Gillnet"))) %>%
+    group_by(Gear, Year, Age) %>%
+    summarize(Number = sum(Number)) %>%
+    mutate(Proportion = Number / ifelse(all(is.na(Number)), NA, sum(Number, na.rm = TRUE))) %>%
+    ungroup()
+
+  # Determine weighted mean and approximate CI age by year
+  df_ci <- df %>%
+    select(Gear, Year, Age, Proportion) %>%
+    mutate(Age = as.numeric(Age)) %>%
+    group_by(Gear, Year) %>%
+    summarize(
+      MeanAge = weighted.mean(x = Age, w = Proportion),
+      sBar = qnorm(1 - (1 - conf) / 2) * sum(sqrt(Proportion * (1 - Proportion)) / sqrt(Age)),
+      Lower = exp(log(MeanAge) - log(sBar)),
+      Upper = exp(log(MeanAge) + log(sBar))
+    ) %>%
+    ungroup() %>%
+    mutate(GroupID = consecutive_group(Year))
+
+  g <- ggplot(df, aes(x = Year)) +
+    geom_point(aes(
+      y = Age,
+      size = ifelse(Proportion, Proportion, NA),
+      alpha =  ifelse(Proportion, Proportion, NA)
+      ),
+    na.rm = TRUE,
+    show.legend = FALSE
+    ) +
+    scale_alpha(range = c(0.4, 1))+
+    geom_path(
+      data = df_ci,
+      aes(y = MeanAge, group = GroupID),
+      linewidth = 1.25,
+      na.rm = TRUE,
+      alpha = .3
+    ) +
+    scale_size_continuous(range = size_range) +
+    geom_ribbon(
+      data = df_ci,
+      aes(ymin = Lower, ymax = Upper, group = GroupID),
+      alpha = 0.25
+    ) +
+    scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10)) +
+    coord_cartesian(xlim, ylim) +
+    expand_limits(x = xlim[1]:xlim[2]) +
+    labs(
+      size = en2fr("Proportion", translate),
+      x = en2fr("Year", translate),
+      y = en2fr("Age", translate)
+    ) +
+    facet_wrap(vars(Gear), ncol = 1) +
+    guides(alpha = "none")
+  g
+}
+
 plot_pa <- function(df,
                     age_plus = 10,
                     conf = 0.9,
@@ -286,7 +360,7 @@ plot_pa <- function(df,
       y = Age,
       size = ifelse(Proportion, Proportion, NA),
       alpha =  ifelse(Proportion, Proportion, NA)
-      ),
+    ),
     na.rm = TRUE,
     show.legend = FALSE
     ) +
