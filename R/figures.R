@@ -194,7 +194,7 @@ plot_wa_by_gear <- function(df,
       x = en2fr("Year", translate),
       y = paste0(en2fr("Weight-at-age", translate), " (kg)")
     ) +
-    facet_wrap(vars(gear), ncol = 1)
+    facet_wrap(vars(gear), scales = "free_x", ncol = 1)
   if(major) {
     g <- g +
       geom_line(aes(x = Year, y = muWeight, group = Age, color = Age), na.rm = TRUE ) +
@@ -305,7 +305,7 @@ plot_pa_by_gear <- function(df,
       x = en2fr("Year", translate),
       y = en2fr("Age", translate)
     ) +
-    facet_wrap(vars(Gear), ncol = 1) +
+    facet_wrap(vars(Gear), scales = "free_x", ncol = 1) +
     guides(alpha = "none")
   g
 }
