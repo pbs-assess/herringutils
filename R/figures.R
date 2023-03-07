@@ -160,6 +160,24 @@ plot_wa <- function(df,
   g
 }
 
+#' Plot weight-at-age time series from a data frames as extracted from csv files
+#' created by dataSummaries
+#' @param df a data frame
+#' @param xlim Limits for the years shown on the plot
+#' @param ylim limits for the weights shown on the plot
+#' @param n_roll Number of years to calculate the rolling mean (window)
+#' @param major Logical. Major SAR or not.
+#' @param translate Logical. If TRUE, translate to French
+#'
+#' @importFrom dplyr filter as_tibble rename mutate group_by ungroup select pivot_longer %>%
+#' @importFrom directlabels geom_dl
+#' @importFrom ggplot2 ggplot aes geom_line geom_point coord_cartesian expand_limits labs facet_wrap
+#' @importFrom reshape2 melt
+#' @importFrom rosettafish en2fr
+#' @importFrom zoo rollmean
+
+#' @export
+#' @return A ggplot object
 plot_wa_by_gear <- function(df,
                     xlim = c(1000, 3000),
                     ylim = c(0, NA),
@@ -316,6 +334,24 @@ plot_pa <- function(df,
   g
 }
 
+
+#' Plot proportions-at-age time series by gear type
+#'
+#' @param df a data frame
+#' @param age_plus age plus group
+#' @param conf confidence value for the envelope
+#' @param xlim limits for the years shown on the plot
+#' @param ylim limits for the ages shown on the plot
+#' @param size_range vector of min and max for range of sizes of points
+#' @param translate Logical. If TRUE, translate to French
+#'
+#' @importFrom dplyr filter as_tibble rename mutate group_by ungroup select summarize
+#' @importFrom ggplot2 ggplot aes geom_point geom_path scale_size_continuous geom_ribbon
+#' coord_cartesian expand_limits labs facet_wrap theme
+#' @importFrom reshape2 melt
+#' @importFrom rosettafish en2fr
+#' @export
+#' @return A ggplot object
 plot_pa_by_gear <- function(df,
                             age_plus = 10,
                             conf = 0.9,
