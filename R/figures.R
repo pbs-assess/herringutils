@@ -40,7 +40,7 @@ plot_catch <- function(df,
 #'   scale_fill_viridis_d
 #' @importFrom dplyr mutate
 #' @importFrom rosettafish en2fr
-#' @importFrom scales comma
+#' @importFrom scales comma label_number
 #'
 #' @export
 #' @return A ggplot object.
@@ -64,6 +64,7 @@ plot_ic <- function(df,
                     ifelse(translate, " (x 1 000)", " (x 1,000)")),
          fill = en2fr("Type", translate, case = "sentence")) +
     scale_fill_viridis_d() +
+    scale_x_continuous(labels = label_number(accuracy = 1, big.mark = "")) +
     scale_y_continuous(labels = comma) +
     facet_wrap(vars(Region), ncol = 1, scales = "free_y") +
     theme(legend.position = "top")
@@ -169,12 +170,13 @@ plot_wa <- function(df,
 #' @param major Logical. Major SAR or not.
 #' @param translate Logical. If TRUE, translate to French
 #'
-#' @importFrom dplyr filter as_tibble rename mutate group_by ungroup select pivot_longer %>%
+#' @importFrom dplyr filter as_tibble rename mutate group_by ungroup select %>%
 #' @importFrom directlabels geom_dl
 #' @importFrom ggplot2 ggplot aes geom_line geom_point coord_cartesian expand_limits labs facet_wrap
 #' @importFrom reshape2 melt
 #' @importFrom rosettafish en2fr
 #' @importFrom zoo rollmean
+#' @importFrom tidyr pivot_longer
 
 #' @export
 #' @return A ggplot object
