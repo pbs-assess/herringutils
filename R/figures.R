@@ -1368,7 +1368,7 @@ plot_biomass_catch <- function(model,
     mutate(year = as.numeric(year)) %>%
     filter(year != proj_yr)
   names(sbt) <- c("year", "lower", "median", "upper", "mpd")
-sbt <- as.data.frame(sbt) %>%
+  sbt <- as.data.frame(sbt) %>%
   mutate(label = paste0(year, ": ", round(median, label_round), " kt"))
 
   prod_period <- sbt %>%
@@ -1785,7 +1785,7 @@ plot_biomass_phase <- function(model,
     summarise(
       lower = mean(lower)*prop_prod,
       median = mean(median)*prop_prod,
-      upper = mean(upper)* prop_prod
+      upper = mean(upper)*prop_prod
     )
 
   sbo <- as.numeric(model$mcmccalcs$r.quants["sbo", 2:4]) * prop_sbo
