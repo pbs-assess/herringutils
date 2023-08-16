@@ -9,7 +9,7 @@ plot_recruitment(
   point_size = 1,
   line_size = 1,
   prod_yrs = 1990:1999,
-  show_prod_yrs = FALSE,
+  show_prod_yrs = TRUE,
   xlim = NA,
   show_x_axis = FALSE,
   show_y_axis = TRUE,

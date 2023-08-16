@@ -9,7 +9,7 @@ plot_natural_mortality(
   line_size = 0.75,
   ribbon_alpha = 0.5,
   prod_yrs = 1990:1999,
-  show_prod_yrs = FALSE,
+  show_prod_yrs = TRUE,
   xlim = NA,
   y_max = NA,
   show_x_axis = TRUE,
