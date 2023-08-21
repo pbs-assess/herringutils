@@ -270,8 +270,8 @@ decision_tables_mp <- function(df,
            targ.hr = f(targ.hr, dec.points = dec_pts)) %>%
     select(om, label, obj1, obj2, obj3, obj4, tac, targ.hr) %>%
     # Change NA to dash
-    mutate(tac = ifelse(grepl(pattern = "NA", x = tac), "- ", tac),
-           targ.hr = ifelse(grepl(pattern = "NA", x = targ.hr), "- ", targ.hr))
+    mutate(tac = ifelse(grepl(pattern = "NA", x = tac), "-- ", tac),
+           targ.hr = ifelse(grepl(pattern = "NA", x = targ.hr), "-- ", targ.hr))
 
   col_align = paste0("ll", paste(rep("c", times = ncol(df) - 2), collapse = ""))
 
