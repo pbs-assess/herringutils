@@ -255,12 +255,11 @@ decision_tables_mp <- function(df,
 
   df$label <- gsub("_", "\\\\_", df$label)
 
-  # If the conservation target is < 75%, no TAC or HR (NA)
-  # df <- df %>%
-  #   mutate(tac = ifelse(obj1 < 0.75, NA, tac),
-  #          targ.hr = ifelse(obj1 < 0.75, NA, targ.hr))
-
   df <- df %>%
+    # If the conservation target is < 75%, set TAC and HR to NA
+    mutate(tac = ifelse(obj1 < 0.75, NA, tac),
+           targ.hr = ifelse(obj1 < 0.75, NA, targ.hr)) %>%
+    # Formatting
     mutate(obj1 = paste0(f(obj1 * 100, dec.points = perc_dec_pts),
                          ifelse(translate, " \\%", "\\%")),
            obj2 = paste0(f(obj2 * 100, dec.points = perc_dec_pts),
@@ -269,7 +268,10 @@ decision_tables_mp <- function(df,
            obj4 = f(obj4, dec.points = dec_pts),
            tac = f(tac, dec.points = dec_pts),
            targ.hr = f(targ.hr, dec.points = dec_pts)) %>%
-    select(om, label, obj1, obj2, obj3, obj4, tac, targ.hr)
+    select(om, label, obj1, obj2, obj3, obj4, tac, targ.hr) %>%
+    # Change NA to dash
+    mutate(tac = ifelse(tac == "  NA", " -- ", tac),
+           targ.hr = ifelse(targ.hr == "  NA", " -- ", targ.hr))
 
   col_align = paste0("ll", paste(rep("c", times = ncol(df) - 2), collapse = ""))
 
