@@ -64,7 +64,7 @@ plot_ic <- function(df,
                     ifelse(translate, " (x 1 000)", " (x 1,000)")),
          fill = en2fr("Type", translate, case = "sentence")) +
     scale_fill_viridis_d() +
-    scale_x_continuous(labels = label_number(accuracy = 1, big.mark = "")) +
+    scale_x_continuous(labels = xlim[1]:xlim[2], breaks = xlim[1]:xlim[2]) +
     scale_y_continuous(labels = comma) +
     facet_wrap(vars(Region), ncol = 1, scales = "free_y") +
     theme(legend.position = "top")
