@@ -2426,3 +2426,15 @@ plot_spawn_section <- function(model,
   }
   g
 }
+
+ppt_theme <- function() {
+  theme(
+    point_size = 4,
+    line_size = 2,
+    x_axis_label_size = 20,
+    x_axis_tick_label_size = 20,
+    y_axis_label_size = 20,
+    y_axis_tick_label_size = 20,
+    y_axis_label_newline_length = 40
+  )
+}
