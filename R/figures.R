@@ -742,8 +742,9 @@ plot_harvest_rate <- function(df,
   ssb <- arrange(transform(ssb, region = factor(region, levels = regions)), region)
 
   g <- ggplot(ssb, aes(x = year, y = ut)) +
-    geom_point(size = line_size, na.rm = TRUE) +
-    geom_errorbar(aes(ymin = utlower, ymax = utupper), size = line_size / 2) +
+    geom_point(size = point_size, na.rm = TRUE) +
+    geom_errorbar(aes(ymin = utlower, ymax = utupper), size = point_size / 2,
+                  width = 0) +
     geom_hline(yintercept = h_line, linetype = "dashed") +
     scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10)) +
     labs(
