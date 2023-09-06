@@ -242,23 +242,28 @@ spawn_index_table <- function(tab,
 #' @importFrom xtable xtable
 #' @importFrom dplyr as_tibble mutate
 decision_tables_mp <- function(df,
-                                   xcaption = "Default",
-                                   xlabel = "tab:default",
-                                   p_sb_ave_prod = "",
-                                   font.size = 11,
-                                   space.size = 15,
-                                   placement = "ht",
-                                   perc_dec_pts = 0,
-                                   dec_pts = 2,
-                                   inc_mps = NA,
-                                   translate = FALSE){
+                               xcaption = "Default",
+                               xlabel = "tab:default",
+                               p_sb_ave_prod = "",
+                               font.size = 11,
+                               space.size = 15,
+                               placement = "ht",
+                               perc_dec_pts = 0,
+                               dec_pts = 2,
+                               inc_mps = NA,
+                               hide_tac_hr_below_targ = FALSE,
+                               translate = FALSE){
 
   df$label <- gsub("_", "\\\\_", df$label)
 
+  # If the conservation target is < 75%, set TAC and HR to NA
+  if(hide_tac_hr_below_targ) {
+    df <- df %>%
+      mutate(tac = ifelse(obj1 < 0.75, NA, tac),
+             targ.hr = ifelse(obj1 < 0.75, NA, targ.hr))
+  }
+
   df <- df %>%
-    # If the conservation target is < 75%, set TAC and HR to NA
-    mutate(tac = ifelse(obj1 < 0.75, NA, tac),
-           targ.hr = ifelse(obj1 < 0.75, NA, targ.hr)) %>%
     # Formatting
     mutate(obj1 = paste0(f(obj1 * 100, dec.points = perc_dec_pts),
                          ifelse(translate, " \\%", "\\%")),

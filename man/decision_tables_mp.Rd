@@ -15,6 +15,7 @@ decision_tables_mp(
   perc_dec_pts = 0,
   dec_pts = 2,
   inc_mps = NA,
+  hide_tac_hr_below_targ = FALSE,
   translate = FALSE
 )
 }
