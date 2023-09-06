@@ -8,7 +8,7 @@ plot_harvest_rate(
   df,
   models,
   regions,
-  line_size = 1,
+  point_size = 1,
   ribbon_alpha = 0.35,
   ylim = c(0, 1),
   h_line = 0.2,
@@ -22,8 +22,6 @@ plot_harvest_rate(
 
 \item{regions}{a vector of regions names in the order they are to appear in the facets}
 
-\item{line_size}{thickness of the mediat Ut line}
-
 \item{ribbon_alpha}{transparency of the ribbon representing the  credible interval for Ut}
 
 \item{ylim}{Limits to show on the y-axis. Implemented with [ggplot2::coord_cartesian()]}
@@ -31,6 +29,8 @@ plot_harvest_rate(
 \item{h_line}{horizontal line value to plot}
 
 \item{translate}{Logical. If TRUE, translate to French}
+
+\item{line_size}{thickness of the mediat Ut line}
 }
 \value{
 a ggplot object

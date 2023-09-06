@@ -703,7 +703,7 @@ plot_biomass_total_biomass <- function(
 plot_harvest_rate <- function(df,
                               models,
                               regions,
-                              line_size = 1,
+                              point_size = 1,
                               ribbon_alpha = 0.35,
                               ylim = c(0, 1),
                               h_line = 0.2,
@@ -742,11 +742,8 @@ plot_harvest_rate <- function(df,
   ssb <- arrange(transform(ssb, region = factor(region, levels = regions)), region)
 
   g <- ggplot(ssb, aes(x = year, y = ut)) +
-    geom_line(
-      size = line_size,
-      na.rm = TRUE
-    ) +
-    geom_ribbon(aes(ymin = utlower, ymax = utupper), alpha = ribbon_alpha) +
+    geom_point(size = line_size, na.rm = TRUE) +
+    geom_errorbar(aes(ymin = utlower, ymax = utupper), size = line_size / 2) +
     geom_hline(yintercept = h_line, linetype = "dashed") +
     scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10)) +
     labs(
