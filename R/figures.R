@@ -2426,13 +2426,12 @@ plot_spawn_section <- function(model,
 }
 
 ppt_theme <- function() {
+  herring_theme() +
   theme(
     point_size = 4,
-    line_size = 2,
-    x_axis_label_size = 20,
-    x_axis_tick_label_size = 20,
-    y_axis_label_size = 20,
-    y_axis_tick_label_size = 20,
-    y_axis_label_newline_length = 40
+    line_size = element_line(linewidth = 2),
+    axis.line = element_line(linewidth = 20),
+    axis.ticks = element_line(size = 20)
   )
 }
+
