@@ -2385,7 +2385,7 @@ plot_spawn_section <- function(model,
     ~Section, ~Name,
     "067", "067 Kitasu Bay",
     "072", "072 Lower Spiller",
-    "074", "074 Thompson/Styker",
+    "074", "074 Thompson/Stryker",
     "078", "078 Upper Spiller")
 
   variable_names <- variable_names %>%
