@@ -1975,6 +1975,7 @@ plot_hcr <- function(hcr.lst,
                      line.width = 0.5,
                      show.medians = TRUE,
                      show.means = TRUE,
+                     show.shaded = FALSE,
                      show.x.axes = FALSE,
                      axis.text.size = 7,
                      panel.text.size = 3) {
@@ -2084,7 +2085,7 @@ plot_hcr <- function(hcr.lst,
             xmax = Inf
           ),
           inherit.aes = FALSE,
-          alpha = 0.2,
+          alpha = ifelse(show.shaded, 0.2, 0),
           color = "transparent",
           fill = "red"
         ) +
@@ -2097,7 +2098,7 @@ plot_hcr <- function(hcr.lst,
             ymax = Inf
           ),
           inherit.aes = FALSE,
-          alpha = 0.2,
+          alpha = ifelse(show.shaded, 0.2, 0),
           color = "transparent",
           fill = "red"
         ) +
@@ -2129,7 +2130,7 @@ plot_hcr <- function(hcr.lst,
             ymax = Inf
           ),
           inherit.aes = FALSE,
-          alpha = 0.2,
+          alpha = ifelse(show.shaded, 0.2, 0),
           color = "transparent",
           fill = "red"
         ) +
@@ -2142,7 +2143,7 @@ plot_hcr <- function(hcr.lst,
             xmax = Inf
           ),
           inherit.aes = FALSE,
-          alpha = 0.2,
+          alpha = ifelse(show.shaded, 0.2, 0),
           color = "transparent",
           fill = "red"
         )
@@ -2168,7 +2169,7 @@ plot_hcr <- function(hcr.lst,
             ymax = Inf
           ),
           inherit.aes = FALSE,
-          alpha = 0.2,
+          alpha = ifelse(show.shaded, 0.2, 0),
           color = "transparent",
           fill = "red"
         ) +
@@ -2181,7 +2182,7 @@ plot_hcr <- function(hcr.lst,
             xmax = Inf
           ),
           inherit.aes = FALSE,
-          alpha = 0.2,
+          alpha = ifelse(show.shaded, 0.2, 0),
           color = "transparent",
           fill = "red"
         )
