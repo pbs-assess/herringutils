@@ -7,13 +7,16 @@
 plot_hcr(
   hcr.lst,
   sbt.lst,
+  sbo.lst,
   mp = "",
   region = "",
   probs = c(0.025, 0.975),
+  depletion = TRUE,
   point.size = 0.05,
   line.width = 0.5,
   show.medians = TRUE,
   show.means = TRUE,
+  show.shaded = FALSE,
   show.x.axes = FALSE,
   axis.text.size = 7,
   panel.text.size = 3
@@ -25,11 +28,15 @@ containing the catch limit (tac) and associated harvest rate (hr)}
 
 \item{sbt.lst}{a list of vectors of timeseries biomass values (typically many posteriors)}
 
+\item{sbo.lst}{a list of vectors of timeseries unfish biomass values (typically many posteriors)}
+
 \item{mp}{name of the management procedure to appear on the blank panel}
 
 \item{region}{name for the region to appear on the blank panel}
 
 \item{probs}{vector of length 2 for credible interval of median}
+
+\item{depletion}{if TRUE, show depletion (SB_t/SB_0); if FALSE show SB_t}
 
 \item{point.size}{size of points}
 

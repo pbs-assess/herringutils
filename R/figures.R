@@ -1950,9 +1950,11 @@ plot_biomass_phase <- function(model,
 #' @param hcr.lst A list of length equal to the length of the sbt list, of vectors of length two,
 #'  containing the catch limit (tac) and associated harvest rate (hr)
 #' @param sbt.lst a list of vectors of timeseries biomass values (typically many posteriors)
+#' @param sbo.lst a list of vectors of timeseries unfish biomass values (typically many posteriors)
 #' @param mp name of the management procedure to appear on the blank panel
 #' @param region name for the region to appear on the blank panel
 #' @param probs vector of length 2 for credible interval of median
+#' @param depletion if TRUE, show depletion (SB_t/SB_0); if FALSE show SB_t
 #' @param show.medians show the median lines and credible intervals
 #' @param show.means show the mean lines
 #' @param show.x.axes if TRUE, axes labels, tick marks and tick labels will be shown on the lower plot's x axes
@@ -1968,9 +1970,11 @@ plot_biomass_phase <- function(model,
 #' @importFrom cowplot plot_grid
 plot_hcr <- function(hcr.lst,
                      sbt.lst,
+                     sbo.lst,
                      mp = "",
                      region = "",
                      probs = c(0.025, 0.975),
+                     depletion = TRUE,
                      point.size = 0.05,
                      line.width = 0.5,
                      show.medians = TRUE,
@@ -1983,16 +1987,24 @@ plot_hcr <- function(hcr.lst,
   tac <- sapply(hcr.lst, "[[", 1)
   hr <- sapply(hcr.lst, "[[", 2)
   sbt <- sapply(sbt.lst, "[[", length(sbt.lst[[1]]))
+  sbo <- sapply(sbo.lst, "[[", length(sbo.lst[[1]]))
+  # Biomass: either depletion or spawning biomass
+  if (depletion) {
+    bio <- sbt / sbo
+  } else {
+    bio <- sbt
+  }
   df <- tibble(
     tac = tac,
     hr = hr,
-    sbt = sbt
+    bio = bio
   )
   if (all(is.na(df$hr)) || all(is.na(df$tac))) {
     df <- data.frame()
     g <- ggplot(df) +
       geom_point() +
-      annotate("text", x = 100, y = 20, label = "No data", size = panel.text.size) +
+      annotate("text", x = 100, y = 20, label = "No data",
+               size = panel.text.size) +
       theme(
         axis.text.x = element_blank(),
         axis.text.y = element_blank(),
@@ -2004,7 +2016,8 @@ plot_hcr <- function(hcr.lst,
       ylab("")
     h <- ggplot(df) +
       geom_point() +
-      annotate("text", x = 100, y = 20, label = "No data", size = panel.text.size) +
+      annotate("text", x = 100, y = 20, label = "No data",
+               size = panel.text.size) +
       theme(
         axis.text.x = element_blank(),
         axis.text.y = element_blank(),
@@ -2016,7 +2029,8 @@ plot_hcr <- function(hcr.lst,
       ylab("")
     i <- ggplot(df) +
       geom_point() +
-      annotate("text", x = 100, y = 20, label = "No data", size = panel.text.size) +
+      annotate("text", x = 100, y = 20, label = "No data",
+               size = panel.text.size) +
       theme(
         axis.text.x = element_blank(),
         axis.text.y = element_blank(),
@@ -2040,7 +2054,7 @@ plot_hcr <- function(hcr.lst,
       ylab("") +
       xlab("TAC")
 
-    h <- ggplot(df, aes(x = sbt, y = tac)) +
+    h <- ggplot(df, aes(x = bio, y = tac)) +
       geom_point(
         size = point.size,
         na.rm = TRUE
@@ -2053,21 +2067,24 @@ plot_hcr <- function(hcr.lst,
       xlab("") +
       ylab("TAC")
 
-    i <- ggplot(df, aes(x = sbt, y = hr)) +
+    i <- ggplot(df, aes(x = bio, y = hr)) +
       geom_point(
         size = point.size,
         na.rm = TRUE
       ) +
       theme(axis.title = element_text(size = axis.text.size)) +
-      xlab("Projected SBt") +
+      xlab(ifelse(depletion, "Projected depletion", "Projected biomass")) +
       ylab("Harvest Rate")
 
     if (show.medians) {
-      quants.tac <- as_tibble(t(as.data.frame(quantile(tac, probs = probs, na.rm = TRUE)))) %>%
+      quants.tac <- as_tibble(t(as.data.frame(quantile(tac, probs = probs,
+                                                       na.rm = TRUE)))) %>%
         rename(lower = 1, upper = 2)
-      quants.hr <- as_tibble(t(as.data.frame(quantile(hr, probs = probs, na.rm = TRUE)))) %>%
+      quants.hr <- as_tibble(t(as.data.frame(quantile(hr, probs = probs,
+                                                      na.rm = TRUE)))) %>%
         rename(lower = 1, upper = 2)
-      quants.sbt <- as_tibble(t(as.data.frame(quantile(sbt, probs = probs)))) %>%
+      quants.bio <- as_tibble(t(as.data.frame(quantile(bio,
+                                                       probs = probs)))) %>%
         rename(lower = 1, upper = 2)
       g <- g +
         geom_vline(
@@ -2116,16 +2133,16 @@ plot_hcr <- function(hcr.lst,
           linetype = "dashed"
         ) +
         geom_vline(
-          xintercept = median(sbt),
+          xintercept = median(bio),
           color = "red",
           size = line.width,
           linetype = "dashed"
         ) +
         geom_rect(
-          data = quants.sbt,
+          data = quants.bio,
           aes(
-            xmin = quants.sbt$lower,
-            xmax = quants.sbt$upper,
+            xmin = quants.bio$lower,
+            xmax = quants.bio$upper,
             ymin = -Inf,
             ymax = Inf
           ),
@@ -2155,16 +2172,16 @@ plot_hcr <- function(hcr.lst,
           linetype = "dashed"
         ) +
         geom_vline(
-          xintercept = median(sbt),
+          xintercept = median(bio),
           color = "red",
           size = line.width,
           linetype = "dashed"
         ) +
         geom_rect(
-          data = quants.sbt,
+          data = quants.bio,
           aes(
-            xmin = quants.sbt$lower,
-            xmax = quants.sbt$upper,
+            xmin = quants.bio$lower,
+            xmax = quants.bio$upper,
             ymin = -Inf,
             ymax = Inf
           ),
