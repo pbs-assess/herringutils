@@ -2074,7 +2074,7 @@ plot_hcr <- function(hcr.lst,
       ) +
       theme(axis.title = element_text(size = axis.text.size)) +
       xlab(ifelse(depletion, "Projected depletion", "Projected biomass")) +
-      ylab("Harvest Rate")
+      ylab("HR")
 
     if (show.medians) {
       quants.tac <- as_tibble(t(as.data.frame(quantile(tac, probs = probs,
