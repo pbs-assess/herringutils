@@ -1960,6 +1960,7 @@ plot_biomass_phase <- function(model,
 #' @param show.x.axes if TRUE, axes labels, tick marks and tick labels will be shown on the lower plot's x axes
 #' @param panel.text.size text size for the description panels
 #' @param point.size size of points
+#' @param point.alpha transparency of points
 #' @param line.width width ot thickness of all lines
 #' @param axis.text.size size of text for axis labels
 #'
@@ -1975,7 +1976,8 @@ plot_hcr <- function(hcr.lst,
                      region = "",
                      probs = c(0.025, 0.975),
                      depletion = TRUE,
-                     point.size = 0.05,
+                     point.size = 0.3,
+                     point.alpha = 0.4,
                      line.width = 0.5,
                      show.medians = TRUE,
                      show.means = TRUE,
@@ -1999,6 +2001,7 @@ plot_hcr <- function(hcr.lst,
     hr = hr,
     bio = bio
   )
+  # If no data
   if (all(is.na(df$hr)) || all(is.na(df$tac))) {
     df <- data.frame()
     g <- ggplot(df) +
@@ -2040,12 +2043,11 @@ plot_hcr <- function(hcr.lst,
       ) +
       xlab("") +
       ylab("")
-  } else {
+  } else { # Else if data
     g <- ggplot(df, aes(x = tac, y = hr)) +
       geom_point(
-        size = point.size,
-        na.rm = TRUE
-      ) +
+        size = point.size, alpha = point.alpha, shape = 16, na.rm = TRUE
+        ) +
       theme(
         axis.text.y = element_blank(),
         axis.ticks.y = element_blank(),
@@ -2056,8 +2058,7 @@ plot_hcr <- function(hcr.lst,
 
     h <- ggplot(df, aes(x = bio, y = tac)) +
       geom_point(
-        size = point.size,
-        na.rm = TRUE
+        size = point.size, alpha = point.alpha, shape = 16, na.rm = TRUE
       ) +
       theme(
         axis.text.x = element_blank(),
@@ -2069,8 +2070,7 @@ plot_hcr <- function(hcr.lst,
 
     i <- ggplot(df, aes(x = bio, y = hr)) +
       geom_point(
-        size = point.size,
-        na.rm = TRUE
+        size = point.size, alpha = point.alpha, shape = 16, na.rm = TRUE
       ) +
       theme(axis.title = element_text(size = axis.text.size)) +
       xlab(ifelse(depletion, "Projected depletion", "Projected biomass")) +

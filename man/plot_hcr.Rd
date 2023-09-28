@@ -12,7 +12,8 @@ plot_hcr(
   region = "",
   probs = c(0.025, 0.975),
   depletion = TRUE,
-  point.size = 0.05,
+  point.size = 0.3,
+  point.alpha = 0.4,
   line.width = 0.5,
   show.medians = TRUE,
   show.means = TRUE,
@@ -39,6 +40,8 @@ containing the catch limit (tac) and associated harvest rate (hr)}
 \item{depletion}{if TRUE, show depletion (SB_t/SB_0); if FALSE show SB_t}
 
 \item{point.size}{size of points}
+
+\item{point.alpha}{transparency of points}
 
 \item{line.width}{width ot thickness of all lines}
 
