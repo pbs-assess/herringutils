@@ -1982,7 +1982,7 @@ plot_hcr <- function(hcr.lst,
                      show.medians = TRUE,
                      show.means = TRUE,
                      show.shaded = FALSE,
-                     show.x.axes = FALSE,
+                     show.x.axes = TRUE,
                      axis.text.size = 7,
                      panel.text.size = 3) {
   label <- paste0(region, "\n", gsub("_", "\n", mp))
@@ -2268,10 +2268,7 @@ plot_hcr <- function(hcr.lst,
     ylab("") +
     theme(plot.margin = ff)
 
-  plot_grid(h,
-    j,
-    i,
-    g,
+  plot_grid(h, j, i, g,
     nrow = 2,
     ncol = 2,
     align = "hv",

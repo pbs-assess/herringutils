@@ -18,7 +18,7 @@ plot_hcr(
   show.medians = TRUE,
   show.means = TRUE,
   show.shaded = FALSE,
-  show.x.axes = FALSE,
+  show.x.axes = TRUE,
   axis.text.size = 7,
   panel.text.size = 3
 )
