@@ -1120,7 +1120,7 @@ plot_natural_mortality <- function(model,
           "Instantaneous natural mortality",
           translate
         ), " (/",
-        en2fr("Year", translate, case = "lower"),
+        en2fr("yr", translate, case = "lower"),
         ")"
       ),
       y_axis_label_newline_length
