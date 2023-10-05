@@ -685,11 +685,13 @@ plot_biomass_total_biomass <- function(
   p
 }
 
-#' Title
+#' Effective harvest rate plot
 #'
 #' @param df a data frame as constructed by [get_catch()]
 #' @param models a list of iscam model objects
 #' @param regions a vector of regions names in the order they are to appear in the facets
+#' @param prop_msy proportion of F_MSY
+#' @param show_f_msy show horizontal line at prop_msy * F_MSY
 #' @param line_size thickness of the mediat Ut line
 #' @param ribbon_alpha transparency of the ribbon representing the  credible interval for Ut
 #' @param ylim Limits to show on the y-axis. Implemented with [ggplot2::coord_cartesian()]
@@ -703,6 +705,8 @@ plot_biomass_total_biomass <- function(
 plot_harvest_rate <- function(df,
                               models,
                               regions,
+                              prop_msy = 0.5,
+                              show_f_msy = FALSE,
                               point_size = 1,
                               ribbon_alpha = 0.35,
                               ylim = c(0, 1),
@@ -717,6 +721,7 @@ plot_harvest_rate <- function(df,
     j <- t(models[[x]]$mcmccalcs$sbt.quants) %>%
       as_tibble(rownames = "year") %>%
       mutate(year = as.numeric(year))
+    f_msy <- models[[x]]$mpd$fmsy[1]
     names(j) <- c("year", "lower", "median", "upper", "mpd")
     j <- j %>%
       full_join(dfm, by = "year") %>%
@@ -725,6 +730,7 @@ plot_harvest_rate <- function(df,
         utlower = ct / (ct + lower),
         ut = ct / (ct + median),
         utupper = ct / (ct + upper),
+        fmsy = f_msy * prop_msy,
         region = as.character(region)
       )
     yrs <- as.numeric(min(j$year):max(j$year))
@@ -739,7 +745,8 @@ plot_harvest_rate <- function(df,
     bind_rows()
 
   # Needed to have facets appear in same order as regions vector
-  ssb <- arrange(transform(ssb, region = factor(region, levels = regions)), region)
+  ssb <- arrange(transform(ssb, region = factor(region, levels = regions)),
+                 region)
 
   g <- ggplot(ssb, aes(x = year, y = ut)) +
     geom_point(size = point_size, na.rm = TRUE) +
@@ -752,6 +759,11 @@ plot_harvest_rate <- function(df,
       y = en2fr("Effective harvest rate", translate)
     ) +
     facet_wrap(vars(region), ncol = 1)
+
+  if (show_f_msy) {
+    g <- g +
+      geom_hline(data = ssb, aes(yintercept = fmsy), linetype = "dotted")
+  }
 
   if (!is.na(ylim[1])) {
     g <- g +
