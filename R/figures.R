@@ -1321,6 +1321,7 @@ plot_biomass_catch <- function(model,
                                line_size = 0.75,
                                ribbon_alpha = 0.5,
                                lrp_ribbon_alpha = 0.35,
+                               show_lrp_ribbon = TRUE,
                                between_bars = 0.75,
                                refpt_show = "0.3sbo",
                                show_prod_usr = TRUE,
@@ -1419,17 +1420,16 @@ plot_biomass_catch <- function(model,
     geom_hline(
       yintercept = lrp$median,
       color = "red",
-      size = line_size
+      size = line_size)
 
-    ) +
-    geom_rect(
+  if (show_lrp_ribbon){
+    g <- g + geom_rect(
       #lrp line size may appear different depending on the y axis range
       #data = lrp, aes(xmin = 2018, xmax = Inf, ymin = lrp$median-line_size/2, ymax = lrp$median + line_size/2),
       data = lrp, aes(xmin = 2018, xmax = Inf, ymin = lrp$lower, ymax = lrp$upper),
       alpha = lrp_ribbon_alpha,
-      fill = "red"
-    )
-
+      fill = "red")
+  }
   if (show_sbo_usr) {
     g <- g +
       geom_hline(yintercept = sbo[2]) +
