@@ -2,12 +2,14 @@
 % Please edit documentation in R/figures.R
 \name{plot_harvest_rate}
 \alias{plot_harvest_rate}
-\title{Title}
+\title{Effective harvest rate plot}
 \usage{
 plot_harvest_rate(
   df,
   models,
   regions,
+  prop_msy = 0.5,
+  show_f_msy = FALSE,
   point_size = 1,
   ribbon_alpha = 0.35,
   ylim = c(0, 1),
@@ -21,6 +23,10 @@ plot_harvest_rate(
 \item{models}{a list of iscam model objects}
 
 \item{regions}{a vector of regions names in the order they are to appear in the facets}
+
+\item{prop_msy}{proportion of F_MSY}
+
+\item{show_f_msy}{show horizontal line at prop_msy * F_MSY}
 
 \item{ribbon_alpha}{transparency of the ribbon representing the  credible interval for Ut}
 
@@ -36,5 +42,5 @@ plot_harvest_rate(
 a ggplot object
 }
 \description{
-Title
+Effective harvest rate plot
 }
