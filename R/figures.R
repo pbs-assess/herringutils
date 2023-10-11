@@ -1334,6 +1334,7 @@ plot_biomass_catch <- function(model,
                                ribbon_alpha = 0.5,
                                lrp_ribbon_alpha = 0.35,
                                show_lrp_ribbon = TRUE,
+                               show_catch = TRUE,
                                between_bars = 0.75,
                                refpt_show = "0.3sbo",
                                show_prod_usr = TRUE,
@@ -1464,14 +1465,18 @@ plot_biomass_catch <- function(model,
                xmin = -Inf, xmax = Inf, ymin = blt$lower, ymax = blt$upper)
   }
 
-  g <- g +
+  if (show_catch) {
+    g <- g +
     geom_bar(
       data = ct,
       stat = "identity",
       width = between_bars,
       position = "stack",
       aes(fill = gear)
-    ) +
+    )
+  }
+
+  g <- g +
     geom_line(
       size = line_size,
       na.rm = TRUE
@@ -1508,7 +1513,7 @@ plot_biomass_catch <- function(model,
         aes(label = ifelse(year == assess_yr, label,'')),
         nudge_x = -10,
         box.padding = 0.5,
-        nudge_y = 20, #max(sbt$upper),
+        nudge_y = 40, #max(sbt$upper),
         segment.curvature = -0.1,
         segment.ncp = 5,
         segment.angle = 20,
@@ -1521,7 +1526,7 @@ plot_biomass_catch <- function(model,
         aes(label = label),
         nudge_x = -5,
         box.padding = 0.5,
-        nudge_y = max(sbt$upper),
+        nudge_y = 30, #max(sbt$upper),
         segment.curvature = -0.1,
         segment.ncp = 5,
         segment.angle = 90,
