@@ -14,6 +14,7 @@ plot_biomass_catch(
   ribbon_alpha = 0.5,
   lrp_ribbon_alpha = 0.35,
   show_lrp_ribbon = TRUE,
+  show_catch = TRUE,
   between_bars = 0.75,
   refpt_show = "0.3sbo",
   show_prod_usr = TRUE,
