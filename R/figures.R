@@ -1293,6 +1293,7 @@ plot_recruitment <- function(model,
 #' @param line_size thickness of the median and LRP lines
 #' @param ribbon_alpha transparency value for the biomass credibility interval ribbon
 #' @param lrp_ribbon_alpha transparency value for the LRP credibility interval ribbon
+#' @param show_catch Logical. Show catch bar plot.
 #' @param between_bars amount of space between catch bars
 #' @param refpt_show which reference point to show. See `model$mcmccalcs$r.quants`` for choices
 #' @param show_prod_usr Logical. Show the productive period USR. Default TRUE.
@@ -2457,6 +2458,7 @@ plot_spawn_section <- function(model,
   g
 }
 
+#Needs fixing
 ppt_theme <- function() {
   herring_theme() +
   theme(
