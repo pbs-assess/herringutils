@@ -58,6 +58,8 @@ plot_biomass_catch(
 
 \item{lrp_ribbon_alpha}{transparency value for the LRP credibility interval ribbon}
 
+\item{show_catch}{Logical. Show catch bar plot.}
+
 \item{between_bars}{amount of space between catch bars}
 
 \item{refpt_show}{which reference point to show. See `model$mcmccalcs$r.quants`` for choices}

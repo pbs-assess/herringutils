@@ -48,6 +48,31 @@ input_data_table <- function(tab,
              ...)
 }
 
+#' General table for the herring assessment.
+#'
+#' @param tab data.frame as read in by [readr::read_csv()]
+#' @param cap caption for table
+#' @param translate Logical. Translate to french if TRUE
+#' @param ... arguments passed to [csas_table()]
+#'
+#' @importFrom rosettafish en2fr
+#' @importFrom csasdown csas_table
+#'
+#' @export
+#' @return a [csasdown::csas_table()]
+basic_table <- function(tab,
+                        cap = "",
+                        translate = FALSE,
+                        ...){
+
+  names(tab) <- en2fr(names(tab), translate)
+  names(tab) <- latex.bold(names(tab))
+  csas_table(tab,
+             format = "latex",
+             caption = cap,
+             ...)
+}
+
 #' Table showing the total landed catch by area for herring
 #'
 #' @param tab data.frame as returned from [gfiscamutils::get_catch()]
