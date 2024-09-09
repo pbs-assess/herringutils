@@ -33,4 +33,4 @@ Imports:
   grid
 Depends: R (>= 3.5.0)
 LazyData: true
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2

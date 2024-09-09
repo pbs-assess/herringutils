@@ -32,9 +32,8 @@ stock_status_text <- function(SAR,
     ifelse(
       translate,
       "Par rapport à l'année dernière, la biomasse reproductrice estimée en ",
-      "Compared to last year, estimated spawning biomass in "
+      "Compared to last year, estimated spawning biomass "
     ),
-    this_yr, " $\\SB_{", this_yr, "}$ ",
     if (translate) {
       ifelse(
         vars$final_yr_sbt[2] > vars$prev_yr_sbt[2],
@@ -49,13 +48,14 @@ stock_status_text <- function(SAR,
         "decreased from "
       )
     },
-    f(vars$prev_yr_sbt[2]),
+    f(vars$prev_yr_sbt[2]), " ($\\SB_{", this_yr - 1, "}$)",
     ifelse(translate, " à ", " to "),
     f(vars$final_yr_sbt[2]), "$\\,\\text{t}$ ",
+    "($\\SB_{", this_yr, "}$, ",
     ifelse(
       translate,
-      "(médiane postérieure), ce qui correspond à ",
-      "(posterior median), and is equivalent to "
+      "médiane postérieure), ce qui correspond à ",
+      "posterior median), and is equivalent to "
     ),
     f(vars$final_yr_dt[2] * 100, 1), "% ",
     ifelse(translate, "de ", "of "),
