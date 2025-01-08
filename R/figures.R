@@ -673,14 +673,14 @@ plot_biomass_total_biomass <- function(
     )
 
   p <- ggplot(data = df, mapping = aes(x = Year, y = Value, group = Name)) +
-    geom_line(mapping = aes(colour = Name)) +
+    geom_line(mapping = aes(linetype = Name)) +
     facet_wrap(vars(SAR), ncol = 1, scales = "free_y") +
     scale_x_continuous(breaks = seq(from = 1900, to = 2100, by = 10)) +
-    scale_colour_viridis_d() +
+    # scale_colour_viridis_d() +
     guides(fill = guide_legend(nrow = 2, byrow = TRUE)) +
     labs(x = en2fr("Year", translate),
          y = ifelse(translate, "Biomasse (1 000 t)", "Biomass (1,000 t)"),
-         colour = en2fr("Biomass", translate)) +
+         linetype = en2fr("Biomass", translate)) +
     theme(legend.position = "top", legend.text.align = 0)
   p
 }
