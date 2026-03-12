@@ -461,11 +461,13 @@ plot_spawn_ind <- function(df,
       filter(year %in% (min(yr_range):max(yr_range))) %>%
       complete(year = min(yr_range):max(yr_range), region)
   }
+  gear_levels <- en2fr(c("Surface", "Dive"), translate)
   df <- df %>%
     complete(year = min(df$year):max(df$year), region) %>%
     mutate(
       gear = ifelse(year < new_surv_yr, "Surface", "Dive"),
-      gear = factor(gear, levels=c("Surface", "Dive"))
+      gear = en2fr(gear, translate),
+      gear = factor(gear, levels = gear_levels)
     ) %>%
     select(-qind)
 
@@ -2424,9 +2426,13 @@ plot_spawn_section <- function(model,
   variable_names <- variable_names %>%
     mutate(Name  = en2fr(Name, translate, allow_missing = TRUE))
 
+  gear_levels <- en2fr(c("Surface", "Dive"), translate)
+
   dat <- dat %>%
     left_join(variable_names, by = "Section") %>%
-    mutate(Name = ifelse(is.na(Name), Section, Name))
+    mutate(Name = ifelse(is.na(Name), Section, Name),
+           Survey = en2fr(Survey, translate),
+           Survey = factor(Survey, levels = gear_levels))
 
   g <- ggplot(data = dat, mapping = aes(x = Year, y = Index)) +
     geom_point(mapping = aes(shape = Survey), size = 1, na.rm = TRUE) +
