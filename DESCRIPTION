@@ -17,7 +17,7 @@ Imports:
   cowplot,
   rosettafish,
   reshape2,
-  csasdown,
+  csasdowntex,
   stringr,
   gfutilities,
   ggrepel,

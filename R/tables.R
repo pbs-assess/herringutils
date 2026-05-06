@@ -9,10 +9,10 @@
 #' @importFrom gfutilities firstup firstlower
 #' @importFrom stringr str_extract
 #' @importFrom rosettafish en2fr
-#' @importFrom csasdown csas_table
+#' @importFrom csasdowntex csas_table
 #'
 #' @export
-#' @return a [csasdown::csas_table()]
+#' @return a [csasdowntex::csas_table()]
 input_data_table <- function(tab,
                              last_year = NA,
                              cap = "",
@@ -56,10 +56,10 @@ input_data_table <- function(tab,
 #' @param ... arguments passed to [csas_table()]
 #'
 #' @importFrom rosettafish en2fr
-#' @importFrom csasdown csas_table
+#' @importFrom csasdowntex csas_table
 #'
 #' @export
-#' @return a [csasdown::csas_table()]
+#' @return a [csasdowntex::csas_table()]
 basic_table <- function(tab,
                         cap = "",
                         translate = FALSE,
@@ -85,11 +85,11 @@ basic_table <- function(tab,
 #' @importFrom dplyr filter select mutate as_tibble group_by ungroup summarize full_join lead
 #' @importFrom reshape2 dcast
 #' @importFrom rosettafish en2fr
-#' @importFrom csasdown csas_table
+#' @importFrom csasdowntex csas_table
 #'
 #' @export
 #' @importFrom kableExtra add_header_above
-#' @return a [csasdown::csas_table()]
+#' @return a [csasdowntex::csas_table()]
 total_landed_catch_table <- function(tab,
                                      by_vec,
                                      first_yr,
@@ -131,11 +131,11 @@ total_landed_catch_table <- function(tab,
 #' @importFrom dplyr filter select mutate as_tibble group_by ungroup summarize full_join lead
 #' @importFrom reshape2 dcast
 #' @importFrom rosettafish en2fr
-#' @importFrom csasdown csas_table
+#' @importFrom csasdowntex csas_table
 #'
 #' @export
 #' @importFrom kableExtra add_header_above
-#' @return a [csasdown::csas_table()]
+#' @return a [csasdowntex::csas_table()]
 sok_harvest_table <- function(tab,
                               by_vec,
                               first_yr,
@@ -181,7 +181,7 @@ sok_harvest_table <- function(tab,
 #' @export
 #' @importFrom kableExtra add_header_above
 #' @importFrom dplyr filter
-#' @return a [csasdown::csas_table()]
+#' @return a [csasdowntex::csas_table()]
 spawn_index_by_area_table <- function(tab,
                                       cap = "",
                                       first_yr,
@@ -216,11 +216,11 @@ spawn_index_by_area_table <- function(tab,
 #' @importFrom dplyr filter select rename mutate
 #' @importFrom reshape2 dcast
 #' @importFrom rosettafish en2fr
-#' @importFrom csasdown csas_table
+#' @importFrom csasdowntex csas_table
 #'
 #' @export
 #' @importFrom kableExtra add_header_above
-#' @return a [csasdown::csas_table()]
+#' @return a [csasdowntex::csas_table()]
 spawn_index_table <- function(tab,
                               by_vec,
                               first_yr,
@@ -421,10 +421,10 @@ decision_tables_mp <- function(df,
 #'
 #' @importFrom tibble tibble
 #' @importFrom rosettafish en2fr
-#' @importFrom csasdown csas_table
+#' @importFrom csasdowntex csas_table
 #'
 #' @export
-#' @return a [csasdown::csas_table()]
+#' @return a [csasdowntex::csas_table()]
 prod_period_table <- function(dat,
                               cap = "",
                               translate = FALSE,

@@ -16,7 +16,7 @@ prod_period_table(dat, cap = "", translate = FALSE, ...)
 \item{...}{arguments passed to [csas_table()]}
 }
 \value{
-a [csasdown::csas_table()]
+a [csasdowntex::csas_table()]
 }
 \description{
 Table showing productive period and related information

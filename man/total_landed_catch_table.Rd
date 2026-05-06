@@ -27,7 +27,7 @@ total_landed_catch_table(
 \item{...}{arguments passed to [csas_table()]}
 }
 \value{
-a [csasdown::csas_table()]
+a [csasdowntex::csas_table()]
 }
 \description{
 Table showing the total landed catch by area for herring

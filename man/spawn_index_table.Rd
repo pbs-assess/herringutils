@@ -20,7 +20,7 @@ spawn_index_table(tab, by_vec, first_yr, cap = "", translate = FALSE, ...)
 \item{...}{arguments passed to [csas_table()]}
 }
 \value{
-a [csasdown::csas_table()]
+a [csasdowntex::csas_table()]
 }
 \description{
 Table for the spawn index in multiple areas

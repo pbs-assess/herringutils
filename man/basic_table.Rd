@@ -16,7 +16,7 @@ basic_table(tab, cap = "", translate = FALSE, ...)
 \item{...}{arguments passed to [csas_table()]}
 }
 \value{
-a [csasdown::csas_table()]
+a [csasdowntex::csas_table()]
 }
 \description{
 General table for the herring assessment.

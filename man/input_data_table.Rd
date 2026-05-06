@@ -18,7 +18,7 @@ input_data_table(tab, last_year = NA, cap = "", translate = FALSE, ...)
 \item{last-year}{Last year of data}
 }
 \value{
-a [csasdown::csas_table()]
+a [csasdowntex::csas_table()]
 }
 \description{
 Table showing input data to the herring assessment.

@@ -18,7 +18,7 @@ spawn_index_by_area_table(tab, cap = "", first_yr, translate = FALSE, ...)
 \item{...}{arguments passed to [csas_table()]}
 }
 \value{
-a [csasdown::csas_table()]
+a [csasdowntex::csas_table()]
 }
 \description{
 Table for spawn index by area

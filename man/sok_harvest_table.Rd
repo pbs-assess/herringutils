@@ -20,7 +20,7 @@ sok_harvest_table(tab, by_vec, first_yr, cap = "", translate = FALSE, ...)
 \item{...}{arguments passed to [csas_table()]}
 }
 \value{
-a [csasdown::csas_table()]
+a [csasdowntex::csas_table()]
 }
 \description{
 Table for the Spawn on kelp harvest for herring
